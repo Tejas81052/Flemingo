@@ -68,11 +68,39 @@ body {
 }
 
 .hero {
+  position: relative;
+  overflow: hidden;
   padding: 28px 30px;
   border-radius: calc(var(--radius-lg) + 6px);
-  background: linear-gradient(130deg, rgba(233, 136, 65, 0.28), rgba(42, 157, 143, 0.18));
+  background:
+    linear-gradient(125deg, rgba(255, 216, 160, 0.68), rgba(255, 152, 102, 0.52), rgba(42, 157, 143, 0.48), rgba(233, 136, 65, 0.58));
+  background-size: 280% 280%;
+  will-change: background-position;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  animation: heroGradientShift 14s ease-in-out infinite;
   border: 1px solid rgba(76, 54, 28, 0.16);
   box-shadow: var(--shadow);
+}
+
+.hero.reveal {
+  animation: rise 620ms ease both, heroGradientShift 14s ease-in-out infinite;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(circle at 20% 35%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 45%),
+    radial-gradient(circle at 75% 70%, rgba(255, 237, 210, 0.35), rgba(255, 237, 210, 0) 50%);
+  animation: heroGlowDrift 18s linear infinite;
+  pointer-events: none;
+}
+
+.hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 .eyebrow {
@@ -423,6 +451,37 @@ button:focus {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes heroGradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes heroGlowDrift {
+  0% {
+    transform: translate3d(-3%, -2%, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(4%, 3%, 0) rotate(10deg);
+  }
+  100% {
+    transform: translate3d(-3%, -2%, 0) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .hero::before {
+    animation: none;
   }
 }
 
