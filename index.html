@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLemingo Progress Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
+  <main class="app">
+    <header class="hero reveal">
+      <p class="eyebrow">Daily Inputs. Long-Term Compounding.</p>
+      <h1>FLemingo Activity Tracker</h1>
+      <p class="hero-copy">Create activities once, report daily results, and watch small actions stack into meaningful progress.</p>
+    </header>
+
+    <section class="panel reveal" aria-labelledby="activity-title">
+      <div class="panel-head">
+        <h2 id="activity-title">Create Activity</h2>
+      </div>
+      <form id="activity-form" class="activity-form" autocomplete="off">
+        <label>
+          Activity Name
+          <input id="activity-name" name="name" type="text" placeholder="Reading, Pushups, Sales Calls..." maxlength="50" required>
+        </label>
+        <label>
+          Unit
+          <input id="activity-unit" name="unit" type="text" placeholder="pages, reps, calls" maxlength="20" required>
+        </label>
+        <label>
+          Daily Target (optional)
+          <input id="activity-target" name="target" type="number" min="0" step="0.01" placeholder="20">
+        </label>
+        <label>
+          Start Date
+          <input id="activity-start-date" name="startDate" type="date" required>
+        </label>
+        <label>
+          Color
+          <input id="activity-color" name="color" type="color" value="#f97316">
+        </label>
+        <button type="submit" class="btn btn-primary">Add Activity</button>
+      </form>
+
+      <div class="activity-list-wrap">
+        <h3>Your Activities</h3>
+        <ul id="activity-list" class="activity-list"></ul>
+        <p id="activity-empty" class="empty-message">No activities yet. Add one to start tracking.</p>
+      </div>
+    </section>
+
+    <section class="panel reveal" aria-labelledby="checkin-title">
+      <div class="panel-head">
+        <h2 id="checkin-title">Daily Check-In</h2>
+      </div>
+      <div class="checkin-toolbar">
+        <label>
+          Check-In Date
+          <input id="checkin-date" type="date">
+        </label>
+        <button id="save-all-btn" type="button" class="btn btn-primary">Save All Entries</button>
+      </div>
+      <div class="table-wrap">
+        <table class="checkin-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Target</th>
+              <th>Result</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="checkin-body"></tbody>
+        </table>
+      </div>
+      <p id="checkin-empty" class="empty-message">Create an activity to start daily check-ins.</p>
+    </section>
+
+    <section class="panel reveal" aria-labelledby="analytics-title">
+      <div class="panel-head split">
+        <h2 id="analytics-title">Compounding Analytics</h2>
+        <div class="toolbar-inline">
+          <label>
+            Activity
+            <select id="activity-select"></select>
+          </label>
+        </div>
+      </div>
+
+      <div class="range-switch" role="group" aria-label="Time range">
+        <button type="button" data-range="7" class="range-btn">7D</button>
+        <button type="button" data-range="30" class="range-btn active">30D</button>
+        <button type="button" data-range="90" class="range-btn">90D</button>
+        <button type="button" data-range="all" class="range-btn">All</button>
+      </div>
+
+      <div id="metrics" class="metrics"></div>
+
+      <div class="chart-grid">
+        <article class="chart-card">
+          <h3>Daily Trend</h3>
+          <div class="chart-wrap">
+            <canvas id="daily-chart" aria-label="Daily progress chart"></canvas>
+          </div>
+        </article>
+        <article class="chart-card">
+          <div class="chart-title-row">
+            <h3>Cumulative Growth</h3>
+            <label class="toggle-wrap">
+              <input id="projection-toggle" type="checkbox" checked>
+              1% Better Projection
+            </label>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="cumulative-chart" aria-label="Cumulative growth chart"></canvas>
+          </div>
+        </article>
+      </div>
+
+      <div id="insight" class="insight"></div>
+    </section>
+
+    <section class="panel reveal" aria-labelledby="data-title">
+      <div class="panel-head">
+        <h2 id="data-title">Data Controls</h2>
+      </div>
+      <div class="data-controls">
+        <button id="export-btn" type="button" class="btn">Export JSON</button>
+        <label class="btn file-import" for="import-file">Import JSON</label>
+        <input id="import-file" type="file" accept="application/json" hidden>
+      </div>
+      <p class="small-note">Your data is stored locally in your browser.</p>
+    </section>
+  </main>
+</body>
+</html>
