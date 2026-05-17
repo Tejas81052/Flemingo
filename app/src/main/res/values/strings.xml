@@ -8,6 +8,8 @@
     <string name="refresh_button">Refresh page</string>
     <string name="home_button">Open home</string>
     <string name="browser_menu">Menu</string>
+    <string name="browser_menu_page_title">For this page</string>
+    <string name="browser_menu_library_title">Library</string>
     <string name="bookmark_button">Bookmarks</string>
     <string name="tab_switcher_button">Switch tabs</string>
     <string name="search_button">Search</string>
@@ -22,9 +24,12 @@
     <string name="default_browser_not_changed">Default browser was not changed.</string>
     <string name="default_browser_already_set">Effective Browser is already your default browser.</string>
     <string name="share_page">Share page</string>
+    <string name="save_page">Save</string>
+    <string name="saved_page">Saved</string>
     <string name="copy_link">Copy link</string>
     <string name="link_copied">Link copied.</string>
     <string name="print_page">Print / Save as PDF</string>
+    <string name="menu_print_pdf">Print · PDF</string>
     <string name="print_unavailable">Printing isn\'t available on this device.</string>
     <string name="no_page_loaded">Open a page first.</string>
     <string name="allow_once">Allow this time</string>
@@ -131,6 +136,7 @@
     <string name="blocklist_update_skipped">Block list was already checked recently.</string>
 
     <string name="blocked_sites_title">Blocked sites</string>
+    <string name="blocked_sites_summary_domains">%1$d domains</string>
     <string name="blocked_sites_empty_title">Your block list is empty</string>
     <string name="blocked_sites_empty_subtitle">Add domains you want this browser to refuse to load. Paste one per line.</string>
     <string name="blocked_sites_add_first">Add your first site</string>
@@ -207,6 +213,7 @@
     <string name="about_version_label">Version %1$s</string>
 
     <string name="library_title">Library</string>
+    <string name="bookmarks_history">Bookmarks &amp; history</string>
     <string name="tab_bookmarks">Bookmarks</string>
     <string name="tab_history">History</string>
     <string name="add_bookmark">Add bookmark</string>

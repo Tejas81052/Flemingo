@@ -1,18 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Effective Browser v10 — "ink" palette (night theme).
+  Same hue family as paper (warm ~50°), just inverted lightness; the
+  accent stays terracotta but shifts one step warmer-bright so it
+  still earns contrast against the dark surface.
+-->
 <resources>
     <color name="browser_bg_solid">#211C16</color>
     <color name="browser_surface">#2A241D</color>
     <color name="browser_surface_muted">#332C24</color>
     <color name="browser_stroke">#3F372D</color>
+
     <color name="browser_accent">#E26545</color>
     <color name="browser_accent_soft">#3F2A22</color>
     <color name="browser_on_accent">#1A140F</color>
     <color name="browser_chip_bg">#3F2A22</color>
+
     <color name="browser_text">#F0E8D8</color>
     <color name="browser_text_2">#C8BFA9</color>
     <color name="browser_hint">#9C907B</color>
     <color name="browser_faint">#6C6354</color>
     <color name="browser_icon">#E0D6C2</color>
+
     <color name="browser_progress_track">#00000000</color>
     <color name="browser_danger">#F0664A</color>
     <color name="browser_success">#82C89B</color>

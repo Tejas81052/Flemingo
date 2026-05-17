@@ -12,15 +12,24 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
 import android.os.Message
 import android.provider.Settings
 import android.text.Editable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.ContextMenu
-import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -41,10 +50,13 @@ import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ListPopupWindow
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -52,7 +64,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -68,6 +79,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.behavior.HideViewOnScrollBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 // URI / IDN / Locale references previously lived in this file's URL
@@ -152,6 +164,8 @@ import com.google.android.material.snackbar.Snackbar
 class MainActivity : AppCompatActivity() {
     private lateinit var rootView: View
     private lateinit var addressBar: EditText
+    private lateinit var addressSuggestionAdapter: AddressSuggestionAdapter
+    private var addressSuggestionPopup: ListPopupWindow? = null
     private lateinit var captionView: TextView
     private lateinit var securityIndicator: ImageView
     private lateinit var webContainer: androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -174,7 +188,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var menuButton: ImageButton
     // V8: back/forward dropped from the bottom nav in favour of
     // bookmark / tabs / search / home / menu. Back is handled by the
-    // system gesture (configureBackHandling); forward via the PopupMenu.
+    // system gesture (configureBackHandling); forward via the menu sheet.
     // V9: refresh moved from the (removed) bottom nav to the top app
     // bar — refreshButton lives next to the address pill, not down here.
     private lateinit var bookmarkButton: ImageButton
@@ -720,6 +734,7 @@ class MainActivity : AppCompatActivity() {
         // overlay-popup design's V1 spoofing surface is gone because every
         // chrome update is sourced from the foreground tab.
         updateAddressBar(target.webView.url ?: target.displayUrl.takeIf { it.isNotBlank() })
+        renderBrowserCaption(SearchEngineResolver.displayName(prefs), target.isPrivate)
         updateNavigationButtons()
         // Find-in-page closes on tab switch — the query rarely makes sense
         // against a different page and the find state isn't migrated.
@@ -910,8 +925,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureNavigation() {
+        configureAddressSuggestions()
+
         goButton.setOnClickListener {
-            loadAddress(resolveUserInput(addressBar.text?.toString().orEmpty()))
+            submitAddressBarInput()
         }
 
         menuButton.setOnClickListener {
@@ -923,16 +940,37 @@ class MainActivity : AppCompatActivity() {
                 event.action == KeyEvent.ACTION_DOWN
 
             if (actionId == EditorInfo.IME_ACTION_GO || pressedEnter) {
-                loadAddress(resolveUserInput(addressBar.text?.toString().orEmpty()))
+                submitAddressBarInput()
                 true
             } else {
                 false
             }
         }
 
+        addressBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: Editable?) {
+                if (addressBar.hasFocus()) {
+                    refreshAddressSuggestions(s?.toString().orEmpty())
+                }
+            }
+        })
+
         addressBar.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                addressBar.post { addressBar.selectAll() }
+                addressBar.setText(currentAddressUrl())
+                addressBar.post {
+                    addressBar.selectAll()
+                    refreshAddressSuggestions("")
+                }
+            } else {
+                addressBar.postDelayed({
+                    if (!addressBar.hasFocus()) {
+                        dismissAddressSuggestions()
+                    }
+                }, ADDRESS_SUGGESTION_DISMISS_DELAY_MS)
+                renderAddressBar(currentAddressUrl())
             }
         }
 
@@ -969,6 +1007,89 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateNavigationButtons()
+    }
+
+    private fun configureAddressSuggestions() {
+        addressSuggestionAdapter = AddressSuggestionAdapter(this)
+        addressSuggestionPopup = ListPopupWindow(this).apply {
+            setAdapter(addressSuggestionAdapter)
+            setBackgroundDrawable(ContextCompat.getDrawable(this@MainActivity, R.drawable.bg_address_suggestions))
+            setOnItemClickListener { _, _, position, _ ->
+                val entry = addressSuggestionAdapter.getItem(position) ?: return@setOnItemClickListener
+                dismissAddressSuggestions()
+                addressBar.clearFocus()
+                hideKeyboard(addressBar)
+                loadAddress(entry.url)
+            }
+        }
+    }
+
+    private fun submitAddressBarInput() {
+        val resolved = resolveUserInput(addressBar.text?.toString().orEmpty())
+        dismissAddressSuggestions()
+        addressBar.clearFocus()
+        hideKeyboard(addressBar)
+        loadAddress(resolved)
+    }
+
+    private fun refreshAddressSuggestions(query: String) {
+        val suggestions = buildAddressSuggestions(query)
+        addressSuggestionAdapter.submit(suggestions)
+        if (suggestions.isEmpty()) {
+            dismissAddressSuggestions()
+        } else {
+            showAddressSuggestions()
+        }
+    }
+
+    private fun showAddressSuggestions() {
+        val popup = addressSuggestionPopup ?: return
+        if (!addressBar.hasFocus() || addressBar.windowToken == null) return
+
+        val anchor = addressSuggestionAnchor()
+        popup.setAnchorView(anchor)
+        popup.width = anchor.width.coerceAtLeast(dp(260))
+        popup.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        popup.verticalOffset = dp(6)
+        if (!popup.isShowing) {
+            popup.show()
+        }
+    }
+
+    private fun dismissAddressSuggestions() {
+        addressSuggestionPopup?.dismiss()
+    }
+
+    private fun buildAddressSuggestions(query: String): List<HistoryEntry> {
+        val needle = query.trim().lowercase()
+        val seen = HashSet<String>()
+        return HistoryRepository.snapshot().asSequence()
+            .filter { entry ->
+                if (needle.isBlank()) {
+                    true
+                } else {
+                    entry.title.lowercase().contains(needle) ||
+                        entry.url.lowercase().contains(needle) ||
+                        (Uri.parse(entry.url).host?.lowercase()?.contains(needle) == true)
+                }
+            }
+            .filter { seen.add(UrlInputUtils.canonicalForCompare(it.url)) }
+            .take(ADDRESS_SUGGESTION_LIMIT)
+            .toList()
+    }
+
+    private fun addressSuggestionAnchor(): View {
+        return (addressBar.parent as? View) ?: addressBar
+    }
+
+    private fun currentAddressUrl(): String {
+        val tab = activeTabOrNull ?: return ""
+        return tab.webView.url ?: tab.displayUrl.takeIf { it.isNotBlank() }.orEmpty()
+    }
+
+    private fun hideKeyboard(view: View) {
+        getSystemService<InputMethodManager>()
+            ?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun configureFindBar() {
@@ -2388,9 +2509,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateAddressBar(url: String?) {
         if (!url.isNullOrBlank() && !addressBar.isFocused) {
-            val display = prettifyUrl(url)
-            addressBar.setText(display)
-            addressBar.setSelection(addressBar.text.length)
+            renderAddressBar(url)
         }
         updateSecurityIndicator(url)
     }
@@ -2399,6 +2518,39 @@ class MainActivity : AppCompatActivity() {
     // [UrlInputUtils.prettifyUrl]; this thin wrapper exists only because
     // the call site reads better as `prettifyUrl(url)`.
     private fun prettifyUrl(url: String): String = UrlInputUtils.prettifyUrl(url)
+
+    private fun renderAddressBar(url: String?) {
+        if (addressBar.hasFocus()) return
+        val display = url.orEmpty()
+            .takeIf { it.isNotBlank() }
+            ?.let(::prettifyUrl)
+            .orEmpty()
+            .removePrefix("https://")
+            .removePrefix("http://")
+
+        if (display.isBlank()) {
+            addressBar.setText("")
+            return
+        }
+
+        val pathStart = display.indexOfFirst { it == '/' || it == '?' || it == '#' }
+            .takeIf { it >= 0 }
+            ?: display.length
+        val host = display.substring(0, pathStart)
+        val path = display.substring(pathStart)
+        val span = SpannableString(host + path)
+        span.setSpan(StyleSpan(Typeface.BOLD), 0, host.length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        if (path.isNotEmpty()) {
+            span.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(this, R.color.browser_faint)),
+                host.length,
+                span.length,
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE,
+            )
+        }
+        addressBar.setText(span, TextView.BufferType.SPANNABLE)
+        addressBar.setSelection(span.length)
+    }
 
     private fun updateSecurityIndicator(url: String?) {
         val isSecure = url == null ||
@@ -2488,142 +2640,134 @@ class MainActivity : AppCompatActivity() {
     // ---------------------------------------------------------------------
 
     private fun showBrowserMenu() {
-        PopupMenu(this, menuButton).apply {
-            menuInflater.inflate(R.menu.browser_menu, menu)
+        val view = layoutInflater.inflate(R.layout.sheet_browser_menu, null)
+        val dialog = BottomSheetDialog(this)
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setOnShowListener {
+            dialog.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+                ?.background = ColorDrawable(Color.TRANSPARENT)
+        }
 
-            val tab = activeTabOrNull
-            val currentUrl = tab?.webView?.url.orEmpty()
-            val isBookmarked = currentUrl.isNotBlank() && BookmarkRepository.isBookmarked(currentUrl)
-            menu.findItem(R.id.action_bookmark_toggle).title = getString(
-                if (isBookmarked) R.string.remove_bookmark else R.string.add_bookmark,
-            )
-            menu.findItem(R.id.action_desktop_mode).apply {
-                isCheckable = true
-                isChecked = prefs.desktopMode
+        val tab = activeTabOrNull
+        val currentUrl = tab?.webView?.url.orEmpty()
+        val hasPage = currentUrl.isNotBlank()
+        val isBookmarked = hasPage && BookmarkRepository.isBookmarked(currentUrl)
+
+        val saveTile: LinearLayout = view.findViewById(R.id.menu_save)
+        val saveLabel: TextView = view.findViewById(R.id.menu_save_label)
+        val saveIcon: ImageView = view.findViewById(R.id.menu_save_icon)
+        saveTile.setBackgroundResource(
+            if (isBookmarked) R.drawable.bg_menu_quick_action_selected else R.drawable.bg_menu_quick_action,
+        )
+        saveLabel.setText(if (isBookmarked) R.string.saved_page else R.string.save_page)
+        saveLabel.setTextColor(ContextCompat.getColor(this, R.color.browser_accent))
+        saveIcon.imageTintList = ContextCompat.getColorStateList(this, R.color.browser_accent)
+
+        setMenuTileEnabled(view.findViewById(R.id.menu_share), hasPage)
+        setMenuTileEnabled(saveTile, hasPage)
+        setMenuTileEnabled(view.findViewById(R.id.menu_reader), canEnterReaderMode())
+        setMenuTileEnabled(view.findViewById(R.id.menu_find), hasPage)
+        setMenuTileEnabled(view.findViewById(R.id.menu_forward), tab?.webView?.canGoForward() == true)
+        setMenuTileEnabled(view.findViewById(R.id.menu_private), multiProfileSupported)
+        setMenuTileEnabled(view.findViewById(R.id.menu_print), hasPage)
+
+        val downloads = DownloadRepository.getSnapshot()
+        val activeDownloads = downloads.count {
+            it.status == DownloadStatus.QUEUED || it.status == DownloadStatus.DOWNLOADING
+        }
+        val completedDownloads = downloads.count { it.status == DownloadStatus.COMPLETED }
+        view.findViewById<TextView>(R.id.menu_downloads_summary).text =
+            getString(R.string.downloads_summary, activeDownloads, completedDownloads)
+
+        view.findViewById<TextView>(R.id.menu_blocked_summary).text =
+            getString(R.string.blocked_sites_summary_domains, BlockedSitesRepository.snapshot().size)
+
+        view.findViewById<ImageButton>(R.id.menu_close).setOnClickListener { dialog.dismiss() }
+        view.findViewById<View>(R.id.menu_share).setOnClickListener {
+            dialog.dismiss()
+            shareCurrentPage()
+        }
+        saveTile.setOnClickListener {
+            dialog.dismiss()
+            toggleCurrentPageBookmark(tab)
+        }
+        view.findViewById<View>(R.id.menu_reader).setOnClickListener {
+            dialog.dismiss()
+            enterReaderMode()
+        }
+        view.findViewById<View>(R.id.menu_find).setOnClickListener {
+            dialog.dismiss()
+            showFindBar()
+        }
+        view.findViewById<View>(R.id.menu_forward).setOnClickListener {
+            dialog.dismiss()
+            activeTabOrNull?.webView?.goForward()
+        }
+        view.findViewById<View>(R.id.menu_desktop).setOnClickListener {
+            dialog.dismiss()
+            toggleDesktopMode()
+        }
+        view.findViewById<View>(R.id.menu_print).setOnClickListener {
+            dialog.dismiss()
+            printCurrentPage()
+        }
+        view.findViewById<View>(R.id.menu_private).setOnClickListener {
+            dialog.dismiss()
+            openNewTab(url = homeUrl(), switchTo = true, isPrivate = true)
+        }
+        view.findViewById<View>(R.id.menu_downloads).setOnClickListener {
+            dialog.dismiss()
+            openDownloadsScreen()
+        }
+        view.findViewById<View>(R.id.menu_library).setOnClickListener {
+            dialog.dismiss()
+            openLibraryLauncher.launch(Intent(this, BookmarksActivity::class.java))
+        }
+        view.findViewById<View>(R.id.menu_blocked).setOnClickListener {
+            dialog.dismiss()
+            startActivity(Intent(this, BlockedSitesActivity::class.java))
+        }
+        view.findViewById<View>(R.id.menu_settings).setOnClickListener {
+            dialog.dismiss()
+            openSettingsLauncher.launch(Intent(this, SettingsActivity::class.java))
+        }
+
+        dialog.show()
+    }
+
+    private fun setMenuTileEnabled(tile: View, enabled: Boolean) {
+        tile.isEnabled = enabled
+        tile.alpha = if (enabled) 1f else 0.38f
+        if (tile is ViewGroup) {
+            for (i in 0 until tile.childCount) {
+                tile.getChildAt(i).isEnabled = enabled
             }
+        }
+    }
 
-            // Multi-tab menu items. Built fresh on every menu show so the
-            // tab count stays accurate even after the user closed/opened
-            // tabs via the switcher.
-            menu.findItem(R.id.action_show_tabs).title =
-                getString(R.string.tabs_with_count, tabs.size)
-            // Close-tab is only meaningful when there's more than one open
-            // — closing the last tab is "back to home" via the regular
-            // back-pressed handler.
-            menu.findItem(R.id.action_close_tab).isVisible = tabs.size > 1
-            // Hide "New private tab" entirely on WebViews that don't
-            // support MULTI_PROFILE rather than offering a degraded
-            // fake-private mode where cookies still share the default
-            // session. The user can update Android System WebView via
-            // Play to gain the feature.
-            menu.findItem(R.id.action_new_private_tab).isVisible = multiProfileSupported
-            // Reader mode is only meaningful for http(s) pages — for
-            // about:/data:/the reader view itself there's nothing to
-            // extract, and we'd just toast "no readable content" on
-            // tap. Hiding the entry is the cleaner UX.
-            menu.findItem(R.id.action_reader_mode).isVisible = canEnterReaderMode()
+    private fun toggleCurrentPageBookmark(tab: Tab?) {
+        val url = tab?.webView?.url
+        if (url.isNullOrBlank()) {
+            showToast(getString(R.string.no_page_loaded))
+            return
+        }
+        val nowSaved = BookmarkRepository.addOrRemove(url, tab.webView.title.orEmpty())
+        showToast(
+            getString(
+                if (nowSaved) R.string.bookmark_added else R.string.bookmark_removed,
+            ),
+        )
+    }
 
-            setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_new_tab -> {
-                        openNewTab(url = homeUrl(), switchTo = true)
-                        true
-                    }
-
-                    R.id.action_new_private_tab -> {
-                        openNewTab(
-                            url = homeUrl(),
-                            switchTo = true,
-                            isPrivate = true,
-                        )
-                        true
-                    }
-
-                    R.id.action_show_tabs -> {
-                        showTabSwitcher()
-                        true
-                    }
-
-                    R.id.action_close_tab -> {
-                        if (tabs.size > 1) closeTab(activeTabIndex)
-                        true
-                    }
-
-                    R.id.action_bookmark_toggle -> {
-                        val url = tab?.webView?.url
-                        if (url.isNullOrBlank()) {
-                            showToast(getString(R.string.no_page_loaded))
-                        } else {
-                            val nowSaved = BookmarkRepository.addOrRemove(url, tab.webView.title.orEmpty())
-                            showToast(
-                                getString(
-                                    if (nowSaved) R.string.bookmark_added else R.string.bookmark_removed,
-                                ),
-                            )
-                        }
-                        true
-                    }
-
-                    R.id.action_library -> {
-                        openLibraryLauncher.launch(Intent(this@MainActivity, BookmarksActivity::class.java))
-                        true
-                    }
-
-                    R.id.action_find_in_page -> {
-                        showFindBar()
-                        true
-                    }
-
-                    R.id.action_reader_mode -> {
-                        enterReaderMode()
-                        true
-                    }
-
-                    R.id.action_desktop_mode -> {
-                        prefs.desktopMode = !prefs.desktopMode
-                        applyPreferences()
-                        showToast(
-                            getString(
-                                if (prefs.desktopMode) R.string.desktop_mode_on else R.string.desktop_mode_off,
-                            ),
-                        )
-                        true
-                    }
-
-                    R.id.action_downloads -> {
-                        openDownloadsScreen()
-                        true
-                    }
-
-                    R.id.action_settings -> {
-                        openSettingsLauncher.launch(Intent(this@MainActivity, SettingsActivity::class.java))
-                        true
-                    }
-
-                    R.id.action_share_page -> {
-                        shareCurrentPage()
-                        true
-                    }
-
-                    R.id.action_copy_link -> {
-                        copyCurrentPageLink()
-                        true
-                    }
-
-                    R.id.action_print -> {
-                        printCurrentPage()
-                        true
-                    }
-
-                    R.id.action_set_default_browser -> {
-                        requestDefaultBrowserRole()
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }.show()
+    private fun toggleDesktopMode() {
+        prefs.desktopMode = !prefs.desktopMode
+        applyPreferences()
+        showToast(
+            getString(
+                if (prefs.desktopMode) R.string.desktop_mode_on else R.string.desktop_mode_off,
+            ),
+        )
     }
 
     /**
@@ -2722,7 +2866,27 @@ class MainActivity : AppCompatActivity() {
     private fun updateSearchEngineUi() {
         val name = SearchEngineResolver.displayName(prefs)
         addressBar.hint = getString(R.string.address_hint_with_engine, name)
-        captionView.text = getString(R.string.browser_caption_with_engine, name)
+        renderBrowserCaption(name, activeTabOrNull?.isPrivate == true)
+    }
+
+    private fun renderBrowserCaption(searchEngineName: String, isPrivate: Boolean) {
+        val span = SpannableStringBuilder()
+        span.append("● ")
+        span.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(this, R.color.browser_accent)),
+            0,
+            1,
+            Spanned.SPAN_INCLUSIVE_INCLUSIVE,
+        )
+        span.append(if (isPrivate) "Private · " else "Search · ")
+        span.append(searchEngineName)
+        span.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(this, R.color.browser_hint)),
+            2,
+            span.length,
+            Spanned.SPAN_INCLUSIVE_INCLUSIVE,
+        )
+        captionView.text = span
     }
 
     private fun requestDefaultBrowserRole() {
@@ -3063,6 +3227,38 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    private class AddressSuggestionAdapter(
+        private val context: Context,
+    ) : BaseAdapter() {
+        private var items: List<HistoryEntry> = emptyList()
+
+        fun submit(newItems: List<HistoryEntry>) {
+            items = newItems
+            notifyDataSetChanged()
+        }
+
+        override fun getCount(): Int = items.size
+
+        override fun getItem(position: Int): HistoryEntry? = items.getOrNull(position)
+
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view = convertView ?: LayoutInflater.from(context)
+                .inflate(R.layout.item_address_suggestion, parent, false)
+            val entry = getItem(position) ?: return view
+            val title = view.findViewById<TextView>(R.id.suggestion_title)
+            val url = view.findViewById<TextView>(R.id.suggestion_url)
+            title.text = entry.title.ifBlank { entry.url }
+            url.text = UrlInputUtils.prettifyUrl(entry.url)
+                .removePrefix("https://")
+                .removePrefix("http://")
+            return view
+        }
+    }
+
     companion object {
         // Slightly longer than the Material collapse / slide animation
         // (~300 ms) so transient WebView scroll deltas during the
@@ -3072,6 +3268,8 @@ class MainActivity : AppCompatActivity() {
         /** Empirically about the longest gap that still feels responsive
          *  while collapsing the per-keystroke `findAllAsync` cost. */
         private const val FIND_DEBOUNCE_MS = 150L
+        private const val ADDRESS_SUGGESTION_LIMIT = 8
+        private const val ADDRESS_SUGGESTION_DISMISS_DELAY_MS = 120L
 
         private const val STATE_TAB_URLS = "state_tab_urls"
         private const val STATE_ACTIVE_TAB_INDEX = "state_active_tab_index"

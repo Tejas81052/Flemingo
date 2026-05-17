@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Tab-count badge under the tabs icon. A soft tinted rectangle so
+  the number reads as a count chip, not a free-floating glyph.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/browser_surface_muted" />
+    <corners android:radius="4dp" />
+    <size
+        android:width="16dp"
+        android:height="14dp" />
+</shape>

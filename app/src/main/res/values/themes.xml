@@ -60,4 +60,87 @@
         <item name="android:textColor">@color/browser_hint</item>
         <item name="android:textSize">12sp</item>
     </style>
+
+    <style name="BrowserMenuQuickAction">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">84dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_menu_quick_action</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingBottom">9dp</item>
+    </style>
+
+    <style name="BrowserMenuQuickIcon">
+        <item name="android:layout_width">25dp</item>
+        <item name="android:layout_height">25dp</item>
+    </style>
+
+    <style name="BrowserMenuQuickLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">7dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="BrowserMenuListRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">68dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">28dp</item>
+        <item name="android:paddingEnd">24dp</item>
+    </style>
+
+    <style name="BrowserMenuListIcon">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:background">@drawable/bg_menu_icon_box</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="BrowserMenuListText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="BrowserMenuListTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="BrowserMenuListSummary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/browser_hint</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="BrowserMenuChevron">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:padding">4dp</item>
+    </style>
 </resources>

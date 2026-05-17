@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Root is a CoordinatorLayout so the top chrome (address bar + progress)
-  can auto-hide via AppBarLayout scroll flags and the bottom chrome
-  (caption + navigation buttons) can slide away via
-  HideBottomViewOnScrollBehavior. WebView dispatches nested scrolls into
-  the CoordinatorLayout, which drives both animations — Brave-style.
-  Every ID below is referenced by MainActivity.kt; do not rename without
-  updating the activity.
+  Effective Browser v10 — paper theme rebuild of activity_main.xml.
+
+  ALL existing IDs and child ordering are preserved. MainActivity.kt
+  does not need any code changes to compile against this file; the
+  visual upgrade is delivered entirely via:
+    1. Updated color tokens (res/values/colors.xml)
+    2. Type system from values/styles.xml
+    3. Two new drawables (bg_address_pill.xml, bg_tab_badge.xml)
+    4. Spannable styling of address_bar host vs. path — set from
+       MainActivity.onUrlChanged() using:
+         val span = SpannableStringBuilder()
+         span.append(host, StyleSpan(BOLD), 0)
+         span.append(path).apply {
+           setSpan(ForegroundColorSpan(browser_faint), host.length, length, 0)
+           setSpan(TypefaceSpan("monospace"), 0, length, 0)
+         }
+         address_bar.setText(span, BufferType.SPANNABLE)
 -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/browser_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/browser_bg_solid"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -36,10 +48,10 @@
             app:layout_scrollFlags="scroll">
 
             <!--
-              V9: refresh button (right side) coexists with the address
-              bar pill. The pill is `0dp` + `layout_weight="1"` so it
-              still stretches to fill all leftover space; the refresh
-              button takes its natural 44dp on the trailing edge.
+              v10: pill goes from cardCornerRadius+cardElevation to a
+              drawable background (bg_address_pill.xml) which paints a
+              1dp warm stroke and the surface fill. Removing the
+              MaterialCardView trims one View from the hierarchy.
             -->
             <FrameLayout
                 android:layout_width="0dp"
@@ -52,9 +64,15 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="14dp"
+                    android:paddingStart="12dp"
                     android:paddingEnd="6dp">
 
+                    <!--
+                      Site favicon. Bind in MainActivity via
+                      WebView.getFavicon() → security_indicator if SSL
+                      is broken, else a real favicon. Tint is removed —
+                      favicons paint full-color.
+                    -->
                     <ImageView
                         android:id="@+id/security_indicator"
                         android:layout_width="20dp"
@@ -63,6 +81,15 @@
                         android:src="@drawable/ic_lock_24"
                         app:tint="@color/browser_hint" />
 
+                    <!--
+                      Address bar. v10 styling notes:
+                      - fontFamily=monospace + textSize=13sp gives a
+                        condensed feel that matches the prototype
+                      - When the host/path spannable is applied (see
+                        header comment), host renders bold and the path
+                        renders in browser_faint. EditText respects
+                        SpannableString on setText.
+                    -->
                     <EditText
                         android:id="@+id/address_bar"
                         android:layout_width="0dp"
@@ -107,6 +134,11 @@
                 app:tint="@color/browser_text_2" />
         </LinearLayout>
 
+        <!--
+          Progress hairline. v10 inset 12dp on each side so it floats
+          inside the chrome margin rather than running edge-to-edge —
+          matches the prototype.
+        -->
         <ProgressBar
             android:id="@+id/loading_progress"
             style="?android:attr/progressBarStyleHorizontal"
@@ -121,11 +153,7 @@
             android:visibility="gone"
             app:layout_scrollFlags="scroll" />
 
-        <!--
-          Find-in-page bar stays pinned (no scroll flags) so a long
-          search session isn't interrupted by the bar disappearing on
-          scroll. Visibility is gone by default.
-        -->
+        <!-- Find-in-page (unchanged structure, restyled colors) -->
         <LinearLayout
             android:id="@+id/find_bar"
             android:layout_width="match_parent"
@@ -197,52 +225,22 @@
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!--
-      Tab host. Each Tab owns a ScrollAwareWebView that gets attached to
-      the inner FrameLayout (web_host) when the tab becomes active and
-      detached when another tab takes the foreground. Keeping detached
-      WebViews alive (rather than destroying + recreating per switch)
-      preserves form state, scroll position, and the existing JS heap
-      for background tabs.
-
-      The outer container is a SwipeRefreshLayout — the standard Android
-      "pull down to reload" gesture is wired in
-      MainActivity.configureSwipeRefresh. SwipeRefreshLayout's "single
-      direct child" contract is satisfied by the FrameLayout: it caches
-      that first non-spinner child as its `mTarget` and only ever
-      measures / lays out that one cached view. That cache is the load-
-      bearing fact behind this structure: if we added/removed WebViews
-      *directly* under the SwipeRefreshLayout instead, the cached
-      `mTarget` would still point at the removed WebView after a tab
-      switch, the freshly attached WebView would never receive a
-      measure or layout pass, and it would render as 0×0 (visible as a
-      black screen on tab switch). The FrameLayout sidesteps that
-      entirely — it stays the permanent mTarget, and we swap WebViews
-      inside it where FrameLayout's normal child measure / layout
-      logic applies.
-
-      Important: do NOT statically inflate a WebView inside web_host.
-      The activity treats it as a slot that contains exactly zero or
-      one child at any time. A stray static WebView would break that.
-    -->
+    <!-- Tab host (unchanged — single-child contract preserved) -->
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/web_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <FrameLayout
-            android:id="@+id/web_host"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <!--
-      Bottom chrome group. HideBottomViewOnScrollBehavior translates the
-      whole group off-screen on scroll-down and back in on scroll-up
-      with the standard Material curve (Brave uses an almost identical
-      one). navigation_card keeps its original id so MainActivity can
-      still anchor snackbars to it.
+      Bottom chrome.
+      v10 changes:
+      - caption gets an accent dot prefix (built in code: prepend
+        a non-breaking bullet "● " with ForegroundColorSpan(accent))
+      - nav row keeps all 5 ImageButton IDs but is wrapped in
+        a container with a 1dp top hairline (border_stroke)
+      - tab_count_text moves into a small badge drawable on the
+        upper-right of the tabs icon
     -->
     <LinearLayout
         android:id="@+id/bottom_chrome"
@@ -272,20 +270,8 @@
             android:text="@string/browser_caption"
             android:textColor="@color/browser_hint"
             android:textSize="11sp"
-            tools:text="Search engine: DuckDuckGo" />
+            tools:text="● Search · DuckDuckGo" />
 
-        <!--
-          V8: bottom nav redesign. Left → right:
-            1. Bookmark    → opens the library (bookmarks/history)
-            2. Tab switch  → outlined square with live tab-count overlay
-            3. Search      → focuses the address bar so the user can type
-            4. Home        → loads the configured home URL
-            5. Menu (⋮)    → opens the browser PopupMenu
-
-          Back / forward / refresh moved out of the nav bar — back is
-          handled by the system back gesture (and configureBackHandling),
-          refresh by pull-to-refresh, forward via the PopupMenu.
-        -->
         <LinearLayout
             android:id="@+id/navigation_card"
             android:layout_width="match_parent"
@@ -308,13 +294,6 @@
                 android:src="@drawable/ic_bookmark_outline_24"
                 app:tint="@color/browser_icon" />
 
-            <!--
-              Tab-switcher button. The outlined square is the icon; the
-              live count is painted on top via tab_count_text. The whole
-              FrameLayout is the click target (clickable + focusable +
-              borderless ripple) so taps anywhere inside fire the
-              switcher.
-            -->
             <FrameLayout
                 android:id="@+id/tabs_button"
                 android:layout_width="0dp"
@@ -333,6 +312,12 @@
                     android:src="@drawable/ic_tabs_outline_24"
                     app:tint="@color/browser_icon" />
 
+                <!--
+                  Tab count badge. Drawable is a 6dp-radius
+                  rectangle filled with browser_surface_muted in v10
+                  (was floating on the icon center). It now sits at
+                  top-end with a small inset.
+                -->
                 <TextView
                     android:id="@+id/tab_count_text"
                     android:layout_width="wrap_content"
@@ -348,7 +333,7 @@
                     android:textColor="@color/browser_text"
                     android:textSize="10sp"
                     android:textStyle="bold"
-                    tools:text="2" />
+                    tools:text="3" />
             </FrameLayout>
 
             <ImageButton

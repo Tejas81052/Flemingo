@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/browser_menu_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_browser_menu_sheet"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <View
+        android:layout_width="50dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_menu_handle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="28dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="serif"
+            android:text="@string/browser_menu_page_title"
+            android:textColor="@color/browser_text_2"
+            android:textSize="23sp"
+            android:textStyle="italic" />
+
+        <ImageButton
+            android:id="@+id/menu_close"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/find_close"
+            android:padding="9dp"
+            android:src="@drawable/ic_close_24"
+            app:tint="@color/browser_text_2" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <LinearLayout
+            android:id="@+id/menu_share"
+            style="@style/BrowserMenuQuickAction">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_share_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/share_page" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_save"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
+
+            <ImageView
+                android:id="@+id/menu_save_icon"
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_bookmark_outline_24"
+                app:tint="@color/browser_accent" />
+
+            <TextView
+                android:id="@+id/menu_save_label"
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/save_page"
+                android:textColor="@color/browser_accent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_reader"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_text_fields_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/action_reader_mode" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_find"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_search_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/find_in_page" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <LinearLayout
+            android:id="@+id/menu_forward"
+            style="@style/BrowserMenuQuickAction">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_arrow_forward_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/forward_button" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_desktop"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_desktop_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/setting_desktop_mode_title" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_print"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_print_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/menu_print_pdf" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_private"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_private_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/new_private_tab" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/browser_stroke" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="serif"
+        android:paddingStart="28dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="8dp"
+        android:text="@string/browser_menu_library_title"
+        android:textColor="@color/browser_text_2"
+        android:textSize="17sp"
+        android:textStyle="italic" />
+
+    <LinearLayout
+        android:id="@+id/menu_downloads"
+        style="@style/BrowserMenuListRow">
+
+        <ImageView
+            style="@style/BrowserMenuListIcon"
+            android:src="@drawable/ic_download_24"
+            app:tint="@color/browser_icon" />
+
+        <LinearLayout style="@style/BrowserMenuListText">
+
+            <TextView
+                style="@style/BrowserMenuListTitle"
+                android:text="@string/view_downloads" />
+
+            <TextView
+                android:id="@+id/menu_downloads_summary"
+                style="@style/BrowserMenuListSummary" />
+        </LinearLayout>
+
+        <ImageView
+            style="@style/BrowserMenuChevron"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="@color/browser_hint" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_library"
+        style="@style/BrowserMenuListRow">
+
+        <ImageView
+            style="@style/BrowserMenuListIcon"
+            android:src="@drawable/ic_bookmark_outline_24"
+            app:tint="@color/browser_icon" />
+
+        <LinearLayout style="@style/BrowserMenuListText">
+
+            <TextView
+                style="@style/BrowserMenuListTitle"
+                android:text="@string/bookmarks_history" />
+        </LinearLayout>
+
+        <ImageView
+            style="@style/BrowserMenuChevron"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="@color/browser_hint" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_blocked"
+        style="@style/BrowserMenuListRow">
+
+        <ImageView
+            style="@style/BrowserMenuListIcon"
+            android:src="@drawable/ic_block_24"
+            app:tint="@color/browser_icon" />
+
+        <LinearLayout style="@style/BrowserMenuListText">
+
+            <TextView
+                style="@style/BrowserMenuListTitle"
+                android:text="@string/blocked_sites_title" />
+
+            <TextView
+                android:id="@+id/menu_blocked_summary"
+                style="@style/BrowserMenuListSummary" />
+        </LinearLayout>
+
+        <ImageView
+            style="@style/BrowserMenuChevron"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="@color/browser_hint" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/menu_settings"
+        style="@style/BrowserMenuListRow">
+
+        <ImageView
+            style="@style/BrowserMenuListIcon"
+            android:src="@drawable/ic_settings_24"
+            app:tint="@color/browser_icon" />
+
+        <LinearLayout style="@style/BrowserMenuListText">
+
+            <TextView
+                style="@style/BrowserMenuListTitle"
+                android:text="@string/settings_title" />
+        </LinearLayout>
+
+        <ImageView
+            style="@style/BrowserMenuChevron"
+            android:src="@drawable/ic_chevron_right_24"
+            app:tint="@color/browser_hint" />
+    </LinearLayout>
+</LinearLayout>
