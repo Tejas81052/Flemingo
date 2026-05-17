@@ -1,0 +1,14 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.EffectiveBrowser" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/browser_accent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/browser_accent</item>
+        <item name="colorSurface">@color/browser_surface</item>
+        <item name="colorOnSurface">@color/browser_text</item>
+        <item name="colorOnSurfaceVariant">@color/browser_hint</item>
+        <item name="android:windowBackground">@color/browser_bg_solid</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:textColor">@color/browser_text</item>
+    </style>
+</resources>

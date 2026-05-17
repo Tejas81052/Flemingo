@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="browser_bg_solid">#0B0B0F</color>
+    <color name="browser_surface">#16161D</color>
+    <color name="browser_surface_muted">#1C1C24</color>
+    <color name="browser_stroke">#26262E</color>
+    <color name="browser_chip_bg">#1E1B4B</color>
+    <color name="browser_accent">#818CF8</color>
+    <color name="browser_text">#F5F5F7</color>
+    <color name="browser_hint">#9CA3AF</color>
+    <color name="browser_icon">#E5E7EB</color>
+    <color name="browser_progress_track">#26262E</color>
+    <color name="browser_danger">#F87171</color>
+</resources>

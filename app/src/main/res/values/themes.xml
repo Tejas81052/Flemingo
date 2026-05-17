@@ -1,0 +1,63 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.EffectiveBrowser" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/browser_accent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/browser_accent</item>
+        <item name="colorSurface">@color/browser_surface</item>
+        <item name="colorOnSurface">@color/browser_text</item>
+        <item name="colorOnSurfaceVariant">@color/browser_hint</item>
+        <item name="android:windowBackground">@color/browser_bg_solid</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:textColor">@color/browser_text</item>
+    </style>
+
+    <style name="Theme.EffectiveBrowser" parent="Base.Theme.EffectiveBrowser" />
+
+    <style name="TextAppearance.EffectiveBrowser.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="SettingsHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_hint</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingTop">18dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="SettingsRowCard" parent="Widget.Material3.CardView.Filled">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="cardBackgroundColor">@color/browser_surface</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/browser_stroke</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="SettingsRowTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SettingsRowSummary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">@color/browser_hint</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+</resources>

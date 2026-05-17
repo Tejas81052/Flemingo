@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<!--
+    Reader-mode render template.
+
+    Placeholders (substituted by ReaderMode.kt before WebView.loadDataWithBaseURL):
+      ${LANG}    - html lang attribute (the page's <html lang>, or "en" fallback)
+      ${TITLE}   - article title, HTML-escaped
+      ${META}    - byline + site name + reading time, "·"-joined, HTML-escaped
+      ${CONTENT} - cleaned article HTML from the extractor (additionally scrubbed
+                   on the Kotlin side for script/iframe/style/event-handler
+                   injection vectors — defence in depth on top of the JS
+                   sanitiser, because loadDataWithBaseURL gives this content
+                   the original page's origin).
+
+    CSS is intentionally self-contained: no external fonts, no JS, no remote
+    asset references. The whole reader view should work offline.
+-->
+<html lang="${LANG}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${TITLE}</title>
+    <style>
+        /* Theme tokens. `color-scheme: light dark` tells the WebView that
+           we cope with both modes, so prefers-color-scheme reflects the
+           system theme correctly. */
+        :root {
+            color-scheme: light dark;
+            --bg: #fefefe;
+            --fg: #1a1a1a;
+            --muted: #5e6b75;
+            --link: #1a5490;
+            --border: #e5e5e5;
+            --code-bg: rgba(127, 127, 127, 0.15);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #181a1c;
+                --fg: #e8e8e8;
+                --muted: #9aa3ad;
+                --link: #82b5e3;
+                --border: #2a2d31;
+            }
+        }
+
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 18px;
+            line-height: 1.65;
+            padding: 28px 22px 64px;
+            max-width: 720px;
+            margin: 0 auto;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        header.reader-header {
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        header.reader-header h1 {
+            font-size: 30px;
+            line-height: 1.2;
+            margin: 0 0 14px;
+            letter-spacing: -0.01em;
+        }
+        header.reader-header .reader-meta {
+            font-size: 14px;
+            color: var(--muted);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            letter-spacing: 0.01em;
+        }
+
+        article.reader-content { font-size: 18px; line-height: 1.7; }
+        article.reader-content p { margin: 0 0 1.2em; }
+        article.reader-content h1,
+        article.reader-content h2,
+        article.reader-content h3,
+        article.reader-content h4 {
+            line-height: 1.3;
+            margin: 1.6em 0 0.55em;
+            letter-spacing: -0.005em;
+        }
+        article.reader-content h2 { font-size: 1.4em; }
+        article.reader-content h3 { font-size: 1.2em; }
+        article.reader-content a {
+            color: var(--link);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+        }
+
+        article.reader-content img,
+        article.reader-content video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.2em auto;
+            border-radius: 4px;
+        }
+        article.reader-content figure { margin: 1.4em 0; }
+        article.reader-content figcaption {
+            font-size: 14px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        article.reader-content blockquote {
+            border-left: 3px solid var(--border);
+            margin: 1.2em 0;
+            padding: 0.2em 0 0.2em 1em;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        article.reader-content code {
+            background: var(--code-bg);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.92em;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+        }
+        article.reader-content pre {
+            background: var(--code-bg);
+            padding: 14px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.92em;
+            line-height: 1.5;
+        }
+        article.reader-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        article.reader-content ul,
+        article.reader-content ol {
+            margin: 0 0 1.2em;
+            padding-left: 1.4em;
+        }
+        article.reader-content li { margin: 0.3em 0; }
+
+        article.reader-content hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 2em 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="reader-header">
+        <h1>${TITLE}</h1>
+        <div class="reader-meta">${META}</div>
+    </header>
+    <article class="reader-content">
+        ${CONTENT}
+    </article>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+      Only expose the downloads directory. The previous `path="."` exposed
+      the whole external-files dir to any app holding a granted URI, which
+      is wider than necessary. Downloads are stored under
+      Environment.DIRECTORY_DOWNLOADS = "Download" inside getExternalFilesDir.
+    -->
+    <external-files-path
+        name="downloads"
+        path="Download/" />
+</paths>

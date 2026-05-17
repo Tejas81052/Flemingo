@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew.bat compileDebugKotlin)",
+      "Bash(./gradlew.bat assembleDebug)",
+      "Bash(./gradlew.bat lintDebug)",
+      "Bash(del \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\\\\app\\\\src\\\\main\\\\res\\\\xml\\\\backup_rules.xml\" \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\\\\app\\\\src\\\\main\\\\res\\\\xml\\\\data_extraction_rules.xml\" \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\\\\app\\\\src\\\\main\\\\res\\\\drawable\\\\bg_browser_surface.xml\" \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\\\\app\\\\src\\\\main\\\\res\\\\drawable\\\\ic_search_24.xml\")",
+      "Bash(./gradlew.bat assembleDebug lintDebug)",
+      "PowerShell($dir = \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\"; if \\(Test-Path \"$dir\\\\.git\"\\) { git -C $dir log --oneline -20 } else { Write-Output \"Not a git repo\" })",
+      "PowerShell($d = \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\"; & \"$d\\\\gradlew.bat\" -p $d :app:compileDebugUnitTestKotlin --console=plain 2>&1 | Select-Object -Last 80)",
+      "Bash(dir /s /b *.kt *.java)",
+      "Bash(findstr /v \"build\")",
+      "Bash(cd /d \"C:\\\\Users\\\\tejas\\\\AndroidStudioProjects\\\\EffectiveBrowser\")",
+      "Bash(gradlew.bat :app:compileDebugKotlin -q)",
+      "PowerShell(.\\\\gradlew.bat :app:compileDebugKotlin -q)",
+      "Bash(./gradlew.bat lint *)",
+      "Bash(./gradlew.bat testDebugUnitTest)",
+      "Bash(./gradlew.bat assembleDebug lint testDebugUnitTest)",
+      "Bash(git -C \"C:/Users/tejas/AndroidStudioProjects/EffectiveBrowser\" log --oneline -1 \"app/src/test/java/me/thimmaiah/effectivebrowser/BrowserBlockerTest.kt\")",
+      "Bash(git -C \"C:/Users/tejas/AndroidStudioProjects/EffectiveBrowser\" status --short)",
+      "Bash(awk '/internal fun sanitizeFileName/,/^    \\\\}$/' \"C:/Users/tejas/AndroidStudioProjects/EffectiveBrowser/app/src/main/java/me/thimmaiah/effectivebrowser/DownloadRepository.kt\")",
+      "Bash(./gradlew.bat assembleRelease)",
+      "Bash(python app/build/splice_blocklist.py)",
+      "Bash(sed -n '1,12p' app/src/main/java/me/thimmaiah/effectivebrowser/BrowserBlocker.kt)",
+      "Bash(./gradlew.bat assembleDebug testDebugUnitTest)",
+      "Bash(awk -F'\"' '{s+=$2} END {print \"total tests:\", s}')",
+      "Bash(unzip -l app/build/outputs/apk/release/app-release.apk)",
+      "Bash(unzip -l app/build/outputs/apk/debug/app-debug.apk)",
+      "Bash(./gradlew.bat testDebugUnitTest assembleRelease)",
+      "Bash(awk -F'\"' '{s+=$2} END {print s, \"tests\"}')",
+      "Bash(./gradlew.bat clean *)",
+      "Bash(find app/build -name \"*.apk\" -newer app/src/main/assets/blocklist.json)",
+      "Bash(find app/build -name \"*.apk\")",
+      "Bash(find app/build/intermediates -path '*compress*' -name 'blocklist*')",
+      "Bash(unzip -l app/build/outputs/apk/release/app-release-unsigned.apk)",
+      "Bash(awk -F'\"' '{s+=$2} END {print s, \"tests total\"}')",
+      "Bash(./gradlew.bat assembleDebug assembleRelease lint testDebugUnitTest)",
+      "Bash(awk '-F\"' 'BEGIN{t=0;f=0} {for\\(i=1;i<NF;i++\\){if\\($i ~ /tests=/\\) t+=$\\(i+1\\); if\\($i ~ /failures=/\\) f+=$\\(i+1\\); if\\($i ~ /errors=/\\) f+=$\\(i+1\\)}} END{printf \"%d total, %d failures/errors\\\\n\",t,f}')",
+      "Bash(./gradlew assembleDebug lintDebug testDebugUnitTest)"
+    ]
+  }
+}
