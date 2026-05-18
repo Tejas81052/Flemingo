@@ -258,6 +258,24 @@
     <string name="accent_swatch_content_description">%1$s accent</string>
     <string name="accent_swatch_selected_content_description">%1$s accent, selected</string>
 
+    <!-- v10 menu sheet tile labels. -->
+    <string name="menu_action_go_backward">Go backward</string>
+    <string name="menu_action_go_forward">Go forward</string>
+
+    <!-- v10 private start page (incognito about:home). -->
+    <string name="private_start_session_badge">PRIVATE SESSION</string>
+    <string name="private_start_greeting_top">You\'re</string>
+    <string name="private_start_greeting_bottom">off the record.</string>
+    <string name="private_start_search_hint">Search privately or paste a link</string>
+    <string name="private_start_quick_to">Quick to</string>
+    <string name="private_start_promises_title">This tab promises</string>
+    <string name="private_start_promise_history">History isn\'t recorded</string>
+    <string name="private_start_promise_cookies">Cookies clear when the tab closes</string>
+    <string name="private_start_promise_cache">Cache stays in this tab\'s heap</string>
+    <string name="private_start_promise_trackers">Trackers are still blocked</string>
+    <string name="private_start_disclaimer_lead">It doesn\'t hide you.</string>
+    <string name="private_start_disclaimer_body"> Your network, employer, and the sites you visit can still see what you\'re doing.</string>
+
     <!-- v10 start page (about:home). -->
     <string name="start_page_app_name">EFFECTIVE BROWSER</string>
     <string name="start_page_date_format">EEE · MMM d</string>
@@ -265,11 +283,32 @@
     <string name="start_page_greeting_afternoon">Good afternoon,</string>
     <string name="start_page_greeting_evening">Good evening,</string>
     <string name="start_page_greeting_night">Working late,</string>
-    <string name="start_page_greeting_bottom">where would you like to read today?</string>
+    <string name="start_page_greeting_bottom">where would you like to start today?</string>
+
+    <!--
+      v10 rotating bottom-line greeting prompts. StartPageView picks
+      one at random for each show() — different prompts on different
+      days keep the home page feeling alive without resorting to a
+      bigger feature.
+    -->
+    <string-array name="start_page_greeting_prompts">
+        <item>where would you like to read today?</item>
+        <item>what are you curious about?</item>
+        <item>what\'s on your mind?</item>
+        <item>where shall we wander?</item>
+        <item>what shall we learn today?</item>
+        <item>any rabbit holes to chase?</item>
+        <item>pick a thread to pull.</item>
+        <item>ready to dig in?</item>
+        <item>what\'s the plan?</item>
+        <item>what are you looking for?</item>
+        <item>ready when you are.</item>
+        <item>what shall we discover?</item>
+    </string-array>
     <string name="start_page_search_hint">Search or paste a link</string>
     <string name="start_page_section_pinned">Pinned</string>
     <string name="start_page_pinned_edit">EDIT</string>
-    <string name="start_page_section_continue">Continue reading</string>
+    <string name="start_page_section_continue">Recent visits </string>
     <string name="start_page_history_link">HISTORY ↗</string>
     <string name="start_page_continue_empty">Nothing recent. Open a page and it lands here.</string>
     <string name="start_page_continue_reader_ready">reader ready</string>

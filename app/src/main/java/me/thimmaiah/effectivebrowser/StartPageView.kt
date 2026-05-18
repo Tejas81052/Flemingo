@@ -46,26 +46,28 @@ class StartPageView(
 ) {
 
     interface Listener {
-        /** User tapped the big search pill — open the address bar with
-         *  focus + keyboard. */
-        fun onStartPageSearchTapped()
         /** User tapped a pinned tile or a Continue-reading row. Loads
          *  the URL in the active tab. */
         fun onStartPageUrlTapped(url: String)
+        /** User pressed Enter / Go in the inline search input. The
+         *  activity resolves URL vs. search-query and loads in the
+         *  active tab. */
+        fun onStartPageQuerySubmitted(query: String)
         /** User tapped the "EDIT" link beside Pinned. Opens Bookmarks. */
         fun onStartPageEditPinned()
         /** User tapped the "HISTORY ↗" link. Opens Bookmarks on the
          *  history segment. */
         fun onStartPageOpenHistory()
-        /** User tapped the trackers card. Opens the blocked-sites
-         *  screen so they can see what's being blocked. */
-        fun onStartPageTrackersTapped()
     }
 
     private val dateView: TextView = overlay.findViewById(R.id.start_page_date)
     private val greetingTopView: TextView = overlay.findViewById(R.id.start_page_greeting_top)
-    private val searchPill: View = overlay.findViewById(R.id.start_page_search_pill)
+    private val greetingBottomView: TextView = overlay.findViewById(R.id.start_page_greeting_bottom)
+    private val searchInput: android.widget.EditText =
+        overlay.findViewById(R.id.start_page_search_input)
     private val engineBadge: TextView = overlay.findViewById(R.id.start_page_engine_badge)
+    private val suggestionsContainer: LinearLayout =
+        overlay.findViewById(R.id.start_page_suggestions)
     private val pinnedRow1: LinearLayout = overlay.findViewById(R.id.start_page_pinned_row_1)
     private val pinnedRow2: LinearLayout = overlay.findViewById(R.id.start_page_pinned_row_2)
     private val pinnedEdit: View = overlay.findViewById(R.id.start_page_pinned_edit)
@@ -77,10 +79,93 @@ class StartPageView(
     private val trackersMeta: TextView = overlay.findViewById(R.id.start_page_trackers_meta)
 
     init {
-        searchPill.setOnClickListener { listener.onStartPageSearchTapped() }
         pinnedEdit.setOnClickListener { listener.onStartPageEditPinned() }
         historyLink.setOnClickListener { listener.onStartPageOpenHistory() }
-        trackersCard.setOnClickListener { listener.onStartPageTrackersTapped() }
+        // Task 6: trackers card is informational, not navigational.
+        // Strip the click target and the surrounding ripple so the
+        // card reads as a status badge rather than a link.
+        trackersCard.isClickable = false
+        trackersCard.isFocusable = false
+        trackersCard.foreground = null
+
+        wireSearchInput()
+    }
+
+    /** Wire the inline home-page search experience. Same flow as the
+     *  top address bar's autocomplete (TextWatcher → filter
+     *  HistoryRepository → render rows) but the suggestion list lives
+     *  directly under the pill instead of in a popup window. */
+    private fun wireSearchInput() {
+        searchInput.setOnEditorActionListener { _, actionId, event ->
+            val pressedEnter = event?.keyCode == android.view.KeyEvent.KEYCODE_ENTER &&
+                event.action == android.view.KeyEvent.ACTION_DOWN
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_GO || pressedEnter) {
+                listener.onStartPageQuerySubmitted(searchInput.text?.toString().orEmpty())
+                true
+            } else {
+                false
+            }
+        }
+        searchInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (!searchInput.isFocused) return
+                refreshSearchSuggestions(s?.toString().orEmpty())
+            }
+        })
+        searchInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) refreshSearchSuggestions(searchInput.text?.toString().orEmpty())
+            else hideSearchSuggestions()
+        }
+    }
+
+    private fun refreshSearchSuggestions(query: String) {
+        val trimmed = query.trim()
+        val matches = if (trimmed.isEmpty()) {
+            HistoryRepository.snapshot().take(SUGGESTION_LIMIT)
+        } else {
+            HistoryRepository.snapshot().asSequence()
+                .filter {
+                    it.url.contains(trimmed, ignoreCase = true) ||
+                        it.title.contains(trimmed, ignoreCase = true)
+                }
+                .take(SUGGESTION_LIMIT)
+                .toList()
+        }
+        suggestionsContainer.removeAllViews()
+        if (matches.isEmpty()) {
+            suggestionsContainer.isVisible = false
+            return
+        }
+        val inflater = LayoutInflater.from(context)
+        for (entry in matches) {
+            val row = inflater.inflate(
+                R.layout.item_address_suggestion,
+                suggestionsContainer,
+                false,
+            )
+            val title = row.findViewById<TextView>(R.id.suggestion_title)
+            val url = row.findViewById<TextView>(R.id.suggestion_url)
+            title.text = entry.title.ifBlank { entry.url }
+            url.text = UrlInputUtils.prettifyUrl(entry.url)
+                .removePrefix("https://")
+                .removePrefix("http://")
+            row.setOnClickListener { listener.onStartPageUrlTapped(entry.url) }
+            suggestionsContainer.addView(row)
+        }
+        suggestionsContainer.isVisible = true
+    }
+
+    private fun hideSearchSuggestions() {
+        // Defer so a tap inside a suggestion row still fires before
+        // the focus-change tears the list down.
+        suggestionsContainer.postDelayed({
+            if (!searchInput.isFocused) {
+                suggestionsContainer.isVisible = false
+                suggestionsContainer.removeAllViews()
+            }
+        }, FOCUS_DISMISS_DELAY_MS)
     }
 
     /** Toggle visibility of the start-page overlay. Repopulates state
@@ -89,6 +174,11 @@ class StartPageView(
      *  user was on a different surface. */
     fun show() {
         refresh()
+        // Clear any previous typed text & dropdown so re-entering the
+        // start page from a navigation doesn't surface stale state.
+        searchInput.setText("")
+        suggestionsContainer.removeAllViews()
+        suggestionsContainer.isVisible = false
         overlay.isVisible = true
     }
 
@@ -128,6 +218,26 @@ class StartPageView(
             else -> R.string.start_page_greeting_night
         }
         greetingTopView.setText(greetingRes)
+        // Pick a fresh "where would you like to read today?" prompt
+        // from the rotating array. Seed the picker with the calendar
+        // day so we don't reshuffle on every back-press refresh — the
+        // same day-of-year always lands on the same prompt, but
+        // tomorrow is a fresh one.
+        greetingBottomView.text = pickGreetingPrompt()
+    }
+
+    /** Pick today's bottom greeting line from the rotating array.
+     *  Seeded by the day-of-year so the prompt stays stable across a
+     *  single calendar day (every back-press to home shows the same
+     *  one) but flips to a new prompt at midnight. */
+    private fun pickGreetingPrompt(): String {
+        val prompts = context.resources.getStringArray(R.array.start_page_greeting_prompts)
+        if (prompts.isEmpty()) {
+            return context.getString(R.string.start_page_greeting_bottom)
+        }
+        val cal = Calendar.getInstance()
+        val seed = cal.get(Calendar.YEAR) * 1000 + cal.get(Calendar.DAY_OF_YEAR)
+        return prompts[(seed.toLong() and 0x7fffffff).rem(prompts.size).toInt()]
     }
 
     // ---------------------------------------------------------------------
@@ -188,8 +298,18 @@ class StartPageView(
         }
     }
 
+    /**
+     * Pull the Pinned tiles straight from [BookmarkRepository]. The
+     * v10 defaults are now seeded into the bookmark store on first
+     * install (see [BookmarkRepository.seedDefaultBookmarksIfNeeded]),
+     * so we no longer need a separate fallback list — what the user
+     * sees here is exactly what's in their bookmark set. Removing a
+     * default bookmark from Bookmarks makes the corresponding tile
+     * disappear; removing the lot leaves the section empty (the
+     * row containers stay laid out with their margins, just no tiles).
+     */
     private fun collectPinnedTiles(): List<PinnedTile> {
-        val realBookmarks = BookmarkRepository.snapshot()
+        return BookmarkRepository.snapshot()
             .take(TILES_TOTAL)
             .map { entry ->
                 val host = extractHost(entry.url)
@@ -200,16 +320,6 @@ class StartPageView(
                     colourKey = host.ifBlank { entry.url },
                 )
             }
-        if (realBookmarks.size >= TILES_TOTAL) return realBookmarks
-        // Pad with prototype-matching defaults so a fresh install still
-        // shows a full 4×2 grid. The defaults are picked to mirror the
-        // v10 design — Coffee/Are.na/HN/Docs · Times/GitHub/Maps/DDG.
-        val padded = realBookmarks.toMutableList()
-        for (default in DEFAULT_TILES) {
-            if (padded.size >= TILES_TOTAL) break
-            if (padded.none { it.url == default.url }) padded.add(default)
-        }
-        return padded.take(TILES_TOTAL)
     }
 
     // ---------------------------------------------------------------------
@@ -429,20 +539,13 @@ class StartPageView(
         private const val TILES_TOTAL = 8
         private const val TILES_PER_ROW = 4
         private const val CONTINUE_LIMIT = 3
+        private const val SUGGESTION_LIMIT = 6
+        private const val FOCUS_DISMISS_DELAY_MS = 120L
 
-        /** Defaults that fill the Pinned grid until the user has eight
-         *  real bookmarks. URLs were chosen to mirror the prototype
-         *  screenshot literally; they're never persisted to the user's
-         *  bookmark store. */
-        private val DEFAULT_TILES = listOf(
-            PinnedTile("Coffee", "https://www.craftcoffee.dev/", "C", "craftcoffee"),
-            PinnedTile("Are.na", "https://www.are.na/", "A", "are.na"),
-            PinnedTile("HN", "https://news.ycombinator.com/", "H", "ycombinator"),
-            PinnedTile("Docs", "https://docs.google.com/", "E", "docs.google.com"),
-            PinnedTile("Times", "https://www.nytimes.com/", "N", "nytimes"),
-            PinnedTile("GitHub", "https://github.com/", "G", "github"),
-            PinnedTile("Maps", "https://maps.google.com/", "M", "maps.google"),
-            PinnedTile("DDG", "https://duckduckgo.com/", "D", "duckduckgo"),
-        )
+        // The Pinned grid no longer has any fallback defaults — the
+        // v10 default tiles are seeded into the bookmark store on
+        // first install by BookmarkRepository, so the grid always
+        // reflects exactly what's bookmarked. Removing all of them
+        // leaves the section empty (matching Task 5's spec).
     }
 }

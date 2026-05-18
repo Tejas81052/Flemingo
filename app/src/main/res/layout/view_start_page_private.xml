@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v10 private start page (about:home when the active tab is private).
+
+  Distinct from view_start_page.xml because the visual identity of a
+  private tab is theme-invariant ink — even in day mode the private
+  surface stays dark — and because the content itself is different:
+  a "promises" card replaces the Pinned / Continue reading sections.
+
+  Same overlay slot in activity_main.xml; StartPageView switches
+  which include is visible based on activeTabOrNull.isPrivate.
+
+  Sections, top → bottom:
+    1. "PRIVATE SESSION" badge + incognito glyph
+    2. Mixed serif italic / regular greeting:
+       "You're off the record."
+    3. Search pill ("Search privately or paste a link") + DDG badge
+    4. Quick-to row — 4 letter tiles
+    5. "This tab promises" card with 4 checkmark rows
+    6. Disclaimer ("It doesn't hide you...")
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tab_private_bg"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
+
+        <!-- PRIVATE SESSION badge -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_private_session_badge"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="6dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_incognito_24"
+                app:tint="@color/tab_private_text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.14"
+                android:text="@string/private_start_session_badge"
+                android:textColor="@color/tab_private_text"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- Greeting: italic "You're" then bold "off the record." -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="serif"
+            android:lineSpacingExtra="-2dp"
+            android:textColor="@color/tab_private_text"
+            android:textSize="32sp"
+            android:textStyle="italic"
+            android:text="@string/private_start_greeting_top" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:lineSpacingExtra="-2dp"
+            android:text="@string/private_start_greeting_bottom"
+            android:textColor="@color/tab_private_text"
+            android:textSize="32sp" />
+
+        <!-- Private search pill (EditText so the home page can drive
+             its own inline autocomplete dropdown right below it). -->
+        <FrameLayout
+            android:id="@+id/private_start_search_pill"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_private_search_pill">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="18dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_search_24"
+                app:tint="@color/tab_private_hint" />
+
+            <EditText
+                android:id="@+id/private_start_search_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:hint="@string/private_start_search_hint"
+                android:imeOptions="actionGo"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:maxLines="1"
+                android:paddingStart="46dp"
+                android:paddingEnd="60dp"
+                android:textColor="@color/tab_private_text"
+                android:textColorHint="@color/tab_private_hint"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/private_start_engine_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="14dp"
+                android:background="@drawable/bg_private_engine_badge"
+                android:fontFamily="monospace"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.05"
+                android:paddingStart="6dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="3dp"
+                android:textColor="@color/tab_private_hint"
+                android:textSize="10sp"
+                tools:text="DDG" />
+        </FrameLayout>
+
+        <!-- Inline autocomplete suggestion list (Task 4). Filled by
+             StartPageView when the private search EditText has focus
+             and the user has typed something. -->
+        <LinearLayout
+            android:id="@+id/private_start_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+        <!-- Quick to header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="serif"
+            android:text="@string/private_start_quick_to"
+            android:textColor="@color/tab_private_text"
+            android:textSize="18sp"
+            android:textStyle="italic" />
+
+        <!-- Quick to row (filled by StartPageView with the 4 fixed
+             private shortcut tiles: DuckDuckGo, Kagi, Wikipedia,
+             Archive). Letter-avatar style same as the regular
+             Pinned grid but rendered against ink tiles. -->
+        <LinearLayout
+            android:id="@+id/private_start_quick_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" />
+
+        <!-- "This tab promises" card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:background="@drawable/bg_private_promises_card"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif"
+                android:text="@string/private_start_promises_title"
+                android:textColor="@color/tab_private_text_2"
+                android:textSize="15sp"
+                android:textStyle="italic" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_check_24"
+                    app:tint="?attr/browserAccent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/private_start_promise_history"
+                    android:textColor="@color/tab_private_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_check_24"
+                    app:tint="?attr/browserAccent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/private_start_promise_cookies"
+                    android:textColor="@color/tab_private_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_check_24"
+                    app:tint="?attr/browserAccent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/private_start_promise_cache"
+                    android:textColor="@color/tab_private_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_check_24"
+                    app:tint="?attr/browserAccent" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/private_start_promise_trackers"
+                    android:textColor="@color/tab_private_text"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Disclaimer line — italic lead + plain body, matching the
+             prototype's "It doesn't hide you. Your network..." -->
+        <TextView
+            android:id="@+id/private_start_disclaimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:textColor="@color/tab_private_hint"
+            android:textSize="13sp" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -89,40 +89,52 @@
             android:textColor="@color/browser_text"
             android:textSize="32sp" />
 
-        <!-- Search pill: tappable, focuses the real address bar above -->
-        <LinearLayout
+        <!--
+          Search pill — owns the home page's own inline autocomplete
+          (Task 4). EditText so the user can type directly here
+          without jumping focus to the top address bar; the
+          suggestion list below repopulates from HistoryRepository
+          as they type, and Enter submits to MainActivity which
+          loads the URL (or search query) in the active tab.
+        -->
+        <FrameLayout
             android:id="@+id/start_page_search_pill"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="22dp"
-            android:background="@drawable/bg_start_search_pill"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="18dp"
-            android:paddingEnd="14dp">
+            android:background="@drawable/bg_start_search_pill">
 
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="18dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_search_24"
                 app:tint="@color/browser_hint" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_weight="1"
-                android:text="@string/start_page_search_hint"
-                android:textColor="@color/browser_hint"
+            <EditText
+                android:id="@+id/start_page_search_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:hint="@string/start_page_search_hint"
+                android:imeOptions="actionGo"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:maxLines="1"
+                android:paddingStart="46dp"
+                android:paddingEnd="60dp"
+                android:textColor="@color/browser_text"
+                android:textColorHint="@color/browser_hint"
                 android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/start_page_engine_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="14dp"
                 android:background="@drawable/bg_engine_badge"
                 android:fontFamily="monospace"
                 android:includeFontPadding="false"
@@ -134,7 +146,19 @@
                 android:textColor="@color/browser_hint"
                 android:textSize="10sp"
                 tools:text="DDG" />
-        </LinearLayout>
+        </FrameLayout>
+
+        <!-- Inline autocomplete suggestion list. Painted directly
+             under the search pill — no jump to the top address bar.
+             StartPageView fills this from HistoryRepository whenever
+             the search EditText has focus. -->
+        <LinearLayout
+            android:id="@+id/start_page_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone" />
 
         <!-- Pinned header -->
         <LinearLayout

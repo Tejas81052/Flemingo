@@ -256,6 +256,21 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <!--
+      v10 private start page. Same overlay slot as the regular start
+      page but a separate include because the layouts diverge enough
+      that conditional show/hide inside one layout would be noisier
+      than two distinct files. StartPageView toggles exactly one of
+      them visible based on activeTabOrNull.isPrivate.
+    -->
+    <include
+        android:id="@+id/private_start_page_overlay"
+        layout="@layout/view_start_page_private"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <!--
       v10 full-screen tab-switcher overlay.
 
       Sits between web_container and bottom_chrome in the CoordinatorLayout
@@ -525,20 +540,22 @@
                     app:tint="@color/browser_icon" />
 
                 <!--
-                  v10: badge anchored to the top-right of the icon
-                  rather than the centre. The 8dp margins position
-                  the badge so its lower-left overlaps the icon's
-                  upper-right corner — same anchor pattern as the
-                  Chrome/Brave tab-count badges and the prototype
-                  reference image.
+                  v10.1: badge sits ON the icon's upper-right corner,
+                  touching its boundary, rather than floating outside.
+                  With a 52dp button and 14dp icon padding the icon
+                  occupies (14..38, 14..38); the badge (16x14) is
+                  positioned so its centre lands on the icon's
+                  top-right corner — bottom-left corner of the badge
+                  is now flush against the icon edge, matching the
+                  "4" reference image the user shared.
                 -->
                 <TextView
                     android:id="@+id/tab_count_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|end"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="11dp"
+                    android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_tab_badge"
                     android:fontFamily="monospace"
                     android:importantForAccessibility="no"

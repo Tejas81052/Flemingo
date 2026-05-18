@@ -46,6 +46,11 @@
             app:tint="@color/browser_text_2" />
     </LinearLayout>
 
+    <!--
+      Row 1 — Share · Save · Desktop site · Find in page. Reader mode
+      was dropped from the bottom sheet in v10.1 (still reachable from
+      future menu surfaces if/when it returns).
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -86,18 +91,18 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/menu_reader"
+            android:id="@+id/menu_desktop"
             style="@style/BrowserMenuQuickAction"
             android:layout_marginStart="10dp">
 
             <ImageView
                 style="@style/BrowserMenuQuickIcon"
-                android:src="@drawable/ic_text_fields_24"
+                android:src="@drawable/ic_desktop_24"
                 app:tint="@color/browser_icon" />
 
             <TextView
                 style="@style/BrowserMenuQuickLabel"
-                android:text="@string/action_reader_mode" />
+                android:text="@string/setting_desktop_mode_title" />
         </LinearLayout>
 
         <LinearLayout
@@ -116,6 +121,11 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!--
+      Row 2 — Go backward · Go forward · Print · PDF · New private
+      tab. Backward replaces the spot previously held by the reader
+      mode tile so the row still reads as four equal-weight actions.
+    -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -125,8 +135,23 @@
         android:paddingEnd="20dp">
 
         <LinearLayout
-            android:id="@+id/menu_forward"
+            android:id="@+id/menu_backward"
             style="@style/BrowserMenuQuickAction">
+
+            <ImageView
+                style="@style/BrowserMenuQuickIcon"
+                android:src="@drawable/ic_arrow_back_24"
+                app:tint="@color/browser_icon" />
+
+            <TextView
+                style="@style/BrowserMenuQuickLabel"
+                android:text="@string/menu_action_go_backward" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_forward"
+            style="@style/BrowserMenuQuickAction"
+            android:layout_marginStart="10dp">
 
             <ImageView
                 style="@style/BrowserMenuQuickIcon"
@@ -135,22 +160,7 @@
 
             <TextView
                 style="@style/BrowserMenuQuickLabel"
-                android:text="@string/forward_button" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/menu_desktop"
-            style="@style/BrowserMenuQuickAction"
-            android:layout_marginStart="10dp">
-
-            <ImageView
-                style="@style/BrowserMenuQuickIcon"
-                android:src="@drawable/ic_desktop_24"
-                app:tint="@color/browser_icon" />
-
-            <TextView
-                style="@style/BrowserMenuQuickLabel"
-                android:text="@string/setting_desktop_mode_title" />
+                android:text="@string/menu_action_go_forward" />
         </LinearLayout>
 
         <LinearLayout

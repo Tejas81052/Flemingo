@@ -40,7 +40,30 @@ object BookmarkRepository {
     private const val PREFS_NAME = "effective_browser_bookmarks"
     private const val KEY_BOOKMARKS = "bookmarks_json"
     private const val KEY_MIGRATED = "migrated_to_db"
+    /** Once-per-install flag so the v10 default Pinned set isn't
+     *  re-seeded if the user deletes them. The seed runs exactly
+     *  once; after that the Pinned grid mirrors the user's real
+     *  bookmarks (and goes empty when they remove the last one). */
+    private const val KEY_DEFAULTS_SEEDED = "defaults_seeded"
     private const val TAG = "BookmarkRepository"
+
+    /**
+     * v10 Pinned-grid defaults. Seeded into the database on first
+     * install via [seedDefaultBookmarksIfNeeded] so the start page's
+     * Pinned section shows a populated grid out of the box. Once the
+     * user deletes any of these they stay deleted — the seed never
+     * re-runs because [KEY_DEFAULTS_SEEDED] flips on first run.
+     */
+    private val DEFAULT_PINNED = listOf(
+        "Coffee" to "https://www.craftcoffee.dev/",
+        "Are.na" to "https://www.are.na/",
+        "HN" to "https://news.ycombinator.com/",
+        "Docs" to "https://docs.google.com/",
+        "Times" to "https://www.nytimes.com/",
+        "GitHub" to "https://github.com/",
+        "Maps" to "https://maps.google.com/",
+        "DDG" to "https://duckduckgo.com/",
+    )
 
     private val items = mutableListOf<Bookmark>()
     private val listeners = CopyOnWriteArrayList<Listener>()
@@ -58,7 +81,60 @@ object BookmarkRepository {
         db = BrowserDatabase.get(appContext)
         migrateFromPrefsIfNeeded()
         loadFromDb()
+        seedDefaultBookmarksIfNeeded()
         initialized = true
+    }
+
+    /**
+     * Populate the bookmark store with the v10 Pinned defaults on
+     * first run, so the start page's Pinned grid is non-empty out
+     * of the box. Gated by [KEY_DEFAULTS_SEEDED] so a user who
+     * deletes all the defaults doesn't see them reappear on the
+     * next launch.
+     *
+     * Skipped entirely if the user already has any bookmarks
+     * (covers the migration case where someone upgrades from v9
+     * with an existing bookmark set we don't want to clutter).
+     */
+    private fun seedDefaultBookmarksIfNeeded() {
+        val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        if (prefs.getBoolean(KEY_DEFAULTS_SEEDED, false)) return
+        if (items.isNotEmpty()) {
+            prefs.edit { putBoolean(KEY_DEFAULTS_SEEDED, true) }
+            return
+        }
+        val now = System.currentTimeMillis()
+        // Insert in reverse so that snapshot()'s desc-by-createdAt sort
+        // lands the prototype's first tile (Coffee) at the top of the
+        // grid. 1ms spacing keeps the ordering stable even on devices
+        // whose currentTimeMillis ticks slowly.
+        val seeded = DEFAULT_PINNED.mapIndexed { index, (title, url) ->
+            Bookmark(
+                id = UUID.randomUUID().toString(),
+                title = title,
+                url = normalizeUrl(url),
+                createdAt = now - index,
+            )
+        }
+        items.addAll(seeded)
+        db.runWrite { writable ->
+            writable.beginTransaction()
+            try {
+                for (bookmark in seeded) {
+                    writable.insertWithOnConflict(
+                        BrowserDatabase.TABLE_BOOKMARKS,
+                        null,
+                        bookmark.toContentValues(),
+                        SQLiteDatabase.CONFLICT_REPLACE,
+                    )
+                }
+                writable.setTransactionSuccessful()
+            } finally {
+                writable.endTransaction()
+            }
+        }
+        prefs.edit { putBoolean(KEY_DEFAULTS_SEEDED, true) }
+        broadcast()
     }
 
     @Synchronized

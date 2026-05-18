@@ -270,6 +270,11 @@ class MainActivity : AppCompatActivity() {
      */
     private var startPageView: StartPageView? = null
 
+    /** v10 private start-page controller. Distinct overlay + content
+     *  from [startPageView]; MainActivity swaps which is visible based
+     *  on the active tab's `isPrivate` flag. */
+    private var privateStartPageView: PrivateStartPageView? = null
+
     /**
      * Tab whose runtime permission launcher is currently waiting on an
      * Android grant. New prompts that arrive while this is non-null are
@@ -579,6 +584,12 @@ class MainActivity : AppCompatActivity() {
         // animations and video posters the user can't see.
         activeTabOrNull?.webView?.onResume()
         applyPreferences()
+        // v10: when the user returns from Bookmarks / Downloads /
+        // Settings to a tab that's sitting on about:home, repaint
+        // the start page so any bookmark / history / tracker count
+        // changes made on those screens land in the Pinned + Continue
+        // reading + Trackers sections.
+        if (startPageView?.isShowing() == true) startPageView?.refresh()
     }
 
     override fun onDestroy() {
@@ -945,17 +956,20 @@ class MainActivity : AppCompatActivity() {
      *  / history shortcuts, trackers card) so the activity keeps
      *  control of the tab-state transitions. */
     private val startPageListener = object : StartPageView.Listener {
-        override fun onStartPageSearchTapped() {
-            addressBar.requestFocus()
-            addressBar.post {
-                addressBar.selectAll()
-                getSystemService<InputMethodManager>()
-                    ?.showSoftInput(addressBar, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-
         override fun onStartPageUrlTapped(url: String) {
             loadAddress(url)
+        }
+
+        override fun onStartPageQuerySubmitted(query: String) {
+            // Same flow the top address bar uses: a typed string can be
+            // either a URL or a search query — resolveUserInput
+            // disambiguates. Blank submits go to homeUrl() (which is
+            // ABOUT_HOME_URL by default), keeping the user on the
+            // start page rather than navigating somewhere weird.
+            val text = query.trim()
+            if (text.isEmpty()) return
+            hideKeyboard(addressBar)
+            loadAddress(resolveUserInput(text))
         }
 
         override fun onStartPageEditPinned() {
@@ -965,9 +979,22 @@ class MainActivity : AppCompatActivity() {
         override fun onStartPageOpenHistory() {
             openLibraryLauncher.launch(Intent(this@MainActivity, BookmarksActivity::class.java))
         }
+    }
 
-        override fun onStartPageTrackersTapped() {
-            startActivity(Intent(this@MainActivity, BlockedSitesActivity::class.java))
+    /** Listener for the v10 private start page. Same shape as the
+     *  regular start page listener but only the URL / submit hooks
+     *  apply — the private surface has neither a Pinned editor nor a
+     *  history shortcut. */
+    private val privateStartPageListener = object : PrivateStartPageView.StartPageListener {
+        override fun onStartPageUrlTapped(url: String) {
+            loadAddress(url)
+        }
+
+        override fun onStartPageQuerySubmitted(query: String) {
+            val text = query.trim()
+            if (text.isEmpty()) return
+            hideKeyboard(addressBar)
+            loadAddress(resolveUserInput(text))
         }
     }
 
@@ -1075,6 +1102,17 @@ class MainActivity : AppCompatActivity() {
             context = this,
             overlay = findViewById(R.id.start_page_overlay),
             listener = startPageListener,
+            prefs = prefs,
+        )
+
+        // v10 private start page (about:home for incognito tabs).
+        // Separate controller because the layout and content diverge
+        // from the regular surface enough that conditional binding
+        // would be noisier than a second binding.
+        privateStartPageView = PrivateStartPageView(
+            context = this,
+            overlay = findViewById(R.id.private_start_page_overlay),
+            listener = privateStartPageListener,
             prefs = prefs,
         )
     }
@@ -1219,10 +1257,31 @@ class MainActivity : AppCompatActivity() {
         val popup = addressSuggestionPopup ?: return
         if (!addressBar.hasFocus() || addressBar.windowToken == null) return
 
+        // Task 7: stretch the dropdown to the available screen width
+        // (minus a small horizontal gutter) instead of clamping to the
+        // address-pill's width. Looks heavier visually but matches the
+        // prototype and gives long URLs / titles room to render
+        // without truncation.
         val anchor = addressSuggestionAnchor()
+        val gutter = dp(8)
+        val screenWidth = rootView.width.takeIf { it > 0 } ?: anchor.width
+        val targetWidth = (screenWidth - gutter * 2).coerceAtLeast(dp(260))
+        // Negative horizontalOffset shifts the popup left of the anchor
+        // by the difference between the anchor and the popup, then
+        // gutter shifts it back to leave breathing room at the screen
+        // edge. Computed against the anchor's on-screen position so a
+        // re-anchor (e.g. after the AppBar collapses) stays aligned.
+        val anchorLocation = IntArray(2)
+        anchor.getLocationOnScreen(anchorLocation)
+        val rootLocation = IntArray(2)
+        rootView.getLocationOnScreen(rootLocation)
+        val anchorScreenLeft = anchorLocation[0]
+        val rootScreenLeft = rootLocation[0]
+        val targetLeft = rootScreenLeft + gutter
         popup.setAnchorView(anchor)
-        popup.width = anchor.width.coerceAtLeast(dp(260))
+        popup.width = targetWidth
         popup.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        popup.horizontalOffset = targetLeft - anchorScreenLeft
         popup.verticalOffset = dp(6)
         if (!popup.isShowing) {
             popup.show()
@@ -2704,27 +2763,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Show the v10 paper-theme start page overlay over the WebView.
-     *  Idempotent: a second call while it's already up just refreshes
-     *  the underlying data. */
+     *  Routes to the regular overlay or the ink-coloured private
+     *  overlay based on the active tab's privacy mode — separate
+     *  layouts because the visuals diverge enough that conditional
+     *  binding inside one would be noisier than two controllers.
+     *
+     *  Idempotent: a second call while one is already up just
+     *  refreshes the data behind it. */
     private fun showStartPage() {
-        val view = startPageView ?: return
         // Halt anything the WebView is fetching so a long-running
         // resource on the previous page doesn't paint a flash through
         // the overlay or fire a misleading onPageFinished after the
         // user has already moved on.
         activeTabOrNull?.webView?.stopLoading()
-        view.show()
+        val isPrivate = activeTabOrNull?.isPrivate == true
+        if (isPrivate) {
+            startPageView?.hide()
+            privateStartPageView?.show()
+        } else {
+            privateStartPageView?.hide()
+            val view = startPageView ?: return
+            view.show()
+        }
         webContainer.isVisible = false
     }
 
-    /** Restore the WebView surface. Called whenever a real URL is
-     *  loaded into the active tab (loadAddress, switchToTab to a
-     *  non-home tab, etc.). */
+    /** Restore the WebView surface. Hides whichever start-page
+     *  overlay (regular or private) was visible. Called whenever a
+     *  real URL is loaded into the active tab (loadAddress,
+     *  switchToTab to a non-home tab, etc.). */
     private fun hideStartPage() {
-        val view = startPageView ?: return
-        if (!view.isShowing()) return
-        view.hide()
-        webContainer.isVisible = true
+        val regular = startPageView
+        val incognito = privateStartPageView
+        val wasShowing = regular?.isShowing() == true || incognito?.isShowing() == true
+        regular?.hide()
+        incognito?.hide()
+        if (wasShowing) webContainer.isVisible = true
     }
 
     /**
@@ -2901,8 +2975,8 @@ class MainActivity : AppCompatActivity() {
 
         setMenuTileEnabled(view.findViewById(R.id.menu_share), hasPage)
         setMenuTileEnabled(saveTile, hasPage)
-        setMenuTileEnabled(view.findViewById(R.id.menu_reader), canEnterReaderMode())
         setMenuTileEnabled(view.findViewById(R.id.menu_find), hasPage)
+        setMenuTileEnabled(view.findViewById(R.id.menu_backward), tab?.webView?.canGoBack() == true)
         setMenuTileEnabled(view.findViewById(R.id.menu_forward), tab?.webView?.canGoForward() == true)
         setMenuTileEnabled(view.findViewById(R.id.menu_private), multiProfileSupported)
         setMenuTileEnabled(view.findViewById(R.id.menu_print), hasPage)
@@ -2927,13 +3001,14 @@ class MainActivity : AppCompatActivity() {
             dialog.dismiss()
             toggleCurrentPageBookmark(tab)
         }
-        view.findViewById<View>(R.id.menu_reader).setOnClickListener {
-            dialog.dismiss()
-            enterReaderMode()
-        }
         view.findViewById<View>(R.id.menu_find).setOnClickListener {
             dialog.dismiss()
             showFindBar()
+        }
+        view.findViewById<View>(R.id.menu_backward).setOnClickListener {
+            dialog.dismiss()
+            val webView = activeTabOrNull?.webView ?: return@setOnClickListener
+            if (webView.canGoBack()) webView.goBack()
         }
         view.findViewById<View>(R.id.menu_forward).setOnClickListener {
             dialog.dismiss()
