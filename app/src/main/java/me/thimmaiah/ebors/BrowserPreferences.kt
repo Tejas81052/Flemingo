@@ -208,6 +208,28 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
         set(value) = prefs.edit { putBoolean(KEY_NOTIFICATION_PERMISSION_PROMPT_SHOWN, value) }
 
     /**
+     * Has the user completed the first-launch onboarding flow
+     * (welcome → privacy promise → terms acceptance → optional
+     * set-as-default-browser)? When false, MainActivity defers normal
+     * startup and launches WelcomeActivity instead. Set to true
+     * exactly once, when the user taps "Accept &amp; continue" on
+     * the privacy/terms screen.
+     */
+    var onboardingCompleted: Boolean
+        get() = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+        set(value) = prefs.edit { putBoolean(KEY_ONBOARDING_COMPLETED, value) }
+
+    /**
+     * Timestamp (epoch millis) when the user accepted the in-app
+     * Terms of use. Stored alongside [onboardingCompleted] so that if
+     * the terms text changes in a future update we can re-prompt
+     * users who accepted an older version.
+     */
+    var termsAcceptedAt: Long
+        get() = prefs.getLong(KEY_TERMS_ACCEPTED_AT, 0L)
+        set(value) = prefs.edit { putLong(KEY_TERMS_ACCEPTED_AT, value) }
+
+    /**
      * v10 user-selectable accent colour. Stored as one of the keys
      * defined in [AccentTheme]; an unknown value falls back to the
      * terracotta default at read time so we never paint a missing
@@ -244,6 +266,8 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
         private const val KEY_BLOCKLIST_AUTO_UPDATE = "key_blocklist_auto_update"
         private const val KEY_BLOCKLIST_LAST_CHECKED_AT = "key_blocklist_last_checked_at"
         private const val KEY_ACCENT = "key_accent"
+        private const val KEY_ONBOARDING_COMPLETED = "key_onboarding_completed"
+        private const val KEY_TERMS_ACCEPTED_AT = "key_terms_accepted_at"
 
         private const val DEFAULT_SEARCH_ENGINE = "duckduckgo"
 

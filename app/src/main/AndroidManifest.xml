@@ -85,6 +85,18 @@
             android:exported="false"
             android:label="@string/open_source_licenses_title" />
 
+        <!--
+          First-launch onboarding (Welcome / Privacy / Default browser).
+          Not exported — only MainActivity launches it, on cold start
+          when onboarding has not yet been completed. Locked to
+          singleTask so a launcher tap during onboarding doesn't stack
+          a second instance on top.
+        -->
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
         <service
             android:name=".DownloadService"
             android:exported="false"

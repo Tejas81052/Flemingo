@@ -224,6 +224,28 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<View>(R.id.row_open_source_licenses).setOnClickListener {
             startActivity(Intent(this, OpenSourceLicensesActivity::class.java))
         }
+
+        // Privacy / Terms rows open the hosted URLs in whichever
+        // browser the user has set as default — Ebors itself if
+        // they've made it default, otherwise the system default.
+        // We deliberately don't load them inside a local WebView
+        // here so the URL bar shows the real source (thimmaiah.me)
+        // and so a stale local copy can never be served if the
+        // hosted policy changes between app releases.
+        findViewById<View>(R.id.row_privacy_policy).setOnClickListener {
+            openExternalUrl(WelcomeActivity.PRIVACY_POLICY_URL)
+        }
+        findViewById<View>(R.id.row_terms).setOnClickListener {
+            openExternalUrl(WelcomeActivity.TERMS_OF_USE_URL)
+        }
+    }
+
+    private fun openExternalUrl(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.unsupported_link_message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onResume() {

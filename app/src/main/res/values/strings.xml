@@ -213,9 +213,39 @@
     <string name="about_version_label">Version %1$s</string>
     <string name="about_copyright">© 2025 Tejas Thimmaiah. Licensed under the Apache License, Version 2.0.</string>
     <string name="about_engine">Rendering engine: Android System WebView (Chromium-based).</string>
+    <string name="about_known_limitation">Note: voice search on websites that use the Web Speech API (e.g. Google\'s mic button) is unavailable. The system WebView does not implement Web Speech recognition; only Chrome on the same device does. Standard microphone access via getUserMedia (used by video calls, voice messages, etc.) works normally.</string>
     <string name="setting_open_source_licenses_title">Open-source licenses</string>
     <string name="setting_open_source_licenses_summary">Third-party libraries used by Ebors.</string>
     <string name="open_source_licenses_title">Open-source licenses</string>
+    <string name="setting_privacy_policy_title">Privacy policy</string>
+    <string name="setting_privacy_policy_summary">What Ebors does and doesn\'t collect.</string>
+    <string name="setting_terms_title">Terms of use</string>
+    <string name="setting_terms_summary">Conditions of using Ebors.</string>
+
+    <!-- First-launch onboarding (WelcomeActivity) -->
+    <string name="welcome_eyebrow">Welcome</string>
+    <string name="welcome_title">A calmer way to browse.</string>
+    <string name="welcome_subtitle">Ebors is a fast, private Android browser with built-in ad and tracker blocking. No accounts, no analytics, no surprises.</string>
+    <string name="welcome_continue">Continue</string>
+    <string name="welcome_version_label">Version %1$s</string>
+    <string name="welcome_open_with">Open with</string>
+
+    <string name="welcome_privacy_eyebrow">Privacy promise</string>
+    <string name="welcome_privacy_title">What Ebors does &amp; doesn\'t do</string>
+    <string name="welcome_privacy_bullets">• Your history, bookmarks and downloads stay on this device.\n• No analytics. No telemetry. No advertising SDKs.\n• Private tabs use an isolated profile, wiped when you close them.\n• The browser never sends your browsing to the developer.</string>
+    <string name="welcome_terms_consent">I agree to the Terms of use and have read the Privacy policy.</string>
+    <string name="welcome_link_privacy">Privacy policy</string>
+    <string name="welcome_link_terms">Terms of use</string>
+    <string name="welcome_accept">Accept &amp; continue</string>
+
+    <string name="welcome_default_eyebrow">One last thing</string>
+    <string name="welcome_default_title">Make Ebors your default browser?</string>
+    <string name="welcome_default_body">Optional. If you set Ebors as the default, links from other apps open here. You can change this any time in Android Settings.</string>
+    <string name="welcome_set_default">Set as default</string>
+    <string name="welcome_skip">Not now</string>
+
+    <string name="file_chooser_title">Choose file</string>
+    <string name="file_chooser_unavailable">No app available to pick a file.</string>
 
     <string name="library_title">Library</string>
     <string name="bookmarks_history">Bookmarks &amp; history</string>

@@ -414,6 +414,46 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    /**
+     * The [android.webkit.ValueCallback] from the most recently
+     * launched <input type="file"> picker. Cleared as soon as we
+     * post a result (or null) back to WebView — leaving it set
+     * across a second picker would leak the previous WebView's
+     * callback and starve the form from receiving its result.
+     *
+     * Only one chooser is in flight at a time: WebView is required
+     * to call our `onShowFileChooser` synchronously from the user's
+     * tap, and Android only shows one Activity-result chooser at a
+     * time anyway, so we don't need a queue.
+     */
+    private var pendingFileChooserCallback: android.webkit.ValueCallback<Array<android.net.Uri>>? = null
+
+    /**
+     * System file picker launcher for <input type="file">. Returns
+     * one or more Uris (depending on the page-side `multiple`
+     * attribute we passed via `EXTRA_ALLOW_MULTIPLE`). On cancel /
+     * empty result we post `null` so WebView clears the form's
+     * "loading" state and the user can try again. Posting `null`
+     * is also what Chrome does on cancel.
+     */
+    private val fileChooserLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val callback = pendingFileChooserCallback ?: return@registerForActivityResult
+            pendingFileChooserCallback = null
+            val uris: Array<android.net.Uri>? = if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                val clip = data?.clipData
+                when {
+                    clip != null && clip.itemCount > 0 -> Array(clip.itemCount) { clip.getItemAt(it).uri }
+                    data?.data != null -> arrayOf(data.data!!)
+                    else -> null
+                }
+            } else {
+                null
+            }
+            callback.onReceiveValue(uris)
+        }
+
     /** Accent that was active when this activity was last (re)created.
      *  onResume compares against [BrowserPreferences.accentKey] and
      *  recreate()s the activity if they diverge — that's how a tap in
@@ -427,6 +467,26 @@ class MainActivity : AppCompatActivity() {
         // also has to land before setContentView, so the order below is
         // deliberate.
         val prefs = BrowserPreferences.from(this)
+
+        // First-launch gate. If the user hasn't completed onboarding
+        // (welcome → privacy promise → terms acceptance), hand off to
+        // WelcomeActivity *before* any of the heavy initialisation
+        // below runs. We deliberately don't call super.onCreate /
+        // setContentView in that branch — the only thing the user
+        // should see on a fresh install is the welcome flow.
+        //
+        // Done before applyAccentTheme too so we don't pay theme
+        // inflation cost on a launch that's about to be torn down.
+        if (!prefs.onboardingCompleted) {
+            super.onCreate(savedInstanceState)
+            startActivity(
+                Intent(this, WelcomeActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            )
+            finish()
+            return
+        }
+
         applyAccentTheme(prefs)
         boundAccentKey = prefs.accentKey
 
@@ -1758,6 +1818,62 @@ class MainActivity : AppCompatActivity() {
 
             override fun onHideCustomView() {
                 exitFullscreen()
+            }
+
+            /**
+             * Handle <input type="file"> picker requests. Without this
+             * override every file-picker tap on every page silently
+             * no-ops — uploads in Gmail web, profile-picture pickers,
+             * "attach file" buttons all fail.
+             *
+             * We launch a system chooser combining ACTION_GET_CONTENT
+             * (apps that publish a content provider — gallery, files
+             * app, drive) with the MIME types the page asked for via
+             * the input's `accept=` attribute. Multi-select is
+             * honoured when the page set `multiple`. Camera capture
+             * for `accept="image/*" capture` falls through to whatever
+             * camera app the chooser surfaces; we deliberately don't
+             * roll our own FileProvider+ACTION_IMAGE_CAPTURE chain
+             * for v1.0 — Android's chooser already includes the
+             * camera as a source on devices that have one.
+             */
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: android.webkit.ValueCallback<Array<android.net.Uri>>?,
+                fileChooserParams: FileChooserParams?,
+            ): Boolean {
+                if (filePathCallback == null) return false
+                // Background-tab pages shouldn't pop a system picker.
+                if (tab !== activeTabOrNull) {
+                    filePathCallback.onReceiveValue(null)
+                    return true
+                }
+                // If another chooser is already in flight (shouldn't
+                // happen — WebView serialises these — defensive),
+                // resolve it with null first so its WebView isn't left
+                // hanging.
+                pendingFileChooserCallback?.onReceiveValue(null)
+                pendingFileChooserCallback = filePathCallback
+
+                val intent = fileChooserParams?.createIntent() ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                }
+                // Multi-select honours the page's `multiple` attribute.
+                if (fileChooserParams?.mode == FileChooserParams.MODE_OPEN_MULTIPLE) {
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                }
+                return try {
+                    fileChooserLauncher.launch(
+                        Intent.createChooser(intent, getString(R.string.file_chooser_title)),
+                    )
+                    true
+                } catch (_: ActivityNotFoundException) {
+                    pendingFileChooserCallback = null
+                    filePathCallback.onReceiveValue(null)
+                    showToast(getString(R.string.file_chooser_unavailable))
+                    false
+                }
             }
 
             override fun onCreateWindow(

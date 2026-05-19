@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c66744">
+  <title>App licensing &mdash; Ebors &middot; Tejas Thimmaiah</title>
+  <meta name="description" content="Licensing and open-source attributions for the Ebors Android browser.">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a href="/" class="brand">
+      <span class="brand-mark">●</span>
+      <span class="brand-name">Tejas Thimmaiah</span>
+    </a>
+    <nav class="site-nav">
+      <a href="/#about">About</a>
+      <a href="/#projects">Projects</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="doc">
+  <div class="wrap">
+    <p class="doc-eyebrow">Ebors · Licensing &amp; attributions</p>
+    <h1>App licensing</h1>
+    <p>
+      Ebors is an Android web browser distributed by Tejas Thimmaiah.
+      This page is the public companion to the <code>LICENSE</code> and
+      <code>NOTICE</code> files inside the Ebors source repository
+      and the in-app &ldquo;Open-source licenses&rdquo; screen.
+    </p>
+
+    <div class="toc">
+      <strong>On this page</strong>
+      <ol>
+        <li><a href="#license">License for Ebors itself</a></li>
+        <li><a href="#engine">Rendering engine</a></li>
+        <li><a href="#third-party">Third-party libraries</a></li>
+        <li><a href="#apache">Apache License, Version 2.0</a></li>
+        <li><a href="#trademarks">Trademarks &amp; brand</a></li>
+        <li><a href="#contact">Reporting an issue</a></li>
+      </ol>
+    </div>
+
+    <h2 id="license">License for Ebors itself</h2>
+    <p>
+      <strong>&copy; 2025 Tejas Thimmaiah.</strong> Ebors is licensed
+      under the
+      <a href="https://www.apache.org/licenses/LICENSE-2.0" rel="noopener">Apache License, Version 2.0</a>.
+      You are free to use, modify, and redistribute the source under
+      the terms of that license, including for commercial use,
+      provided you retain attribution and the license notice.
+    </p>
+    <p>
+      The Apache-2.0 license includes a patent grant from contributors
+      to users. It does <em>not</em> grant rights to use the
+      &ldquo;Ebors&rdquo; name or logo to label your own redistributions
+      &mdash; see <a href="#trademarks">Trademarks</a> below.
+    </p>
+
+    <h2 id="engine">Rendering engine</h2>
+    <p>
+      Ebors uses Android&rsquo;s system <strong>WebView</strong> as its
+      rendering engine. The system WebView is Chromium-based and is
+      provided by the device&rsquo;s operating system (Google or the
+      OEM); it is <strong>not bundled inside the Ebors APK</strong>.
+      That is why Ebors does not ship a copy of Chromium and is not
+      required to redistribute the Chromium <code>LICENSE</code> or
+      <code>credits.html</code> in its application bundle.
+    </p>
+    <p>
+      If you read the Ebors source you&rsquo;ll see calls into
+      <code>android.webkit.WebView</code> and the AndroidX
+      <code>androidx.webkit</code> compatibility layer; both of those
+      are interfaces, not the engine itself.
+    </p>
+
+    <h2 id="third-party">Third-party libraries (in the APK)</h2>
+    <p>
+      The libraries below are compiled into the Ebors APK. Every one
+      is distributed under the
+      <a href="#apache">Apache License, Version 2.0</a>.
+    </p>
+    <ul>
+      <li>
+        <strong>AndroidX</strong> &mdash; core-ktx, appcompat, activity,
+        constraintlayout, recyclerview, swiperefreshlayout, webkit.
+        &copy; Google LLC / The Android Open Source Project.
+      </li>
+      <li>
+        <strong>Material Components for Android</strong> &mdash;
+        &copy; Google LLC.
+      </li>
+      <li>
+        <strong>Kotlin standard library</strong> &mdash;
+        &copy; JetBrains s.r.o. and Kotlin contributors.
+      </li>
+      <li>
+        <strong>OkHttp</strong> &mdash; &copy; Square, Inc.
+      </li>
+    </ul>
+    <p>
+      Test-only dependencies (JUnit, <code>org.json</code>) are not
+      compiled into the shipping APK and so are not redistributed.
+    </p>
+
+    <h2 id="apache">Apache License, Version 2.0</h2>
+    <p>
+      The full text of the Apache License, Version 2.0 is available at
+      <a href="https://www.apache.org/licenses/LICENSE-2.0" rel="noopener">apache.org/licenses/LICENSE-2.0</a>
+      and is shipped in the Ebors source repository as the file
+      <code>LICENSE</code>. A short summary of the obligations it
+      places on a redistributor:
+    </p>
+    <ul>
+      <li>Include a copy of the License with any redistribution.</li>
+      <li>Mark any modified files as modified.</li>
+      <li>Retain copyright, patent, trademark, and attribution notices.</li>
+      <li>If the project includes a <code>NOTICE</code> file, include
+        a readable copy of it with redistributions.</li>
+    </ul>
+    <p>
+      The Apache-2.0 license is permissive, includes an explicit patent
+      grant, and is widely used across the Android ecosystem.
+    </p>
+
+    <h2 id="trademarks">Trademarks &amp; brand</h2>
+    <p>
+      &ldquo;Ebors&rdquo; and the Ebors logo are unregistered
+      trademarks of Tejas Thimmaiah. The Apache-2.0 license does not
+      grant permission to use these marks; if you fork the source and
+      redistribute, please use a different name and identity so users
+      can tell the upstream project apart from your fork.
+    </p>
+    <p>
+      &ldquo;Android,&rdquo; the Android logo, and &ldquo;Google
+      Play&rdquo; are trademarks of Google LLC. &ldquo;Chromium&rdquo;
+      is a name used by The Chromium Authors for their open-source
+      browser project. Ebors is independent and is not affiliated with
+      or endorsed by Google LLC or The Chromium Authors.
+    </p>
+
+    <h2 id="contact">Reporting an issue</h2>
+    <p>
+      If you believe a third-party component is missing from this
+      page, or you spot a licensing problem in the Ebors source,
+      please reach out at
+      <a href="mailto:hello@thimmaiah.me">hello@thimmaiah.me</a>.
+    </p>
+    <p class="muted" style="margin-top: 28px; font-size: 13.5px;">
+      Last updated: 2025.
+    </p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-row">
+    <p>&copy; 2025 Tejas Thimmaiah.</p>
+    <nav class="footer-nav">
+      <a href="applicencing.html">Licensing</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
