@@ -602,6 +602,11 @@ class MainActivity : AppCompatActivity() {
         }
         applyPreferences()
 
+        // Chrome starts visible, so inset the WebView above the bottom
+        // nav from the first paint. Deferred internally until the
+        // bottom chrome has measured a non-zero height.
+        applyWebContainerBottomInset(chromeVisible = true)
+
         maybeShowDefaultBrowserPrompt()
         maybeRequestNotificationPermission()
     }
@@ -2770,10 +2775,56 @@ class MainActivity : AppCompatActivity() {
                 bottomBehavior.slideIn(bottomChrome)
             }
         }
+        // Keep the WebView's bottom edge above the bottom nav while the
+        // chrome is visible, and let it expand to fill the freed space
+        // when the chrome hides. Without this the WebView is full-height
+        // and the nav floats over it, so a site's own bottom bar /
+        // content sits behind ours and can't be reached.
+        applyWebContainerBottomInset(chromeVisible = !hidden)
         // Hidden state: cancel the pending inactivity hide (it just
         // fired or is moot). Shown state: re-arm so the chrome will
         // auto-hide again after the next 4 s of quiet.
         if (hidden) cancelAutoHide() else scheduleAutoHide()
+    }
+
+    /**
+     * Size the WebView container so its bottom edge sits *above* the
+     * bottom navigation when the chrome is visible, and fills the whole
+     * area when the chrome is hidden. Driven by [setChromeHidden] and
+     * called once at bind time so the very first paint is already inset.
+     *
+     * The bottom chrome's height is 0 until the view tree's first
+     * layout pass; when we're asked to inset before that, defer to the
+     * next layout via [View.post] and re-read the resolved height.
+     */
+    private fun applyWebContainerBottomInset(chromeVisible: Boolean) {
+        val params = webContainer.layoutParams as? CoordinatorLayout.LayoutParams ?: return
+        if (!chromeVisible) {
+            if (params.bottomMargin != 0) {
+                params.bottomMargin = 0
+                webContainer.layoutParams = params
+            }
+            return
+        }
+        val height = bottomChrome.height
+        if (height == 0) {
+            bottomChrome.post {
+                // The chrome may have hidden again between post and run.
+                if (chromeHidden) return@post
+                val deferred = webContainer.layoutParams as? CoordinatorLayout.LayoutParams
+                    ?: return@post
+                val resolved = bottomChrome.height
+                if (deferred.bottomMargin != resolved) {
+                    deferred.bottomMargin = resolved
+                    webContainer.layoutParams = deferred
+                }
+            }
+            return
+        }
+        if (params.bottomMargin != height) {
+            params.bottomMargin = height
+            webContainer.layoutParams = params
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -2851,35 +2902,13 @@ class MainActivity : AppCompatActivity() {
      * the existing Brave-style overlay layout (margin = 0).
      */
     private fun applyShortsLayout(@Suppress("UNUSED_PARAMETER") active: Boolean) {
-        // No-op as of the inactivity-hide redesign.
-        //
-        // The previous implementation pushed web_container up by the
-        // bottom-chrome height whenever the active tab was on a Shorts
-        // URL. The intent was to keep Shorts' bottom controls visible
-        // above the chrome. The unintended consequence: that margin is
-        // static — when the chrome slid out via HideViewOnScrollBehavior
-        // (or now via the inactivity timer in scheduleAutoHide), the
-        // margin stayed, leaving a black band equal to the chrome's
-        // height at the bottom of the WebView (the bug the user filed
-        // with the "MOSFIATA" Shorts screenshot).
-        //
-        // The fix is to drop the margin entirely. The chrome already
-        // floats over the WebView on every other page; doing the same
-        // on Shorts is consistent, and the new 4 s inactivity hide
-        // clears the chrome out of the way fast enough that Shorts'
-        // bottom controls become visible without our help. Matches how
-        // Chrome and Brave handle the same screen.
-        //
-        // Existing margin from a previous Shorts navigation (the field
-        // started life as a long-lived layout mutation) is reset to 0
-        // here defensively so a hot-swap upgrade can't leave the user
-        // with a stranded letterbox.
+        // True no-op now. The WebView's bottom inset is owned uniformly
+        // by [applyWebContainerBottomInset], driven by chrome
+        // visibility, on every page including Shorts — so there is no
+        // Shorts-specific layout to apply, and nothing to reset (doing
+        // so here would fight the chrome-driven inset). Kept as a
+        // no-op so the YouTube poller / bridge call sites stay valid.
         shortsLayoutActive = false
-        val params = webContainer.layoutParams as? CoordinatorLayout.LayoutParams ?: return
-        if (params.bottomMargin != 0) {
-            params.bottomMargin = 0
-            webContainer.layoutParams = params
-        }
     }
 
     private fun injectPageScripts(view: WebView?, url: String?) {
