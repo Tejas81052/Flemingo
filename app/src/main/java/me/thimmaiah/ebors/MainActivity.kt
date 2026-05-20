@@ -1717,6 +1717,20 @@ class MainActivity : AppCompatActivity() {
         }
 
     private inner class SpeechRecognitionBridge(private val tab: Tab) {
+        /**
+         * Called synchronously by the polyfill before it decides whether
+         * to define window.webkitSpeechRecognition. If the device has no
+         * usable recognition service we return false so the polyfill
+         * stays out of the way and the site can fall back to its own
+         * path (often a getUserMedia recorder, which works). This stops
+         * us from advertising a flaky API and pushing sites into a
+         * "voice" branch that then errors with "mic not enabled".
+         */
+        @JavascriptInterface
+        fun isAvailable(): Boolean = runCatching {
+            android.speech.SpeechRecognizer.isRecognitionAvailable(this@MainActivity)
+        }.getOrDefault(false)
+
         @JavascriptInterface
         fun start(lang: String?, continuous: Boolean, interim: Boolean) {
             runOnUiThread {
@@ -4563,6 +4577,12 @@ class MainActivity : AppCompatActivity() {
                     if (window.__eborsSpeechInstalled) return;
                     var bridge = window.$SPEECH_BRIDGE_NAME;
                     if (!bridge || typeof bridge.start !== 'function') return;
+                    // Only polyfill when the device actually has speech
+                    // recognition. Otherwise stay invisible so the site
+                    // falls back to its own (often working) path instead
+                    // of trying our API and erroring.
+                    try { if (typeof bridge.isAvailable === 'function' && !bridge.isAvailable()) return; }
+                    catch (e) { return; }
                     window.__eborsSpeechInstalled = true;
 
                     var active = null;
