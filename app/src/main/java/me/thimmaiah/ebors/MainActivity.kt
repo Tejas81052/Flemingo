@@ -527,6 +527,11 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Correct any defaults that shipped wrong in an earlier build
+        // and got persisted (currently: the WebRTC block, which broke
+        // mic/camera). Runs at most once. Must precede bootstrapDefaults
+        // so the cleared key isn't immediately re-stamped.
+        prefs.migrateDefaults()
         // Fill in any "default on" toggles that the user has never
         // touched yet — covers existing installs upgrading to a build
         // where a new toggle became default-on. Idempotent and never

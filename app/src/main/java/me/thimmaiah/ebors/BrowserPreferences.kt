@@ -137,13 +137,20 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
 
     /**
      * Block WebRTC at the page level so STUN / TURN candidate gathering
-     * can't leak the user's local IP address even when behind a VPN.
-     * Default on for a privacy-leaning browser. Implementation is a
+     * can't leak the user's local IP address. Implementation is a
      * document-start scriptlet that replaces `RTCPeerConnection`
      * constructors with a stub that throws.
+     *
+     * Default **off**. Blocking WebRTC stubs RTCPeerConnection, which
+     * many mic/camera/voice/video-call sites construct as part of their
+     * normal flow — when it throws, those sites report "mic/camera not
+     * enabled" even though the user granted permission. Functionality
+     * wins for the default; the privacy-conscious can turn it on in
+     * Settings. (Chrome and Brave both ship WebRTC enabled by default
+     * for the same reason.)
      */
     var blockWebRtc: Boolean
-        get() = prefs.getBoolean(KEY_BLOCK_WEBRTC, true)
+        get() = prefs.getBoolean(KEY_BLOCK_WEBRTC, false)
         set(value) = prefs.edit { putBoolean(KEY_BLOCK_WEBRTC, value) }
 
     /**
@@ -265,11 +272,35 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
             if (!prefs.contains(KEY_BLOCKLIST_AUTO_UPDATE)) putBoolean(KEY_BLOCKLIST_AUTO_UPDATE, true)
             if (!prefs.contains(KEY_ALLOW_MIXED_CONTENT)) putBoolean(KEY_ALLOW_MIXED_CONTENT, true)
             if (!prefs.contains(KEY_AGGRESSIVE_ANTI_ADBLOCK)) putBoolean(KEY_AGGRESSIVE_ANTI_ADBLOCK, true)
-            if (!prefs.contains(KEY_BLOCK_WEBRTC)) putBoolean(KEY_BLOCK_WEBRTC, true)
+            // KEY_BLOCK_WEBRTC is intentionally NOT bootstrapped on — see
+            // [blockWebRtc] KDoc. Blocking it breaks mic/camera/calls.
             if (!prefs.contains(KEY_TRIM_REFERRER)) putBoolean(KEY_TRIM_REFERRER, true)
             if (!prefs.contains(KEY_HISTORY_ENABLED)) putBoolean(KEY_HISTORY_ENABLED, true)
             if (!prefs.contains(KEY_JS_ENABLED)) putBoolean(KEY_JS_ENABLED, true)
             if (!prefs.contains(KEY_BLOCK_POPUPS)) putBoolean(KEY_BLOCK_POPUPS, true)
+        }
+    }
+
+    /**
+     * One-shot corrections for defaults that shipped wrong in an
+     * earlier build and were persisted to disk before the fix.
+     * Idempotent via a per-correction flag so it runs at most once.
+     * Called from MainActivity.onCreate before bootstrapDefaults.
+     *
+     * Correction #1: an earlier build defaulted (and bootstrapped) the
+     * WebRTC block ON, which made RTCPeerConnection throw and broke
+     * mic / camera / voice / video-call sites that the user had
+     * actually granted access to. We clear the stored value once so it
+     * falls back to the new default (off). A user who deliberately
+     * wants WebRTC blocked can re-enable it in Settings afterward — the
+     * flag stops us clobbering that choice on subsequent launches.
+     */
+    fun migrateDefaults() {
+        if (!prefs.getBoolean(KEY_WEBRTC_DEFAULT_CORRECTED, false)) {
+            prefs.edit {
+                remove(KEY_BLOCK_WEBRTC)
+                putBoolean(KEY_WEBRTC_DEFAULT_CORRECTED, true)
+            }
         }
     }
 
@@ -312,6 +343,7 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
         private const val KEY_ACCENT = "key_accent"
         private const val KEY_ONBOARDING_COMPLETED = "key_onboarding_completed"
         private const val KEY_TERMS_ACCEPTED_AT = "key_terms_accepted_at"
+        private const val KEY_WEBRTC_DEFAULT_CORRECTED = "key_webrtc_default_corrected_v1"
 
         private const val DEFAULT_SEARCH_ENGINE = "duckduckgo"
 
