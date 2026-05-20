@@ -93,7 +93,6 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.behavior.HideViewOnScrollBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -262,7 +261,7 @@ class MainActivity : AppCompatActivity() {
      * Set from JS (via [RefreshGuardBridge]) when the user's finger is
      * down on an element that scrolls / pages on its own — e.g. a
      * YouTube Shorts swipe-paging container or any element with
-     * 
+     *
      * `overscroll-behavior: contain | none`. The SwipeRefreshLayout's
      * OnChildScrollUpCallback reads this on the UI thread, so the
      * volatile-write / volatile-read pair is enough; no extra lock.
@@ -596,7 +595,6 @@ class MainActivity : AppCompatActivity() {
 
         bindViews()
         applyInsets()
-        configureBottomChromeInset()
         configureNavigation()
         configureFindBar()
         configureSwipeRefresh()
@@ -1308,6 +1306,12 @@ class MainActivity : AppCompatActivity() {
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             insets
         }
+        // Force an immediate inset dispatch. Without this, if the system
+        // already dispatched insets before our listener was registered (a
+        // race that happens on some API levels), the listener fires with
+        // zeros — leaving rootView with no padding and the system nav bar
+        // overlapping the bottom of the layout.
+        ViewCompat.requestApplyInsets(rootView)
     }
 
     private fun configureNavigation() {
@@ -2795,86 +2799,34 @@ class MainActivity : AppCompatActivity() {
         scrollDirAccumPx = 0
         chromeAnimGateUntilMs = android.os.SystemClock.uptimeMillis() + CHROME_ANIM_GATE_MS
         topChrome.setExpanded(!hidden, /* animate = */ true)
-        val behavior =
-            (bottomChrome.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior
-        if (behavior is HideViewOnScrollBehavior<*>) {
-            @Suppress("UNCHECKED_CAST")
-            val bottomBehavior = behavior as HideViewOnScrollBehavior<View>
-            if (hidden) {
-                bottomBehavior.slideOut(bottomChrome)
-            } else {
-                bottomBehavior.slideIn(bottomChrome)
-            }
+        // bottom_chrome lives inside a LinearLayout (content_wrapper), so
+        // CoordinatorLayout behaviors (HideViewOnScrollBehavior) don't
+        // apply to it — the cast to CoordinatorLayout.LayoutParams would
+        // always return null. Instead we animate with translationY and
+        // toggle GONE/VISIBLE so the LinearLayout releases the space and
+        // main_content_area (the WebView host) truly resizes — satisfying
+        // the requirement that the viewport grows when the chrome hides.
+        if (hidden) {
+            val slideDistance = bottomChrome.height.toFloat()
+            bottomChrome.animate()
+                .translationY(slideDistance)
+                .setDuration(250)
+                .withEndAction { bottomChrome.visibility = View.GONE }
+                .start()
+        } else {
+            // Pre-position off-screen then slide back in so the bar
+            // doesn't jump into view from y=0.
+            bottomChrome.translationY = bottomChrome.height.toFloat()
+            bottomChrome.visibility = View.VISIBLE
+            bottomChrome.animate()
+                .translationY(0f)
+                .setDuration(250)
+                .start()
         }
-        // Keep the WebView's bottom edge above the bottom nav while the
-        // chrome is visible, and let it expand to fill the freed space
-        // when the chrome hides. Without this the WebView is full-height
-        // and the nav floats over it, so a site's own bottom bar /
-        // content sits behind ours and can't be reached.
-        applyWebContainerBottomInset(chromeVisible = !hidden)
         // Hidden state: cancel the pending inactivity hide (it just
         // fired or is moot). Shown state: re-arm so the chrome will
         // auto-hide again after the next 4 s of quiet.
         if (hidden) cancelAutoHide() else scheduleAutoHide()
-    }
-
-    /**
-     * Register a persistent layout-change listener on [bottomChrome] so
-     * [webHost]'s bottom padding stays in sync with the chrome's height
-     * across its entire lifetime — including the very first layout pass,
-     * which fires asynchronously after [onCreate] returns.
-     *
-     * The old [applyWebContainerBottomInset] approach used [View.post]
-     * for the deferred case, which queues on the main message handler.
-     * On some frames that runnable executed *before* the layout traversal
-     * completed, so [bottomChrome].height was still 0 at the time it ran
-     * and the padding was never set, leaving the WebView's bottom edge
-     * hidden behind [bottomChrome] for the entire session.
-     *
-     * Called once from [onCreate]; the listener lives as long as the view.
-     */
-    private fun configureBottomChromeInset() {
-        bottomChrome.addOnLayoutChangeListener { _, _, top, _, bottom, _, _, _, _ ->
-            val newHeight = bottom - top
-            applyWebContainerBottomInset(chromeVisible = !chromeHidden, knownHeight = newHeight)
-        }
-    }
-
-    /**
-     * Shrink the actual WebView so its bottom edge sits *above* the
-     * bottom navigation while the chrome is visible, and let it fill
-     * the whole area when the chrome hides. This is what makes a page's
-     * `100vh` (YouTube Shorts' video, any sticky bottom bar) reflow to
-     * the visible region instead of hiding behind our nav.
-     *
-     * Why bottom **padding on web_host** rather than a margin on
-     * web_container: web_container carries
-     * `appbar_scrolling_view_behavior`, and AppBarLayout's
-     * ScrollingViewBehavior re-measures the scrolling view to fill the
-     * full height below the AppBar on every layout pass — it ignores
-     * the view's bottomMargin, so a margin there is silently dropped
-     * (this was the "nothing changed" bug). web_host is a plain
-     * FrameLayout with no behavior; padding-bottom on it measures its
-     * MATCH_PARENT child (the WebView) to `height − padding`, so the
-     * WebView truly resizes and the page sees a smaller viewport.
-     *
-     * [knownHeight] can be supplied by [configureBottomChromeInset]'s
-     * layout-change callback to skip a redundant [bottomChrome].height
-     * read; callers that don't have it pass -1 and we read it here.
-     */
-    private fun applyWebContainerBottomInset(
-        chromeVisible: Boolean,
-        knownHeight: Int = -1,
-    ) {
-        val px = if (chromeVisible) {
-            val h = if (knownHeight >= 0) knownHeight else bottomChrome.height
-            h.coerceAtLeast(0)
-        } else {
-            0
-        }
-        if (webHost.paddingBottom != px) {
-            webHost.setPadding(webHost.paddingLeft, webHost.paddingTop, webHost.paddingRight, px)
-        }
     }
 
     // ---------------------------------------------------------------------
@@ -2935,28 +2887,11 @@ class MainActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
-    /**
-     * Toggle the Shorts-fit inset on the web_container. When `active`,
-     * `web_container` is shortened by the bottom-chrome height so the
-     * WebView's actual viewport sits *above* the chrome instead of
-     * extending behind it. The page then sees a smaller `100vh` and
-     * Shorts' video / right-rail / page-indicator naturally reflow into
-     * the visible area, regardless of which DOM elements YouTube uses
-     * (i.e. this fix is robust across DOM revisions in a way the
-     * earlier CSS-selector approach was not).
-     *
-     * Scoped strictly to Shorts: every call path that toggles this
-     * either reads the active tab's URL or is driven by the JS-injected
-     * [YOUTUBE_SHORTS_LAYOUT_SCRIPT], which only fires on `/shorts/`
-     * URLs. Other tabs / other sites / other pages on YouTube stay on
-     * the existing Brave-style overlay layout (margin = 0).
-     */
+    /** No-op stub kept so YouTube poller / bridge call sites compile. */
     private fun applyShortsLayout(@Suppress("UNUSED_PARAMETER") active: Boolean) {
-        // True no-op now. The WebView's bottom inset is owned uniformly
-        // by [applyWebContainerBottomInset], driven by chrome
-        // visibility, on every page including Shorts — so there is no
-        // Shorts-specific layout to apply, and nothing to reset (doing
-        // so here would fight the chrome-driven inset). Kept as a
+        // True no-op. bottom_chrome lives inside content_wrapper (a
+        // LinearLayout), so main_content_area is naturally sized to
+        // exclude it — no Shorts-specific inset is needed. Kept as a
         // no-op so the YouTube poller / bridge call sites stay valid.
         shortsLayoutActive = false
     }
