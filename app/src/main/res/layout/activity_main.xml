@@ -29,8 +29,7 @@
             android:paddingStart="12dp"
             android:paddingTop="8dp"
             android:paddingEnd="12dp"
-            android:paddingBottom="6dp"
-            app:layout_scrollFlags="scroll">
+            android:paddingBottom="6dp">
 
             <!--
               V9: refresh button (right side) coexists with the address
@@ -115,8 +114,7 @@
             android:progress="0"
             android:progressBackgroundTint="@android:color/transparent"
             android:progressTint="?attr/browserAccent"
-            android:visibility="gone"
-            app:layout_scrollFlags="scroll" />
+            android:visibility="gone" />
 
         <!--
           Find-in-page bar stays pinned (no scroll flags) so a long
