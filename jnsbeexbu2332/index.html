@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NODE 02 // intercept</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+
+  <!-- node manifest (machine-readable; do not edit by hand) -->
+  <!-- x-manifest: {"node":"02","ttl":3600,"cipher":"CIPHER","region":"ap-south-1"} -->
+  <!-- decoy-manifest: {"node":"02b","cipher":"WRONGKEY","note":"shadow copy"} -->
+</head>
+<body class="n2">
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main class="shell">
+    <header class="hero">
+      <div class="tag">// node 02 reached &mdash; you really did it</div>
+      <h1 class="glitch" data-text="ACCESS GRANTED">ACCESS GRANTED</h1>
+      <div class="stage">STAGE 02 / 03 &nbsp;·&nbsp; <span class="blink">intercepting...</span></div>
+    </header>
+
+    <article class="letter wide">
+      <!-- TODO(tejas): replace with your own gratitude / memories -->
+      <p>
+        Okay, showoff. You decoded a key out of three scattered fragments to get
+        here. (probably AI) <span class="hi">Of course you did.</span>
+      </p>
+      <p>
+        While you're catching your breath &mdash; I just want to say thank you,
+        properly. For every time you had my back, every dumb joke that turned a
+        bad day around, and for being the kind of friend people are lucky to find
+        once. The memories below are just a few. There are too many to log.
+      </p>
+    </article>
+
+    <!-- interactive memory logs -->
+    <section class="logs" aria-label="memory logs">
+      <div class="logcard"><div class="lc-front">LOG&nbsp;#001</div><div class="lc-back"><!-- TODO: a memory -->that time when we caught late for chemistry 🛣️</div></div>
+      <div class="logcard"><div class="lc-front">LOG&nbsp;#002</div><div class="lc-back"><!-- TODO: a memory -->that time when your explaining Bio class ☕</div></div>
+      <div class="logcard"><div class="lc-front">LOG&nbsp;#003</div><div class="lc-back"><!-- TODO: a memory -->the extraterrestrial  joke I can't explain 😂</div></div>
+      <div class="logcard"><div class="lc-front">LOG&nbsp;#004</div><div class="lc-back"><!-- TODO: a memory -->the one who always there 💪🏻</div></div>
+    </section>
+
+    <!-- decryption console -->
+    <section class="decryptor">
+      <div class="dz-head">// INTERCEPTED TRANSMISSION</div>
+      <p class="dz-note">
+        A ciphertext was captured on this channel. The decryption hint was routed to
+        your developer console (open DevTools &rarr; Console). Recover the plaintext,
+        then submit it as the <strong>access key</strong> to unseal node 03.
+      </p>
+      <div class="dz-row">
+        <span class="prompt">key&gt;</span>
+        <input id="keyInput" class="dz-input" autocomplete="off" spellcheck="false"
+               placeholder="enter decrypted access key" aria-label="access key" />
+        <button id="keyBtn" class="dz-btn">UNSEAL</button>
+      </div>
+      <div id="dzMsg" class="dz-msg"></div>
+      <div id="dzReveal" class="dz-reveal hidden"></div>
+    </section>
+
+    <footer class="foot">
+      <span>thimmaiah.me // node 02</span>
+      <span class="muted">the wire never lies. (check the console.)</span>
+    </footer>
+  </main>
+
+  <script src="js/matrix.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
