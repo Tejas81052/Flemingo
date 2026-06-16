@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>S.B.D.H // secure channel</title>
+  <meta name="description" content="incoming transmission" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/main.css" />
+
+  <!-- ============================================================= -->
+  <!--  TRANSMISSION HEADER                                          -->
+  <!--  node: SBDH-01   ::   3 signal fragments are required.        -->
+  <!--  fragment sig.0 :: TkVPTg==                                   -->   <!-- (one real fragment lives here) -->
+  <!--  sig.x :: bmljZSB0cnk=                                        -->   <!-- (not every signal is genuine) -->
+  <!--  Assemble all three fragments, in order, to forge the key.    -->
+  <!-- ============================================================= -->
+</head>
+<body>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <main class="shell">
+    <!-- boot sequence -->
+    <section id="boot" class="boot">
+      <pre id="bootlog" class="bootlog"></pre>
+    </section>
+
+    <!-- main content (revealed after boot) -->
+    <section id="content" class="content hidden">
+      <header class="hero">
+        <div class="tag">// secure channel established</div>
+        <h1 class="glitch" data-text="HAPPY BIRTHDAY">HAPPY BIRTHDAY</h1>
+        <h2 class="glitch name" data-text="SHASHANK">SHASHANK</h2>
+        <div class="stage">STAGE 01 / 03 &nbsp;·&nbsp; <span class="blink">access: granted</span></div>
+      </header>
+
+      <div class="grid">
+        <figure class="portrait">
+          <div class="frame">
+            <img src="assets/profile.png" alt="target acquired" />
+            <div class="frame-glow"></div>
+            <figcaption>SUBJECT: SHASHANK &nbsp;|&nbsp; STATUS: legend</figcaption>
+          </div>
+        </figure>
+
+        <article class="letter">
+          <!-- TODO(tejas): replace the message below with your own words -->
+          <p>Hey Shashank,</p>
+          <p>
+            Another trip around the sun for one of the Resillient minds I know.
+            You've stood by my side through everything, and I don't say it
+            enough &mdash; <span class="hi">thank you</span>. For the patience,
+            the late-night talks, the loyalty, all of it.
+          </p>
+          <p>
+            But I'm not going to just <em>hand</em> you a birthday card. You break
+            systems for a living &mdash; so let's see you break this one. There's a
+            gift at the end. You'll have to earn it. 😏
+          </p>
+          <p class="signoff">&mdash; with gratitude, your friend Tejas Thimmaiah.</p>
+        </article>
+      </div>
+
+      <!-- interactive terminal -->
+      <section class="terminal" id="terminal">
+        <div class="term-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="term-title">shashank@birthday: ~/stage-01</span>
+        </div>
+        <div class="term-body" id="termBody"></div>
+        <div class="term-input-row">
+          <span class="prompt">&gt;</span>
+          <input id="termInput" class="term-input" autocomplete="off" spellcheck="false"
+                 autofocus placeholder="type 'help' and press enter" aria-label="terminal input" />
+        </div>
+      </section>
+
+      <!-- locked gate -->
+      <section id="gate" class="gate locked">
+        <div class="gate-inner">
+          <div class="lock-icon">🔒</div>
+          <div class="gate-text">NEXT NODE LOCKED &mdash; decrypt to proceed</div>
+          <div id="gateReveal" class="gate-reveal hidden"></div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>thimmaiah.me // SBDH</span>
+        <span class="muted">hint: nothing here is an accident.</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/boot.js"></script>
+  <script src="js/terminal.js"></script>
+</body>
+</html>
