@@ -229,6 +229,12 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
         get() = prefs.getString(KEY_HOME_PAGE, "").orEmpty()
         set(value) = prefs.edit { putString(KEY_HOME_PAGE, value) }
 
+    /** Last target selected in the page translator. Empty means choose from
+     *  the device locale, with English as the final fallback. */
+    var translationTargetLanguage: String
+        get() = prefs.getString(KEY_TRANSLATION_TARGET_LANGUAGE, "").orEmpty()
+        set(value) = prefs.edit { putString(KEY_TRANSLATION_TARGET_LANGUAGE, value) }
+
     var defaultBrowserPromptShown: Boolean
         get() = prefs.getBoolean(KEY_DEFAULT_BROWSER_PROMPT_SHOWN, false)
         set(value) = prefs.edit { putBoolean(KEY_DEFAULT_BROWSER_PROMPT_SHOWN, value) }
@@ -367,6 +373,7 @@ class BrowserPreferences private constructor(private val prefs: SharedPreference
         private const val KEY_TAB_SLEEPING = "key_tab_sleeping"
         private const val KEY_CLEAR_DATA_ON_EXIT = "key_clear_data_on_exit"
         private const val KEY_HOME_PAGE = "key_home_page"
+        private const val KEY_TRANSLATION_TARGET_LANGUAGE = "key_translation_target_language"
         private const val KEY_DEFAULT_BROWSER_PROMPT_SHOWN = "key_default_browser_prompt_shown"
         private const val KEY_NOTIFICATION_PERMISSION_PROMPT_SHOWN = "key_notification_permission_prompt_shown"
         private const val KEY_ALWAYS_HTTPS = "key_always_https"

@@ -1,42 +1,84 @@
 Ebors
-Copyright 2026 Tejas Thimmaiah
+Copyright (C) 2026 Tejas Thimmaiah
 
-This product is licensed under the Apache License, Version 2.0 (see the
-accompanying LICENSE file).
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version. See the accompanying LICENSE file for the full text.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+more details.
 
 Ebors uses Android's system WebView (Chromium-based) as its rendering
-engine. The system WebView is provided by the device's operating system
-and is not bundled with this application.
+engine. The system WebView is provided by the device's operating system and
+is not bundled with this application.
 
-------------------------------------------------------------------------
-Third-party libraries shipped inside the Ebors APK
-------------------------------------------------------------------------
+========================================================================
+Incorporated GPL-licensed components
+========================================================================
 
-This product includes software developed by:
+  - uBlock Origin  (Copyright (C) Raymond Hill and contributors)
+    GNU General Public License, version 3.
+    Ebors bundles and/or downloads uBlock Origin / uAssets filter lists
+    ("uBlock filters", Unbreak, Quick fixes, Privacy, Badware) and reuses
+    uBlock Origin scriptlets. The content-blocking filter engine in Ebors
+    is an independent implementation of the EasyList/Adblock-Plus filter
+    syntax.
+    https://github.com/gorhill/uBlock
+    https://github.com/uBlockOrigin/uAssets
+
+  - EasyList and EasyPrivacy  (Copyright (C) The EasyList authors)
+    Dual-licensed under the GNU General Public License, version 3, and the
+    Creative Commons Attribution-ShareAlike 3.0 Unported license.
+    https://easylist.to/
+
+  - Additional blocklists fetched at runtime (Online Malicious URL
+    Blocklist / URLhaus, Peter Lowe's Ad and tracking server list) remain
+    under the licenses of their respective upstream projects.
+
+The combined work (Ebors together with the GPL components above) is
+distributed under the GNU General Public License, version 3 or later.
+
+========================================================================
+Third-party libraries shipped inside the Ebors APK (Apache-2.0)
+========================================================================
+
+The following libraries are licensed under the Apache License, Version 2.0,
+which is compatible with and may be incorporated into a GPL-3 work:
 
   - The Android Open Source Project / Google LLC
     AndroidX (core-ktx, appcompat, activity, constraintlayout, recyclerview,
     swiperefreshlayout, webkit) and Material Components for Android.
-    Apache License, Version 2.0.
     https://developer.android.com/jetpack/androidx
     https://github.com/material-components/material-components-android
 
   - JetBrains s.r.o. and Kotlin Programming Language contributors
     Kotlin standard library.
-    Apache License, Version 2.0.
     https://github.com/JetBrains/kotlin
 
   - Square, Inc.
     OkHttp.
-    Apache License, Version 2.0.
     https://github.com/square/okhttp
 
-The full text of the Apache License, Version 2.0 is included in LICENSE
-and is also available at http://www.apache.org/licenses/LICENSE-2.0.
+  - ZXing authors / JourneyApps
+    ZXing Android Embedded (QR scanning).
+    https://github.com/journeyapps/zxing-android-embedded
 
-The Android name, the Android logo, the "Droid" name, and other Android
-trademarks are property of Google LLC. Ebors is not affiliated with or
-endorsed by Google LLC. "Chromium" is a name used by The Chromium Authors
-to refer to their open-source browser project; the Chromium-based engine
-in Android's system WebView is shipped by Google / the device OEM and is
-not redistributed by Ebors.
+A copy of the Apache License, Version 2.0 is available at
+http://www.apache.org/licenses/LICENSE-2.0
+
+========================================================================
+Trademarks
+========================================================================
+
+"Ebors" and the Ebors logo are unregistered trademarks of Tejas Thimmaiah.
+The GPL does not grant permission to use these marks to label your own
+redistributions; if you fork and redistribute, please use a different name.
+
+The Android name, the Android logo, and other Android trademarks are
+property of Google LLC. Ebors is not affiliated with or endorsed by Google
+LLC. "Chromium" is a name used by The Chromium Authors for their open-source
+browser project; the Chromium-based engine in Android's system WebView is
+shipped by Google / the device OEM and is not redistributed by Ebors.

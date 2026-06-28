@@ -48,6 +48,12 @@ internal object ReaderMode {
     private const val EXTRACTOR_ASSET = "reader.js"
     private const val TEMPLATE_ASSET = "reader.html"
 
+    @Volatile
+    private var cachedExtractor: String? = null
+
+    @Volatile
+    private var cachedTemplate: String? = null
+
     /**
      * Run extraction against [webView]'s current document and call
      * [onResult] on the WebView's thread (the JS engine's main thread
@@ -58,7 +64,9 @@ internal object ReaderMode {
      */
     fun extractInto(webView: WebView, onResult: (String?) -> Unit) {
         val script = try {
-            loadAsset(webView.context, EXTRACTOR_ASSET)
+            cachedExtractor ?: loadAsset(webView.context, EXTRACTOR_ASSET).also {
+                cachedExtractor = it
+            }
         } catch (e: IOException) {
             Log.w(TAG, "Failed to load $EXTRACTOR_ASSET", e)
             onResult(null)
@@ -112,19 +120,27 @@ internal object ReaderMode {
      * with that origin's privileges — hence the second pass.
      */
     private fun renderTemplate(context: Context, data: JSONObject): String {
-        val template = loadAsset(context, TEMPLATE_ASSET)
+        val template = cachedTemplate ?: loadAsset(context, TEMPLATE_ASSET).also {
+            cachedTemplate = it
+        }
 
         val title = data.optString("title").trim()
             .ifBlank { context.getString(R.string.reader_mode_default_title) }
         val byline = data.optString("byline").trim()
         val siteName = data.optString("siteName").trim()
         val wordCount = data.optInt("wordCount", 0)
-        val readingMinutes = (wordCount / READING_WORDS_PER_MINUTE).coerceAtLeast(1)
+        val readingMinutes = (
+            (wordCount + READING_WORDS_PER_MINUTE - 1) / READING_WORDS_PER_MINUTE
+            ).coerceAtLeast(1)
         val lang = data.optString("lang").trim().ifBlank { "en" }
+        val direction = data.optString("dir").trim().lowercase()
+            .takeIf { it == "rtl" } ?: "ltr"
+        val publishedTime = data.optString("publishedTime").trim()
 
         val metaParts = mutableListOf<String>()
         if (byline.isNotBlank()) metaParts += byline
         if (siteName.isNotBlank()) metaParts += siteName
+        if (publishedTime.isNotBlank()) metaParts += publishedTime.substringBefore('T')
         if (wordCount > 0) {
             metaParts += context.getString(R.string.reader_mode_reading_time, readingMinutes)
         }
@@ -134,6 +150,7 @@ internal object ReaderMode {
 
         return template
             .replace("\${LANG}", htmlEscape(lang))
+            .replace("\${DIR}", direction)
             .replace("\${TITLE}", htmlEscape(title))
             .replace("\${META}", meta)
             .replace("\${CONTENT}", content)

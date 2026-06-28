@@ -74,6 +74,24 @@ class Tab(
      *  and used to repopulate the address bar when the user switches to it. */
     var displayUrl: String = ""
 
+    /**
+     * Current main-frame load progress. Kept per-tab so page actions that
+     * depend on a settled DOM (Reader/Offline) do not guess from the active
+     * progress bar, which only reflects the foreground tab.
+     */
+    var loadProgress: Int = 100
+
+    /**
+     * Reader mode replaces the WebView document with app-generated HTML.
+     * These fields keep the original page identity and rendered reader HTML
+     * attached to the tab so bookmark/offline/share style actions can still
+     * operate on the real website rather than the synthetic reader document.
+     */
+    var readerModeSourceUrl: String? = null
+    var readerModeSourceTitle: String? = null
+    var readerModeHtml: String? = null
+    var pendingReaderModeUrl: String? = null
+
     /** Wall-clock time this tab was last the active/foreground tab (set when
      *  it's switched away from). Drives proactive tab-sleeping: a background
      *  tab idle past the threshold has its page dropped to free memory. */
@@ -148,6 +166,29 @@ class Tab(
 
     /** Bitmask of the privacy document-start preferences installed above. */
     var privacyDocumentStartFlags: Int = DOCUMENT_START_FLAGS_UNSET
+
+    /**
+     * Host of the current top-level document. Read off the WebView worker
+     * thread in `shouldInterceptRequest` to decide first- vs third-party, so
+     * it is @Volatile and set from the main thread on each main-frame load.
+     */
+    @Volatile
+    var currentHost: String? = null
+
+    /**
+     * Original page URL retained while this tab is showing a Google
+     * Translate proxy. Keeping it explicitly lets the user switch target
+     * languages without trying to reverse Google’s translated host name.
+     */
+    var translationSourceUrl: String? = null
+    var translationTargetLanguage: String? = null
+
+    fun clearReaderModeState() {
+        readerModeSourceUrl = null
+        readerModeSourceTitle = null
+        readerModeHtml = null
+        pendingReaderModeUrl = null
+    }
 
     /**
      * Document-start hook that installs the `webkitSpeechRecognition`

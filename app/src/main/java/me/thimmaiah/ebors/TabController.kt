@@ -115,9 +115,12 @@ class TabController(
 
         val isHome = url == MainActivity.ABOUT_HOME_URL
         if (switchTo) {
-            if (!url.isNullOrBlank() && !isHome) {
-                newWebView.loadUrl(url)
-            }
+            // Queue the first navigation through switchToTab so the WebView is
+            // attached to the window and resumed before Chromium starts the
+            // document. Loading first and attaching second leaves a short
+            // lifecycle race on cold start/new tabs where media can receive a
+            // synthetic pause immediately after its first play.
+            tab.pendingLoadUrl = url?.takeUnless { it.isBlank() || isHome }
             switchToTab(_tabs.size - 1)
         } else {
             tab.pendingLoadUrl = url?.takeUnless { it.isBlank() || isHome }

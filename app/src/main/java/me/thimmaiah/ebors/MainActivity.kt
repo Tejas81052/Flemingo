@@ -34,6 +34,7 @@ import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
 import android.os.Message
+import android.os.SystemClock
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
@@ -60,12 +61,14 @@ import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ListView
 import android.widget.ListPopupWindow
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -93,6 +96,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var rootView: View
@@ -1237,6 +1241,8 @@ class MainActivity : AppCompatActivity() {
                 return BrowserBlocker.createBlockingResponse(
                     url = request.url.toString(),
                     isMainFrame = request.isForMainFrame,
+                    requestHeaders = request.requestHeaders,
+                    documentHost = null,
                 )
             }
         })
@@ -1357,6 +1363,7 @@ class MainActivity : AppCompatActivity() {
 
         target.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                tab.loadProgress = newProgress
                 if (tab !== activeTabOrNull) return
                 progressBar.progress = newProgress
                 progressBar.isVisible = newProgress in 0..99
@@ -1515,11 +1522,14 @@ class MainActivity : AppCompatActivity() {
                 return BrowserBlocker.createBlockingResponse(
                     url = request?.url?.toString(),
                     isMainFrame = request?.isForMainFrame == true,
+                    requestHeaders = request?.requestHeaders,
+                    documentHost = tab.currentHost,
                 )
             }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                tab.loadProgress = 0
 
                 // A full navigation in the tab that was driving background
                 // audio means the old media element is gone; clear the
@@ -1534,6 +1544,14 @@ class MainActivity : AppCompatActivity() {
                     hideStartPage()
                 }
                 url?.takeUnless { it == ABOUT_BLANK_URL }?.let { tab.displayUrl = it }
+                tab.currentHost = BrowserBlocker.hostOf(url)
+                if (tab.pendingReaderModeUrl == null || tab.pendingReaderModeUrl != url) {
+                    tab.clearReaderModeState()
+                }
+                if (!PageTranslator.isTranslationUrl(url)) {
+                    tab.translationSourceUrl = null
+                    tab.translationTargetLanguage = null
+                }
                 tab.insecurePageWarningShown = false
                 tab.mainFrameErrored = false
                 tab.siteNotFoundUrl = null
@@ -1554,6 +1572,10 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
+                tab.loadProgress = 100
+                if (tab.pendingReaderModeUrl == url) {
+                    tab.pendingReaderModeUrl = null
+                }
                 injectPageScripts(view, url)
                 url?.takeUnless { it == ABOUT_BLANK_URL }?.let { tab.displayUrl = it }
                 if (url != ABOUT_BLANK_URL) view?.title?.let { tab.displayTitle = it }
@@ -2260,7 +2282,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val tab = activeTabOrNull
-        val currentUrl = tab?.webView?.url.orEmpty()
+        val currentUrl = currentPageUrl(tab).orEmpty()
         val hasPage = currentUrl.isNotBlank()
         val isBookmarked = hasPage && BookmarkRepository.isBookmarked(currentUrl)
 
@@ -2430,12 +2452,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleCurrentPageBookmark(tab: Tab?) {
-        val url = tab?.webView?.url
+        val url = currentPageUrl(tab)
         if (url.isNullOrBlank()) {
             showToast(getString(R.string.no_page_loaded))
             return
         }
-        val nowSaved = BookmarkRepository.addOrRemove(url, tab.webView.title.orEmpty())
+        val nowSaved = BookmarkRepository.addOrRemove(url, currentPageTitle(tab))
         showToast(
             getString(
                 if (nowSaved) R.string.bookmark_added else R.string.bookmark_removed,
@@ -2453,24 +2475,56 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun canEnterReaderMode(): Boolean {
-        val url = activeTabOrNull?.webView?.url ?: return false
-        return url.startsWith("http://", ignoreCase = true) ||
+    private fun currentPageUrl(tab: Tab? = activeTabOrNull): String? {
+        if (tab == null) return null
+        return listOf(
+            tab.readerModeSourceUrl,
+            tab.webView.url,
+            tab.displayUrl,
+        ).firstOrNull { url ->
+            !url.isNullOrBlank() &&
+                url != ABOUT_BLANK_URL &&
+                url != ABOUT_HOME_URL
+        }
+    }
+
+    private fun currentHttpPageUrl(tab: Tab? = activeTabOrNull): String? =
+        currentPageUrl(tab)?.takeIf(::isHttpPageUrl)
+
+    private fun currentPageTitle(tab: Tab?): String {
+        if (tab == null) return ""
+        return tab.readerModeSourceTitle
+            ?.takeIf { it.isNotBlank() }
+            ?: tab.webView.title.orEmpty().ifBlank { tab.displayTitle }
+    }
+
+    private fun isHttpPageUrl(url: String): Boolean =
+        url.startsWith("http://", ignoreCase = true) ||
             url.startsWith("https://", ignoreCase = true)
+
+    private fun canEnterReaderMode(): Boolean {
+        val tab = activeTabOrNull ?: return false
+        return currentHttpPageUrl(tab) != null && tab.loadProgress >= 100
     }
 
     private fun enterReaderMode() {
         val tab = activeTabOrNull ?: return
-        val originalUrl = tab.webView.url
+        val originalUrl = currentHttpPageUrl(tab)
         if (originalUrl.isNullOrBlank() || !canEnterReaderMode()) {
             showToast(getString(R.string.reader_mode_not_eligible))
             return
         }
+        val originalTitle = currentPageTitle(tab)
+        cancelAddressEditing()
         ReaderMode.extractInto(tab.webView) { html ->
             if (html == null) {
                 showToast(getString(R.string.reader_mode_not_eligible))
                 return@extractInto
             }
+            tab.readerModeSourceUrl = originalUrl
+            tab.readerModeSourceTitle = originalTitle
+            tab.readerModeHtml = html
+            tab.pendingReaderModeUrl = originalUrl
             tab.webView.loadDataWithBaseURL(
                 originalUrl,
                 html,
@@ -2481,26 +2535,122 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Re-open the current page through Google Translate's page proxy,
-     * targeting English with source-language auto-detection. The proxy
-     * renders a fully translated copy of the site (translate.goog), so this
-     * works on any http(s) page without an on-device translation model.
-     */
     private fun translateCurrentPage() {
-        val url = activeTabOrNull?.webView?.url
-        if (url.isNullOrBlank() ||
-            !(url.startsWith("http://", true) || url.startsWith("https://", true))
-        ) {
+        val tab = activeTabOrNull
+        val currentUrl = currentPageUrl(tab)
+        if (tab == null || currentUrl.isNullOrBlank()) {
             showToast(getString(R.string.translate_not_available))
             return
         }
-        if (url.contains(".translate.goog") || url.contains("translate.google.com")) {
-            showToast(getString(R.string.translate_already))
+
+        val sourceUrl = tab.translationSourceUrl
+            ?: PageTranslator.extractSourceUrl(currentUrl)
+            ?: currentUrl.takeUnless(PageTranslator::isTranslationUrl)
+        if (sourceUrl == null) {
+            showToast(getString(R.string.translate_source_unavailable))
             return
         }
-        val proxy = "https://translate.google.com/translate?sl=auto&tl=en&u=" + Uri.encode(url)
-        navigationController.loadAddress(proxy)
+        showTranslateLanguageDialog(tab, sourceUrl)
+    }
+
+    /**
+     * Searchable target-language picker. The page proxy auto-detects the
+     * source language; the selected target is remembered for the next page.
+     */
+    private fun showTranslateLanguageDialog(tab: Tab, sourceUrl: String) {
+        val preferred = PageTranslator.preferred(
+            deviceLanguageTag = Locale.getDefault().toLanguageTag(),
+            persistedCode = prefs.translationTargetLanguage,
+        )
+        val ordered = buildList {
+            add(preferred)
+            addAll(PageTranslator.languages.filterNot { it.code.equals(preferred.code, true) })
+        }
+        val visibleLanguages = ordered.toMutableList()
+
+        val search = EditText(this).apply {
+            hint = getString(R.string.translate_search_languages)
+            isSingleLine = true
+            setPadding(dp(16), dp(8), dp(16), dp(8))
+        }
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            visibleLanguages.map(TranslationLanguage::label).toMutableList(),
+        )
+        val list = ListView(this).apply {
+            this.adapter = adapter
+            dividerHeight = 0
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dp(420),
+            )
+        }
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(8), dp(4), dp(8), 0)
+            addView(
+                search,
+                LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                ),
+            )
+            addView(list)
+        }
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.translate_choose_language)
+            .setView(content)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+
+        fun applyFilter(query: String) {
+            val needle = query.trim().lowercase(Locale.ROOT)
+            val filtered = if (needle.isEmpty()) {
+                ordered
+            } else {
+                ordered.filter {
+                    it.name.lowercase(Locale.ROOT).contains(needle) ||
+                        it.code.lowercase(Locale.ROOT).contains(needle)
+                }
+            }
+            visibleLanguages.clear()
+            visibleLanguages.addAll(filtered)
+            adapter.clear()
+            adapter.addAll(filtered.map(TranslationLanguage::label))
+            adapter.notifyDataSetChanged()
+        }
+
+        search.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                applyFilter(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) = Unit
+        })
+        list.setOnItemClickListener { _, _, position, _ ->
+            val language = visibleLanguages.getOrNull(position) ?: return@setOnItemClickListener
+            if (tab !== activeTabOrNull) {
+                dialog.dismiss()
+                return@setOnItemClickListener
+            }
+            val proxy = PageTranslator.buildProxyUrl(sourceUrl, language.code)
+            if (proxy == null) {
+                showToast(getString(R.string.translate_not_available))
+                return@setOnItemClickListener
+            }
+            prefs.translationTargetLanguage = language.code
+            tab.translationSourceUrl = sourceUrl
+            tab.translationTargetLanguage = language.code
+            search.clearFocus()
+            hideImeForcefully()
+            dialog.dismiss()
+            showToast(getString(R.string.translate_loading, language.name))
+            navigationController.loadAddress(proxy)
+        }
+        dialog.setOnShowListener { search.requestFocus() }
+        dialog.show()
     }
 
     /**
@@ -2512,13 +2662,43 @@ class MainActivity : AppCompatActivity() {
      */
     private fun saveCurrentPageOffline() {
         val tab = activeTabOrNull
-        val url = tab?.webView?.url
-        if (tab == null || url.isNullOrBlank() || !canEnterReaderMode()) {
+        val url = currentHttpPageUrl(tab)
+        if (tab == null || url.isNullOrBlank()) {
             showToast(getString(R.string.offline_save_not_eligible))
             return
         }
-        val title = tab.webView.title.orEmpty()
+        val title = currentPageTitle(tab)
         showToast(getString(R.string.offline_saving))
+        val readerHtml = tab.readerModeHtml
+        if (!readerHtml.isNullOrBlank() && tab.readerModeSourceUrl == url) {
+            OfflineArticleStore.save(this, url, title, readerHtml) { ok ->
+                showToast(getString(if (ok) R.string.offline_saved else R.string.offline_save_failed))
+            }
+            return
+        }
+        extractAndSaveCurrentPageOffline(tab, url, title, SystemClock.elapsedRealtime())
+    }
+
+    private fun extractAndSaveCurrentPageOffline(tab: Tab, url: String, title: String, startedAt: Long) {
+        if (tab !== activeTabOrNull || currentHttpPageUrl(tab) != url) return
+        val elapsedMs = SystemClock.elapsedRealtime() - startedAt
+        if (tab.loadProgress < 100 && elapsedMs < OFFLINE_SAVE_MAX_WAIT_MS) {
+            tab.webView.postDelayed(
+                { extractAndSaveCurrentPageOffline(tab, url, title, startedAt) },
+                OFFLINE_SAVE_RETRY_DELAY_MS,
+            )
+            return
+        }
+        tab.webView.postDelayed(
+            {
+                if (tab !== activeTabOrNull || currentHttpPageUrl(tab) != url) return@postDelayed
+                extractAndPersistOfflineArticle(tab, url, title)
+            },
+            OFFLINE_SAVE_DOM_SETTLE_DELAY_MS,
+        )
+    }
+
+    private fun extractAndPersistOfflineArticle(tab: Tab, url: String, title: String) {
         ReaderMode.extractInto(tab.webView) { html ->
             if (html == null) {
                 showToast(getString(R.string.offline_save_not_eligible))
@@ -2655,12 +2835,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun shareCurrentPage() {
-        val currentUrl = activeTabOrNull?.webView?.url ?: return showToast(getString(R.string.no_page_loaded))
+        val currentUrl = currentPageUrl() ?: return showToast(getString(R.string.no_page_loaded))
         shareUrl(currentUrl, chooserTitleRes = R.string.share_page)
     }
 
     private fun copyCurrentPageLink() {
-        val currentUrl = activeTabOrNull?.webView?.url ?: return showToast(getString(R.string.no_page_loaded))
+        val currentUrl = currentPageUrl() ?: return showToast(getString(R.string.no_page_loaded))
         copyUrlToClipboard(currentUrl)
     }
 
@@ -2775,6 +2955,9 @@ class MainActivity : AppCompatActivity() {
 
         private const val FIND_DEBOUNCE_MS = 150L
         private const val ADDRESS_SUGGESTION_DISMISS_DELAY_MS = 120L
+        private const val OFFLINE_SAVE_RETRY_DELAY_MS = 250L
+        private const val OFFLINE_SAVE_DOM_SETTLE_DELAY_MS = 350L
+        private const val OFFLINE_SAVE_MAX_WAIT_MS = 4_000L
 
         private const val PRIVACY_SCRIPT_TRIM_REFERRER = 1
         private const val PRIVACY_SCRIPT_BLOCK_WEBRTC = 2

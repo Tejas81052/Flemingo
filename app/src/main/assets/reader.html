@@ -1,164 +1,282 @@
 <!DOCTYPE html>
-<!--
-    Reader-mode render template.
-
-    Placeholders (substituted by ReaderMode.kt before WebView.loadDataWithBaseURL):
-      ${LANG}    - html lang attribute (the page's <html lang>, or "en" fallback)
-      ${TITLE}   - article title, HTML-escaped
-      ${META}    - byline + site name + reading time, "·"-joined, HTML-escaped
-      ${CONTENT} - cleaned article HTML from the extractor (additionally scrubbed
-                   on the Kotlin side for script/iframe/style/event-handler
-                   injection vectors — defence in depth on top of the JS
-                   sanitiser, because loadDataWithBaseURL gives this content
-                   the original page's origin).
-
-    CSS is intentionally self-contained: no external fonts, no JS, no remote
-    asset references. The whole reader view should work offline.
--->
-<html lang="${LANG}">
+<html lang="${LANG}" dir="${DIR}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${TITLE}</title>
     <style>
-        /* Theme tokens. `color-scheme: light dark` tells the WebView that
-           we cope with both modes, so prefers-color-scheme reflects the
-           system theme correctly. */
         :root {
             color-scheme: light dark;
-            --bg: #fefefe;
-            --fg: #1a1a1a;
-            --muted: #5e6b75;
-            --link: #1a5490;
-            --border: #e5e5e5;
-            --code-bg: rgba(127, 127, 127, 0.15);
+            --page: #f5f1e9;
+            --paper: #fffdf8;
+            --ink: #24211d;
+            --muted: #6e675d;
+            --link: #8c3d2d;
+            --rule: #ddd4c6;
+            --code: #eee8dd;
+            --font-size: 19px;
+            --line-height: 1.72;
+            --measure: 720px;
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg: #181a1c;
-                --fg: #e8e8e8;
-                --muted: #9aa3ad;
-                --link: #82b5e3;
-                --border: #2a2d31;
+                --page: #161412;
+                --paper: #1e1b18;
+                --ink: #eee9df;
+                --muted: #aaa196;
+                --link: #ef9b83;
+                --rule: #3d3832;
+                --code: #2b2723;
             }
         }
 
         * { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
+        html { background: var(--page); color: var(--ink); scroll-behavior: smooth; }
         body {
-            font-family: Georgia, 'Times New Roman', serif;
-            font-size: 18px;
-            line-height: 1.65;
-            padding: 28px 22px 64px;
-            max-width: 720px;
-            margin: 0 auto;
+            margin: 0;
+            min-height: 100vh;
+            background: var(--page);
             -webkit-text-size-adjust: 100%;
+            text-rendering: optimizeLegibility;
         }
 
+        .reader-progress {
+            position: fixed;
+            inset: 0 auto auto 0;
+            z-index: 20;
+            width: 0;
+            height: 3px;
+            background: var(--link);
+        }
+        .reader-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 52px;
+            padding: 7px 12px;
+            background: color-mix(in srgb, var(--paper) 92%, transparent);
+            border-bottom: 1px solid var(--rule);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .reader-toolbar button {
+            min-width: 42px;
+            min-height: 38px;
+            padding: 7px 10px;
+            border: 1px solid var(--rule);
+            border-radius: 999px;
+            background: var(--paper);
+            color: var(--ink);
+            font: 600 14px/1 sans-serif;
+        }
+        .reader-toolbar button:focus-visible {
+            outline: 3px solid color-mix(in srgb, var(--link) 45%, transparent);
+            outline-offset: 2px;
+        }
+
+        main.reader-shell {
+            width: min(calc(100% - 24px), calc(var(--measure) + 72px));
+            margin: 18px auto 56px;
+            padding: clamp(25px, 6vw, 52px);
+            background: var(--paper);
+            border: 1px solid var(--rule);
+            border-radius: 18px;
+            box-shadow: 0 18px 50px rgba(30, 24, 18, 0.08);
+        }
         header.reader-header {
-            margin-bottom: 32px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 34px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--rule);
         }
         header.reader-header h1 {
-            font-size: 30px;
-            line-height: 1.2;
             margin: 0 0 14px;
-            letter-spacing: -0.01em;
+            font: 750 clamp(2rem, 7vw, 3.2rem)/1.08 Georgia, "Times New Roman", serif;
+            letter-spacing: -0.025em;
+            text-wrap: balance;
         }
-        header.reader-header .reader-meta {
-            font-size: 14px;
+        .reader-meta {
             color: var(--muted);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            letter-spacing: 0.01em;
+            font: 500 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        article.reader-content { font-size: 18px; line-height: 1.7; }
-        article.reader-content p { margin: 0 0 1.2em; }
+        article.reader-content {
+            font: var(--font-size)/var(--line-height) Charter, Georgia, "Times New Roman", serif;
+            overflow-wrap: anywhere;
+            hyphens: auto;
+        }
+        article.reader-content > :first-child { margin-top: 0; }
+        article.reader-content p { margin: 0 0 1.25em; }
         article.reader-content h1,
         article.reader-content h2,
         article.reader-content h3,
-        article.reader-content h4 {
-            line-height: 1.3;
-            margin: 1.6em 0 0.55em;
-            letter-spacing: -0.005em;
+        article.reader-content h4,
+        article.reader-content h5,
+        article.reader-content h6 {
+            margin: 1.7em 0 0.62em;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.24;
+            letter-spacing: -0.012em;
+            text-wrap: balance;
         }
-        article.reader-content h2 { font-size: 1.4em; }
-        article.reader-content h3 { font-size: 1.2em; }
+        article.reader-content h2 { font-size: 1.48em; }
+        article.reader-content h3 { font-size: 1.25em; }
         article.reader-content a {
             color: var(--link);
-            text-decoration: underline;
-            text-decoration-thickness: 1px;
-            text-underline-offset: 2px;
+            text-decoration-thickness: 0.08em;
+            text-underline-offset: 0.16em;
         }
-
         article.reader-content img,
         article.reader-content video {
+            display: block;
             max-width: 100%;
             height: auto;
-            display: block;
-            margin: 1.2em auto;
-            border-radius: 4px;
+            margin: 1.45em auto;
+            border-radius: 10px;
         }
-        article.reader-content figure { margin: 1.4em 0; }
+        article.reader-content audio { width: 100%; margin: 1.3em 0; }
+        article.reader-content figure { margin: 1.6em 0; }
         article.reader-content figcaption {
-            font-size: 14px;
+            margin-top: 9px;
             color: var(--muted);
             text-align: center;
-            margin-top: 8px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
-
         article.reader-content blockquote {
-            border-left: 3px solid var(--border);
-            margin: 1.2em 0;
-            padding: 0.2em 0 0.2em 1em;
+            margin: 1.4em 0;
+            padding: 0.25em 0 0.25em 1.1em;
+            border-inline-start: 4px solid var(--link);
             color: var(--muted);
             font-style: italic;
         }
-
         article.reader-content code {
-            background: var(--code-bg);
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-size: 0.92em;
-            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            padding: 0.12em 0.32em;
+            border-radius: 4px;
+            background: var(--code);
+            font: 0.88em/1.5 "SFMono-Regular", Consolas, monospace;
         }
         article.reader-content pre {
-            background: var(--code-bg);
-            padding: 14px;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-size: 0.92em;
+            max-width: 100%;
+            padding: 16px;
+            overflow: auto;
+            border-radius: 9px;
+            background: var(--code);
             line-height: 1.5;
+            tab-size: 4;
         }
-        article.reader-content pre code {
-            background: none;
-            padding: 0;
-            font-size: 1em;
-        }
-
+        article.reader-content pre code { padding: 0; background: none; }
         article.reader-content ul,
-        article.reader-content ol {
-            margin: 0 0 1.2em;
-            padding-left: 1.4em;
+        article.reader-content ol { margin: 0 0 1.25em; padding-inline-start: 1.55em; }
+        article.reader-content li { margin: 0.35em 0; }
+        article.reader-content table {
+            display: block;
+            width: 100%;
+            margin: 1.4em 0;
+            overflow-x: auto;
+            border-collapse: collapse;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 0.86em;
         }
-        article.reader-content li { margin: 0.3em 0; }
+        article.reader-content th,
+        article.reader-content td {
+            padding: 9px 11px;
+            border: 1px solid var(--rule);
+            text-align: start;
+        }
+        article.reader-content hr { margin: 2.2em 0; border: 0; border-top: 1px solid var(--rule); }
 
-        article.reader-content hr {
-            border: 0;
-            border-top: 1px solid var(--border);
-            margin: 2em 0;
+        html[data-theme="light"] {
+            color-scheme: light;
+            --page: #f5f1e9; --paper: #fffdf8; --ink: #24211d;
+            --muted: #6e675d; --link: #8c3d2d; --rule: #ddd4c6; --code: #eee8dd;
+        }
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --page: #161412; --paper: #1e1b18; --ink: #eee9df;
+            --muted: #aaa196; --link: #ef9b83; --rule: #3d3832; --code: #2b2723;
+        }
+        html[data-theme="sepia"] {
+            color-scheme: light;
+            --page: #e9ddc5; --paper: #f7edda; --ink: #3b3026;
+            --muted: #756555; --link: #925239; --rule: #d2bea0; --code: #eadcc3;
+        }
+
+        @media (max-width: 560px) {
+            .reader-toolbar { justify-content: space-between; gap: 4px; }
+            .reader-toolbar button { min-width: 38px; padding-inline: 8px; }
+            main.reader-shell {
+                width: 100%;
+                margin: 0;
+                padding: 30px 22px 54px;
+                border-inline: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+        @media print {
+            .reader-toolbar, .reader-progress { display: none; }
+            main.reader-shell { width: auto; margin: 0; padding: 0; border: 0; box-shadow: none; }
         }
     </style>
 </head>
 <body>
-    <header class="reader-header">
-        <h1>${TITLE}</h1>
-        <div class="reader-meta">${META}</div>
-    </header>
-    <article class="reader-content">
-        ${CONTENT}
-    </article>
+    <div class="reader-progress" aria-hidden="true"></div>
+    <nav class="reader-toolbar" aria-label="Reader settings">
+        <button type="button" data-action="smaller" aria-label="Decrease text size">A−</button>
+        <button type="button" data-action="larger" aria-label="Increase text size">A+</button>
+        <button type="button" data-action="spacing" aria-label="Change line spacing">Lines</button>
+        <button type="button" data-action="width" aria-label="Change reading width">Width</button>
+        <button type="button" data-action="theme" aria-label="Change reader theme">Theme</button>
+    </nav>
+    <main class="reader-shell">
+        <header class="reader-header">
+            <h1>${TITLE}</h1>
+            <div class="reader-meta">${META}</div>
+        </header>
+        <article class="reader-content">
+            ${CONTENT}
+        </article>
+    </main>
+    <script>
+        (function () {
+            'use strict';
+            var root = document.documentElement;
+            var size = 19;
+            var spacing = 1.72;
+            var wide = false;
+            var themes = ['', 'light', 'sepia', 'dark'];
+            var themeIndex = 0;
+
+            document.querySelector('.reader-toolbar').addEventListener('click', function (event) {
+                var action = event.target && event.target.getAttribute('data-action');
+                if (!action) return;
+                if (action === 'smaller') size = Math.max(15, size - 1);
+                if (action === 'larger') size = Math.min(28, size + 1);
+                if (action === 'spacing') spacing = spacing >= 1.9 ? 1.55 : spacing + 0.18;
+                if (action === 'width') wide = !wide;
+                if (action === 'theme') {
+                    themeIndex = (themeIndex + 1) % themes.length;
+                    if (themes[themeIndex]) root.setAttribute('data-theme', themes[themeIndex]);
+                    else root.removeAttribute('data-theme');
+                }
+                root.style.setProperty('--font-size', size + 'px');
+                root.style.setProperty('--line-height', spacing.toFixed(2));
+                root.style.setProperty('--measure', wide ? '900px' : '720px');
+            });
+
+            var progress = document.querySelector('.reader-progress');
+            function updateProgress() {
+                var max = document.documentElement.scrollHeight - window.innerHeight;
+                var percent = max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0;
+                progress.style.width = percent + '%';
+            }
+            document.addEventListener('scroll', updateProgress, { passive: true });
+            updateProgress();
+        })();
+    </script>
 </body>
 </html>

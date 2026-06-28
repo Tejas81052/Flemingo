@@ -12,6 +12,10 @@
     <string name="action_translate">Translate</string>
     <string name="translate_not_available">Open a web page first to translate it</string>
     <string name="translate_already">This page is already translated</string>
+    <string name="translate_choose_language">Translate page to</string>
+    <string name="translate_search_languages">Search languages</string>
+    <string name="translate_loading">Translating to %1$s…</string>
+    <string name="translate_source_unavailable">Open the original page before changing translation language</string>
     <string name="action_save_offline">Offline</string>
     <string name="saved_pages_title">Saved pages</string>
     <string name="saved_pages_summary">%1$d saved for offline reading</string>

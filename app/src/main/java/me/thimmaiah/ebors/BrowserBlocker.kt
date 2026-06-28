@@ -169,6 +169,25 @@ object BrowserBlocker {
     private var blockListLoaded = false
 
     /**
+     * uBO/EasyList network filter engine, built off the main thread from the
+     * bundled ad lists (`assets/filters/`) plus any on-demand lists cached in
+     * `filesDir/filters/`. Null until the background build finishes — requests
+     * before then fall back to the curated [blockList] rules below.
+     */
+    @Volatile
+    private var filterEngine: FilterEngine? = null
+
+    @Volatile
+    private var filterEngineLoading = false
+
+    /** Bundled ad lists live here; fetched lists are cached under the same name in filesDir. */
+    private const val FILTERS_ASSET_DIR = "filters"
+    const val FILTERS_CACHE_DIR = "filters"
+
+    /** Network filters currently loaded, for the Settings UI. 0 until built. */
+    val filterCount: Int get() = filterEngine?.filterCount ?: 0
+
+    /**
      * Content version of the block list currently in effect. Used by
      * [BlocklistUpdater] to decide whether a downloaded list is newer,
      * and by the Settings UI to show the user what they're running.
@@ -190,6 +209,7 @@ object BrowserBlocker {
         if (blockListLoaded) return
         blockList = loadBestAvailable(context.applicationContext)
         blockListLoaded = true
+        loadFilterEngineAsync(context.applicationContext)
     }
 
     /**
@@ -202,6 +222,74 @@ object BrowserBlocker {
     fun reload(context: Context) {
         blockList = loadBestAvailable(context.applicationContext)
         blockListLoaded = true
+        filterEngineLoading = false
+        loadFilterEngineAsync(context.applicationContext)
+    }
+
+    /**
+     * Build the [FilterEngine] off the main thread. Parsing the bundled ad
+     * lists (~100k+ rules) takes a few hundred ms, so it must never run on the
+     * UI thread. Idempotent while a build is in flight.
+     */
+    private fun loadFilterEngineAsync(appContext: Context) {
+        if (filterEngineLoading) return
+        filterEngineLoading = true
+        Thread({
+            // Parsing the large bundled filter lists is deliberately
+            // best-effort and must not compete with first paint, tab setup, or
+            // initial media decoding. Requests continue to use the curated
+            // rules until this background build is ready.
+            android.os.Process.setThreadPriority(
+                android.os.Process.THREAD_PRIORITY_BACKGROUND,
+            )
+            val startedAt = android.os.SystemClock.elapsedRealtime()
+            try {
+                filterEngine = buildFilterEngine(appContext)
+            } catch (error: Exception) {
+                Log.w(LOG_TAG, "Filter engine build failed; using curated rules only", error)
+            } finally {
+                filterEngineLoading = false
+                Log.d(
+                    LOG_TAG,
+                    "Filter engine background build took " +
+                        "${android.os.SystemClock.elapsedRealtime() - startedAt} ms",
+                )
+            }
+        }, "ebors-filter-engine").start()
+    }
+
+    private fun buildFilterEngine(appContext: Context): FilterEngine {
+        val builder = FilterEngine.Builder()
+        val assets = appContext.assets
+        val bundled = try {
+            assets.list(FILTERS_ASSET_DIR)?.toList().orEmpty()
+        } catch (error: Exception) {
+            emptyList()
+        }
+        for (name in bundled) {
+            if (!name.endsWith(".txt")) continue
+            try {
+                assets.open("$FILTERS_ASSET_DIR/$name")
+                    .bufferedReader(Charsets.UTF_8).use { builder.addList(it.readText()) }
+            } catch (error: Exception) {
+                Log.w(LOG_TAG, "Skipping bundled filter list $name", error)
+            }
+        }
+        val cacheDir = java.io.File(appContext.filesDir, FILTERS_CACHE_DIR)
+        if (cacheDir.isDirectory) {
+            cacheDir.listFiles()?.forEach { file ->
+                if (file.isFile && file.name.endsWith(".txt")) {
+                    try {
+                        builder.addList(file.readText(Charsets.UTF_8))
+                    } catch (error: Exception) {
+                        Log.w(LOG_TAG, "Skipping fetched filter list ${file.name}", error)
+                    }
+                }
+            }
+        }
+        val engine = builder.build()
+        Log.i(LOG_TAG, "Filter engine ready: ${engine.filterCount} network filters")
+        return engine
     }
 
     /**
@@ -298,8 +386,16 @@ object BrowserBlocker {
         return scheme in setOf("http", "https", "about", "data", "javascript", "blob")
     }
 
-    fun createBlockingResponse(url: String?, isMainFrame: Boolean): WebResourceResponse? {
-        val match = findMatch(url, isMainFrame) ?: return null
+    fun createBlockingResponse(url: String?, isMainFrame: Boolean): WebResourceResponse? =
+        createBlockingResponse(url, isMainFrame, null, null)
+
+    fun createBlockingResponse(
+        url: String?,
+        isMainFrame: Boolean,
+        requestHeaders: Map<String, String>?,
+        documentHost: String?,
+    ): WebResourceResponse? {
+        val match = findMatch(url, isMainFrame, requestHeaders, documentHost) ?: return null
 
         // v10 start-page "trackers blocked today" counter. Increment
         // happens regardless of whether this is the user's site block
@@ -345,10 +441,19 @@ object BrowserBlocker {
      * the side of showing the user the friendly block page rather than a
      * silent 204.
      */
-    internal fun findMatch(url: String?): BlockingMatch? = findMatch(url, isMainFrame = true)
+    internal fun findMatch(url: String?): BlockingMatch? = findMatch(url, isMainFrame = true, null, null)
 
-    internal fun findMatch(url: String?, isMainFrame: Boolean): BlockingMatch? {
-        val parsed = parseUri(url) ?: return null
+    internal fun findMatch(url: String?, isMainFrame: Boolean): BlockingMatch? =
+        findMatch(url, isMainFrame, null, null)
+
+    internal fun findMatch(
+        url: String?,
+        isMainFrame: Boolean,
+        requestHeaders: Map<String, String>?,
+        documentHost: String?,
+    ): BlockingMatch? {
+        val originalUrl = url ?: return null
+        val parsed = parseUri(originalUrl) ?: return null
         val host = normalizeHost(parsed.host) ?: return null
 
         // The user's explicit block list wins over everything else. If
@@ -365,6 +470,23 @@ object BrowserBlocker {
         }
 
         if (adBlockEnabled) {
+            // uBO/EasyList engine first — its @@ exceptions can explicitly allow.
+            filterEngine?.let { engine ->
+                val sourceHost = normalizeHost(documentHost)
+                val ctx = RequestContext(
+                    url = originalUrl,
+                    host = host,
+                    type = inferRequestType(requestHeaders, isMainFrame, parsed),
+                    sourceHost = sourceHost ?: host,
+                    thirdParty = isThirdParty(host, sourceHost),
+                )
+                when (engine.match(ctx)) {
+                    Decision.BLOCK -> return BlockingMatch(BlockingKind.AD_OR_TRACKER, host)
+                    Decision.ALLOW -> return null
+                    Decision.NONE -> { /* fall through to curated rules */ }
+                }
+            }
+
             if (hostMatchesSuffixSet(host, blockList.adAndTrackerDomains)) {
                 return BlockingMatch(kind = BlockingKind.AD_OR_TRACKER, host = host)
             }
@@ -851,6 +973,42 @@ $webRtcBlock
                    tanks the whole page. */
             }
         })();
+
+        // --- Autoplay nudge -------------------------------------------------
+        // A watch page opened in a new/background tab loads via loadUrl with no
+        // user activation in this WebView, so YouTube won't start the video on
+        // its own (it shows the big play button). Gesture enforcement is already
+        // off app-side, so start it once. We never fight a user pause: only a
+        // video that has not begun (paused at time 0) is nudged, and we stop as
+        // soon as it is playing.
+        (function() {
+            try {
+                var host = (location.hostname || '').toLowerCase();
+                if (host.indexOf('youtube.com') === -1) return;
+                if (window.__eb_yt_autoplay__) return;
+                window.__eb_yt_autoplay__ = true;
+                var tries = 0;
+                var timer = setInterval(function() {
+                    try {
+                        if (++tries > 40) { clearInterval(timer); return; }
+                        var path = location.pathname || '';
+                        if (path.indexOf('/watch') !== 0 && path.indexOf('/shorts') !== 0) return;
+                        var v = document.querySelector('video');
+                        if (!v) return;
+                        if (!v.paused) { clearInterval(timer); return; }
+                        if (v.currentTime === 0 && !v.ended) {
+                            var p = v.play();
+                            if (p && p.catch) {
+                                p.catch(function() {
+                                    var b = document.querySelector('.ytp-large-play-button, .ytp-play-button');
+                                    if (b) b.click();
+                                });
+                            }
+                        }
+                    } catch (e) {}
+                }, 250);
+            } catch (e) {}
+        })();
     """.trimIndent()
 
     /**
@@ -1079,6 +1237,94 @@ $computedStyleHook
         } catch (_: Exception) {
             host.trim().lowercase(Locale.US)
         }
+    }
+
+    /** Normalised host of [url], or null for non-network URLs (about:, data:…). */
+    fun hostOf(url: String?): String? = normalizeHost(parseUri(url)?.host)
+
+    /**
+     * A small public-suffix table for registrable-domain extraction. Not the
+     * full PSL — covers the common multi-label TLDs so first-/third-party
+     * classification and `$domain=` don't mis-split e.g. `bbc.co.uk`. A full
+     * PSL is a future upgrade.
+     */
+    private val MULTI_PART_SUFFIXES = setOf(
+        "co.uk", "org.uk", "gov.uk", "ac.uk", "me.uk", "ltd.uk", "plc.uk", "net.uk",
+        "com.au", "net.au", "org.au", "edu.au", "gov.au", "id.au",
+        "co.jp", "or.jp", "ne.jp", "ac.jp", "go.jp", "co.kr", "or.kr",
+        "com.cn", "net.cn", "org.cn", "gov.cn", "com.hk", "com.tw", "com.sg",
+        "com.br", "net.br", "org.br", "gov.br", "com.mx", "com.ar", "com.co",
+        "co.in", "net.in", "org.in", "gen.in", "firm.in", "co.za", "org.za",
+        "com.tr", "com.ua", "com.pl", "com.ru", "com.sa", "com.eg", "com.ng",
+        "co.nz", "org.nz", "co.id", "co.th", "in.th", "com.my", "com.ph", "com.pk",
+        "com.vn", "com.bd", "com.np", "com.kw", "com.qa", "com.lb", "co.il",
+    )
+
+    /** Registrable ("eTLD+1") domain of [host], using [MULTI_PART_SUFFIXES]. */
+    fun registrableDomain(host: String?): String? {
+        if (host.isNullOrEmpty()) return null
+        val labels = host.split('.')
+        if (labels.size <= 2) return host
+        val lastTwo = labels.takeLast(2).joinToString(".")
+        return if (lastTwo in MULTI_PART_SUFFIXES) labels.takeLast(3).joinToString(".") else lastTwo
+    }
+
+    /**
+     * True when [host] is a different registrable domain than [sourceHost].
+     * An unknown source (null) is treated as first-party so we never block a
+     * page's own resources just because the document host wasn't known yet.
+     */
+    private fun isThirdParty(host: String, sourceHost: String?): Boolean {
+        if (sourceHost.isNullOrEmpty()) return false
+        val a = registrableDomain(host) ?: return false
+        val b = registrableDomain(sourceHost) ?: return false
+        return !a.equals(b, ignoreCase = true)
+    }
+
+    /**
+     * Map a WebView request onto an EasyList `$type`. Modern WebView sends
+     * `Sec-Fetch-Dest`, which is authoritative; we fall back to the main-frame
+     * flag and a file-extension heuristic when it's absent.
+     */
+    private fun inferRequestType(
+        headers: Map<String, String>?,
+        isMainFrame: Boolean,
+        parsed: URI,
+    ): RequestType {
+        when (headerValue(headers, "Sec-Fetch-Dest")?.lowercase(Locale.US)) {
+            "document" -> return RequestType.DOCUMENT
+            "iframe", "frame" -> return RequestType.SUBDOCUMENT
+            "script", "serviceworker", "sharedworker", "worker" -> return RequestType.SCRIPT
+            "style" -> return RequestType.STYLESHEET
+            "image" -> return RequestType.IMAGE
+            "font" -> return RequestType.FONT
+            "audio", "video", "track" -> return RequestType.MEDIA
+            "object", "embed" -> return RequestType.OBJECT
+            "empty" -> return RequestType.XHR
+        }
+        if (isMainFrame) return RequestType.DOCUMENT
+        val path = parsed.rawPath.orEmpty().lowercase(Locale.US)
+        return when {
+            path.endsWith(".js") || path.endsWith(".mjs") -> RequestType.SCRIPT
+            path.endsWith(".css") -> RequestType.STYLESHEET
+            path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") ||
+                path.endsWith(".gif") || path.endsWith(".webp") || path.endsWith(".svg") ||
+                path.endsWith(".ico") || path.endsWith(".bmp") -> RequestType.IMAGE
+            path.endsWith(".woff") || path.endsWith(".woff2") || path.endsWith(".ttf") ||
+                path.endsWith(".otf") || path.endsWith(".eot") -> RequestType.FONT
+            path.endsWith(".mp4") || path.endsWith(".webm") || path.endsWith(".m4a") ||
+                path.endsWith(".mp3") || path.endsWith(".ogg") || path.endsWith(".m3u8") ||
+                path.endsWith(".ts") -> RequestType.MEDIA
+            else -> RequestType.OTHER
+        }
+    }
+
+    /** Case-insensitive header lookup ([WebResourceRequest] preserves sent case). */
+    private fun headerValue(headers: Map<String, String>?, name: String): String? {
+        if (headers.isNullOrEmpty()) return null
+        headers[name]?.let { return it }
+        for ((key, value) in headers) if (key.equals(name, ignoreCase = true)) return value
+        return null
     }
 
     private fun htmlResponse(

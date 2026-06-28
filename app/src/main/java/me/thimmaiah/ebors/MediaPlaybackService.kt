@@ -26,9 +26,6 @@ import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
-import android.media.AudioAttributes
-import android.media.AudioFocusRequest
-import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
@@ -49,8 +46,9 @@ import java.util.concurrent.TimeUnit
  * backgrounded and exposes a full media notification (previous / play-pause /
  * next, artwork, and a seek bar) on the shade and lock screen.
  *
- * The service owns the [MediaSession] and the audio focus request. The actual
- * media element lives in a WebView inside [MainActivity]; transport actions
+ * The service owns the [MediaSession]. The actual media element lives in a
+ * WebView inside [MainActivity] and remains the sole audio-focus owner;
+ * transport actions
  * are forwarded back through [transportCallback], which invokes the page's own
  * `navigator.mediaSession` handlers (or the `<video>`/`<audio>` element) via
  * JavaScript. The matching half — masking the Page Visibility API and forcing
@@ -60,8 +58,6 @@ import java.util.concurrent.TimeUnit
 class MediaPlaybackService : Service() {
 
     private lateinit var session: MediaSession
-    private lateinit var audioManager: AudioManager
-    private var focusRequest: AudioFocusRequest? = null
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val http by lazy {
@@ -82,23 +78,12 @@ class MediaPlaybackService : Service() {
     private var artworkUrl: String = ""
     private var artworkBitmap: Bitmap? = null
 
-    private val focusListener = AudioManager.OnAudioFocusChangeListener { change ->
-        when (change) {
-            AudioManager.AUDIOFOCUS_LOSS,
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
-            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK,
-            -> transportCallback?.onPause()
-        }
-    }
-
     override fun onCreate() {
         super.onCreate()
-        audioManager = getSystemService(AudioManager::class.java)
         createNotificationChannel()
         session = MediaSession(this, "ebors-media").apply {
             setCallback(object : MediaSession.Callback() {
                 override fun onPlay() {
-                    requestFocus()
                     transportCallback?.onPlay()
                 }
 
@@ -140,7 +125,6 @@ class MediaPlaybackService : Service() {
             }
 
             ACTION_PLAY -> {
-                requestFocus()
                 transportCallback?.onPlay()
                 playing = true
             }
@@ -155,7 +139,6 @@ class MediaPlaybackService : Service() {
                 durationMs = intent?.getLongExtra(EXTRA_DURATION, durationMs) ?: durationMs
                 positionMs = intent?.getLongExtra(EXTRA_POSITION, positionMs) ?: positionMs
                 playing = intent?.getBooleanExtra(EXTRA_PLAYING, true) ?: true
-                if (playing) requestFocus()
                 fetchArtwork(intent?.getStringExtra(EXTRA_ARTWORK).orEmpty())
             }
         }
@@ -170,7 +153,6 @@ class MediaPlaybackService : Service() {
     }
 
     override fun onDestroy() {
-        abandonFocus()
         session.isActive = false
         session.release()
         super.onDestroy()
@@ -180,29 +162,9 @@ class MediaPlaybackService : Service() {
 
     private fun stopPlayback() {
         playing = false
-        abandonFocus()
         session.isActive = false
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
-    }
-
-    private fun requestFocus() {
-        if (focusRequest != null) return
-        val attrs = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-            .build()
-        val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(attrs)
-            .setOnAudioFocusChangeListener(focusListener)
-            .build()
-        focusRequest = request
-        audioManager.requestAudioFocus(request)
-    }
-
-    private fun abandonFocus() {
-        focusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
-        focusRequest = null
     }
 
     private fun updateSession() {
