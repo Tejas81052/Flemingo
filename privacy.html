@@ -59,10 +59,14 @@
           your device.</li>
       <li>Private (incognito) tabs use an isolated profile that is
           wiped when you close the last private tab or restart the app.</li>
-      <li>The only network calls the <em>app itself</em> makes (as
-          opposed to network calls the pages you visit make) are an
-          optional, signed, rate-limited block-list update fetch &mdash;
-          and only if the build was configured with an update URL.</li>
+      <li>Search suggestions are optional and, when enabled, send the
+          typed address-bar text to your selected search engine.</li>
+      <li>Translate is user-initiated and sends the current page URL to
+          Google Translate&rsquo;s page proxy.</li>
+      <li>The only automatic background network call the <em>app itself</em>
+          may make is an optional, signed, rate-limited block-list update
+          fetch &mdash; and only if the build was configured with an update
+          URL.</li>
     </ul>
 
     <h2 id="what-is-collected">What the app collects</h2>
@@ -98,12 +102,34 @@
       relayed through the developer.
     </p>
     <p>
-      The only request the app makes on its own is an optional update
-      check for the bundled ad/tracker block list. This is disabled
-      unless the build is configured with an update URL and signing
+      If Search suggestions are enabled, the text you type into the address
+      bar is sent to your selected search engine to fetch suggestions. This is
+      controlled in Settings and can be turned off.
+    </p>
+    <p>
+      If you choose Translate, the current page URL is opened through Google
+      Translate&rsquo;s public page proxy so Google can fetch and translate that
+      page. Translation is not performed by a server operated by the developer.
+    </p>
+    <p>
+      Android System WebView may use platform services such as Safe Browsing
+      to check URLs or resources for known unsafe content. Those checks are
+      part of the device WebView/Google Play services stack, not an Ebors
+      analytics or tracking SDK.
+    </p>
+    <p>
+      Voice input for websites that use the Web Speech API is handled through
+      your device&rsquo;s installed speech-recognition service. If you grant
+      microphone access, audio may be processed by that service according to
+      its provider&rsquo;s policy.
+    </p>
+    <p>
+      The only automatic background request the app makes on its own is an
+      optional update check for the bundled ad/tracker block list. This is
+      disabled unless the build is configured with an update URL and signing
       key. When enabled it runs at most once every 24 hours, fetches a
-      cryptographically signed JSON file over HTTPS, and does not send
-      any of your browsing data.
+      cryptographically signed JSON file over HTTPS, and does not send any of
+      your browsing data.
     </p>
 
     <h2 id="permissions">Permissions and what they&rsquo;re used for</h2>
@@ -113,7 +139,9 @@
       <li><strong>Camera, microphone, location</strong> &mdash; only
           used when a web page you are visiting requests access (for
           example, a video call). The browser shows an in-app prompt
-          before any of these are granted.</li>
+          before any of these are granted. Microphone access may also be
+          used for website voice input through the device speech-recognition
+          service when you approve it.</li>
       <li><strong>Storage / downloads</strong> &mdash; used to save
           files you choose to download.</li>
       <li><strong>Post notifications</strong> &mdash; used to show
@@ -124,6 +152,12 @@
           file. The browser does not install anything on its own.</li>
       <li><strong>Foreground service (data sync)</strong> &mdash; keeps
           downloads running while the app is backgrounded.</li>
+      <li><strong>Foreground service (media playback)</strong> &mdash; keeps
+          website audio/video controls visible while media continues playing
+          in the background.</li>
+      <li><strong>Modify audio settings</strong> &mdash; normal Android
+          permission used for WebRTC audio routing when websites use calling
+          features.</li>
     </ul>
 
     <h2 id="downloads">Downloaded files</h2>
@@ -139,8 +173,8 @@
       The app does not embed any third-party analytics, advertising,
       or crash-reporting SDK. The libraries it does include
       (AndroidX, Material Components, OkHttp, Kotlin standard
-      library) are general-purpose UI and networking utilities and
-      do not phone home on their own.
+      library, ZXing Android Embedded) are general-purpose UI, networking,
+      and QR-scanning utilities and do not phone home on their own.
     </p>
     <p>
       Web pages you visit may, of course, set their own cookies and
