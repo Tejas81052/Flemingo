@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  AnimatedVectorDrawable wrapping ill_site_not_found_hero.
+
+  Animation map (period · interp · notes):
+    grp_door       knock shudder         4.2s · ease · rotation keyframes, still 0–70%
+    grp_knock_1/2  sound ring            4.2s · ease-out · scale+alpha, sync w/ knock
+    grp_plate      404 plate swing       3.6s · ease · rotation reverse
+    grp_key        try the lock          5.5s · ease · translate+rotate keyframes
+    grp_mote_1..4  dust drift            4s   · linear · translate+alpha, staggered
+    grp_shaft      light breathe         4s   · ease · alpha reverse
+    grp_blade_1..5 grass sway            3.4s · ease · rotation reverse, staggered
+    grp_tumble     paper roll            9s   · linear · translateX + rotation
+    grp_specks_*   drift up              7/8.5/9.5s · linear · translateY
+
+  Start: (hero.drawable as Animatable).start()
+  Stop:  (hero.drawable as Animatable).stop()  // in onPause
+-->
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ill_site_not_found_hero">
+
+    <!-- Door knock: a quick shudder, then still for most of the cycle -->
+    <target android:name="grp_door">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="rotation"
+                android:duration="4200"
+                android:repeatCount="infinite"
+                android:interpolator="@android:interpolator/fast_out_slow_in">
+                <propertyValuesHolder android:propertyName="rotation" android:valueType="floatType">
+                    <keyframe android:fraction="0"    android:value="0"/>
+                    <keyframe android:fraction="0.70" android:value="0"/>
+                    <keyframe android:fraction="0.74" android:value="0.8"/>
+                    <keyframe android:fraction="0.78" android:value="-0.6"/>
+                    <keyframe android:fraction="0.82" android:value="0.5"/>
+                    <keyframe android:fraction="0.86" android:value="-0.3"/>
+                    <keyframe android:fraction="0.90" android:value="0"/>
+                    <keyframe android:fraction="1"    android:value="0"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+
+    <!-- Knock ring 1 -->
+    <target android:name="grp_knock_1">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="scaleX" android:duration="4200" android:repeatCount="infinite" android:interpolator="@android:interpolator/decelerate_quint">
+                    <propertyValuesHolder android:propertyName="scaleX" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0.3"/>
+                        <keyframe android:fraction="0.70" android:value="0.3"/>
+                        <keyframe android:fraction="0.92" android:value="1.8"/>
+                        <keyframe android:fraction="1"    android:value="1.8"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+                <objectAnimator android:propertyName="scaleY" android:duration="4200" android:repeatCount="infinite" android:interpolator="@android:interpolator/decelerate_quint">
+                    <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0.3"/>
+                        <keyframe android:fraction="0.70" android:value="0.3"/>
+                        <keyframe android:fraction="0.92" android:value="1.8"/>
+                        <keyframe android:fraction="1"    android:value="1.8"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+                <objectAnimator android:propertyName="alpha" android:duration="4200" android:repeatCount="infinite" android:interpolator="@android:interpolator/decelerate_quint">
+                    <propertyValuesHolder android:propertyName="alpha" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0"/>
+                        <keyframe android:fraction="0.70" android:value="0"/>
+                        <keyframe android:fraction="0.74" android:value="0.6"/>
+                        <keyframe android:fraction="0.92" android:value="0"/>
+                        <keyframe android:fraction="1"    android:value="0"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!-- Knock ring 2 (slightly delayed via its own keyframe shape) -->
+    <target android:name="grp_knock_2">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="scaleX" android:duration="4200" android:repeatCount="infinite" android:interpolator="@android:interpolator/decelerate_quint">
+                    <propertyValuesHolder android:propertyName="scaleX" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0.3"/>
+                        <keyframe android:fraction="0.73" android:value="0.3"/>
+                        <keyframe android:fraction="0.95" android:value="1.8"/>
+                        <keyframe android:fraction="1"    android:value="1.8"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+                <objectAnimator android:propertyName="scaleY" android:duration="4200" android:repeatCount="infinite" android:interpolator="@android:interpolator/decelerate_quint">
+                    <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0.3"/>
+                        <keyframe android:fraction="0.73" android:value="0.3"/>
+                        <keyframe android:fraction="0.95" android:value="1.8"/>
+                        <keyframe android:fraction="1"    android:value="1.8"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+                <objectAnimator android:propertyName="alpha" android:duration="4200" android:repeatCount="infinite" android:interpolator="@android:interpolator/decelerate_quint">
+                    <propertyValuesHolder android:propertyName="alpha" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0"/>
+                        <keyframe android:fraction="0.73" android:value="0"/>
+                        <keyframe android:fraction="0.77" android:value="0.45"/>
+                        <keyframe android:fraction="0.95" android:value="0"/>
+                        <keyframe android:fraction="1"    android:value="0"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!-- Plate swing -->
+    <target android:name="grp_plate">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="rotation"
+                android:duration="3600"
+                android:valueFrom="-7"
+                android:valueTo="-2"
+                android:repeatCount="infinite"
+                android:repeatMode="reverse"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+        </aapt:attr>
+    </target>
+
+    <!-- Key try -->
+    <target android:name="grp_key">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateY" android:duration="5500" android:repeatCount="infinite" android:interpolator="@android:interpolator/fast_out_slow_in">
+                    <propertyValuesHolder android:propertyName="translateY" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="22"/>
+                        <keyframe android:fraction="0.20" android:value="0"/>
+                        <keyframe android:fraction="0.48" android:value="0"/>
+                        <keyframe android:fraction="0.68" android:value="22"/>
+                        <keyframe android:fraction="1"    android:value="22"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+                <objectAnimator android:propertyName="translateX" android:duration="5500" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear">
+                    <propertyValuesHolder android:propertyName="translateX" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="0"/>
+                        <keyframe android:fraction="0.30" android:value="-1"/>
+                        <keyframe android:fraction="0.36" android:value="1"/>
+                        <keyframe android:fraction="0.42" android:value="-1"/>
+                        <keyframe android:fraction="0.48" android:value="0"/>
+                        <keyframe android:fraction="1"    android:value="0"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+                <objectAnimator android:propertyName="rotation" android:duration="5500" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear">
+                    <propertyValuesHolder android:propertyName="rotation" android:valueType="floatType">
+                        <keyframe android:fraction="0"    android:value="8"/>
+                        <keyframe android:fraction="0.20" android:value="0"/>
+                        <keyframe android:fraction="0.30" android:value="-3"/>
+                        <keyframe android:fraction="0.36" android:value="3"/>
+                        <keyframe android:fraction="0.42" android:value="-2"/>
+                        <keyframe android:fraction="0.48" android:value="0"/>
+                        <keyframe android:fraction="0.68" android:value="8"/>
+                        <keyframe android:fraction="1"    android:value="8"/>
+                    </propertyValuesHolder>
+                </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!-- Light shaft breathe -->
+    <target android:name="grp_shaft">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="alpha"
+                android:duration="4000"
+                android:valueFrom="0.5"
+                android:valueTo="1"
+                android:repeatCount="infinite"
+                android:repeatMode="reverse"
+                android:interpolator="@android:interpolator/fast_out_slow_in" />
+        </aapt:attr>
+    </target>
+
+    <!-- Dust motes — drift up-right + fade, staggered via startOffset -->
+    <target android:name="grp_mote_1">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateX" android:duration="4000" android:valueFrom="0" android:valueTo="14" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="translateY" android:duration="4000" android:valueFrom="0" android:valueTo="-34" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="alpha" android:duration="4000" android:valueFrom="0.8" android:valueTo="0" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_mote_2">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateX" android:duration="4000" android:startOffset="1300" android:valueFrom="0" android:valueTo="14" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="translateY" android:duration="4000" android:startOffset="1300" android:valueFrom="0" android:valueTo="-34" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="alpha" android:duration="4000" android:startOffset="1300" android:valueFrom="0.8" android:valueTo="0" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_mote_3">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateX" android:duration="4000" android:startOffset="2500" android:valueFrom="0" android:valueTo="14" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="translateY" android:duration="4000" android:startOffset="2500" android:valueFrom="0" android:valueTo="-34" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="alpha" android:duration="4000" android:startOffset="2500" android:valueFrom="0.8" android:valueTo="0" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_mote_4">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateX" android:duration="4000" android:startOffset="3100" android:valueFrom="0" android:valueTo="14" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="translateY" android:duration="4000" android:startOffset="3100" android:valueFrom="0" android:valueTo="-34" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="alpha" android:duration="4000" android:startOffset="3100" android:valueFrom="0.8" android:valueTo="0" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!-- Grass blades sway, staggered -->
+    <target android:name="grp_blade_1">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="rotation" android:duration="3400" android:valueFrom="-3" android:valueTo="3" android:repeatCount="infinite" android:repeatMode="reverse" android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_blade_2">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="rotation" android:duration="3400" android:startOffset="600" android:valueFrom="-3" android:valueTo="3" android:repeatCount="infinite" android:repeatMode="reverse" android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_blade_3">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="rotation" android:duration="3400" android:startOffset="1100" android:valueFrom="-3" android:valueTo="3" android:repeatCount="infinite" android:repeatMode="reverse" android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_blade_4">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="rotation" android:duration="3400" android:startOffset="300" android:valueFrom="-3" android:valueTo="3" android:repeatCount="infinite" android:repeatMode="reverse" android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_blade_5">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="rotation" android:duration="3400" android:startOffset="900" android:valueFrom="-3" android:valueTo="3" android:repeatCount="infinite" android:repeatMode="reverse" android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+
+    <!-- Paper tumbleweed: roll across + spin -->
+    <target android:name="grp_tumble">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator android:propertyName="translateX" android:duration="9000" android:valueFrom="0" android:valueTo="400" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+                <objectAnimator android:propertyName="rotation" android:duration="9000" android:valueFrom="0" android:valueTo="900" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!-- Specks drift up -->
+    <target android:name="grp_specks_1">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="translateY" android:duration="7000" android:valueFrom="0" android:valueTo="-260" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_specks_2">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="translateY" android:duration="8500" android:valueFrom="0" android:valueTo="-260" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+        </aapt:attr>
+    </target>
+    <target android:name="grp_specks_3">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="translateY" android:duration="9500" android:valueFrom="0" android:valueTo="-260" android:repeatCount="infinite" android:interpolator="@android:interpolator/linear"/>
+        </aapt:attr>
+    </target>
+
+</animated-vector>

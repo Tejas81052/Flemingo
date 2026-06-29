@@ -1,0 +1,471 @@
+<resources>
+    <string name="app_name">Ebors</string>
+    <string name="address_hint">Search or enter address</string>
+    <string name="address_hint_with_engine">Search %1$s or enter address</string>
+    <string name="go_button">Load page</string>
+    <string name="back_button">Go back</string>
+    <string name="forward_button">Go forward</string>
+    <string name="refresh_button">Refresh page</string>
+    <string name="qr_scan_button">Scan QR code</string>
+    <string name="qr_scan_prompt">Point the camera at a QR code or barcode</string>
+    <string name="qr_scan_unavailable">Camera not available for scanning</string>
+    <string name="action_translate">Translate</string>
+    <string name="translate_not_available">Open a web page first to translate it</string>
+    <string name="translate_already">This page is already translated</string>
+    <string name="translate_choose_language">Translate page to</string>
+    <string name="translate_search_languages">Search languages</string>
+    <string name="translate_loading">Translating to %1$s…</string>
+    <string name="translate_source_unavailable">Open the original page before changing translation language</string>
+    <string name="action_save_offline">Offline</string>
+    <string name="saved_pages_title">Saved pages</string>
+    <string name="saved_pages_summary">%1$d saved for offline reading</string>
+    <string name="offline_saving">Saving for offline…</string>
+    <string name="offline_saved">Saved for offline reading</string>
+    <string name="offline_save_failed">Couldn\'t save this page</string>
+    <string name="offline_save_not_eligible">This page can\'t be saved for offline reading</string>
+    <string name="offline_empty">No saved pages yet. Use Offline on an article to save it.</string>
+    <string name="offline_open_failed">Couldn\'t open this saved page</string>
+    <string name="offline_clear_all">Clear all</string>
+    <string name="offline_cleared">Saved pages cleared</string>
+    <string name="home_button">Open home</string>
+    <string name="browser_menu">Menu</string>
+    <string name="browser_menu_page_title">For this page</string>
+    <string name="browser_menu_library_title">Library</string>
+    <string name="bookmark_button">Bookmarks</string>
+    <string name="tab_switcher_button">Switch tabs</string>
+    <string name="search_button">Search</string>
+    <string name="browser_caption">Search engine: DuckDuckGo</string>
+    <string name="browser_caption_with_engine">Search engine: %1$s</string>
+    <string name="unsupported_link_message">Only web links are supported.</string>
+    <string name="ssl_blocked_message">Secure connection failed. The page was blocked.</string>
+    <string name="search_engine_dialog_title">Choose a search engine</string>
+    <string name="default_browser_prompt">Set Ebors as your default browser.</string>
+    <string name="set_default_browser_action">Set default</string>
+    <string name="default_browser_success">Ebors is now your default browser.</string>
+    <string name="default_browser_not_changed">Default browser was not changed.</string>
+    <string name="default_browser_already_set">Ebors is already your default browser.</string>
+    <string name="share_page">Share page</string>
+    <string name="save_page">Save</string>
+    <string name="saved_page">Saved</string>
+    <string name="copy_link">Copy link</string>
+    <string name="link_copied">Link copied.</string>
+    <string name="print_page">Print / Save as PDF</string>
+    <string name="menu_print_pdf">Print · PDF</string>
+    <string name="print_unavailable">Printing isn\'t available on this device.</string>
+    <string name="no_page_loaded">Open a page first.</string>
+    <string name="allow_once">Allow this time</string>
+    <string name="allow_always">Always allow</string>
+    <string name="deny">Deny</string>
+    <string name="block_always">Block</string>
+    <string name="this_site">this site</string>
+    <string name="website_permission_title">Allow %1$s?</string>
+    <string name="website_permission_message">%1$s wants access to your %2$s.</string>
+    <string name="website_permission_denied">Website access denied.</string>
+    <string name="website_permission_unsupported">This website requested an unsupported permission.</string>
+    <string name="permission_joiner"> and </string>
+    <string name="camera_permission_label">camera</string>
+    <string name="microphone_permission_label">microphone</string>
+    <string name="location_permission_kind">location</string>
+    <string name="location_permission_title">Share location with %1$s?</string>
+    <string name="location_permission_message">%1$s wants to access your location.</string>
+    <string name="location_denied">Location access denied.</string>
+
+    <!-- Permanently-denied (Android level) recovery -->
+    <string name="permission_blocked_in_android_title">Permission turned off</string>
+    <string name="permission_blocked_in_android_message">%1$s is blocked for Ebors in Android settings, so this site can\'t use it. Open settings to turn it back on?</string>
+    <string name="open_settings">Open settings</string>
+    <string name="location_services_off_title">Location is off</string>
+    <string name="location_services_off_message">Turn on location in your device settings to share it with this site.</string>
+
+    <string name="clear_browsing_data">Clear browsing data</string>
+    <string name="clear_browsing_data_title">Clear browsing data?</string>
+    <string name="clear_browsing_data_message">This removes cookies, cache, history and form data from this browser. Downloads are not affected.</string>
+    <string name="clear_browsing_data_confirm">Clear</string>
+    <string name="clear_browsing_data_done">Browsing data cleared.</string>
+
+    <string name="security_indicator_secure">Connection is secure</string>
+    <string name="security_indicator_insecure">Connection is not secure</string>
+    <string name="insecure_page_warning">This page is loaded over HTTP and is not encrypted.</string>
+    <string name="insecure_leave_action">Leave</string>
+    <string name="private_tab_indicator">Private tab</string>
+
+    <string name="download_prompt_title">Start download?</string>
+    <string name="download_prompt_message">Download %1$s?</string>
+    <string name="download_prompt_message_with_size">Download %1$s (%2$s)?</string>
+    <string name="download_started">%1$s is downloading.</string>
+    <string name="download_denied">Download denied.</string>
+    <string name="download_blocked">This download was blocked by a built-in rule.</string>
+    <string name="blob_download_not_supported">This type of website download is not supported yet.</string>
+    <string name="view_downloads">Downloads</string>
+    <string name="downloads_title">Downloads</string>
+    <string name="downloads_summary">%1$d active · %2$d completed</string>
+    <string name="downloads_summary_with_total">%1$d active · %2$d completed · %3$s total</string>
+    <string name="downloads_empty">No downloads yet.</string>
+    <string name="downloads_filter_all">All</string>
+    <string name="downloads_filter_active">Active</string>
+    <string name="downloads_filter_completed">Completed</string>
+    <string name="clear_completed">Clear completed</string>
+    <string name="clear_completed_title">Clear completed downloads?</string>
+    <string name="clear_completed_message">Completed entries will be removed from the list. The downloaded files stay on your device.</string>
+    <string name="unknown_host">Unknown source</string>
+    <string name="download_status_queued">Queued</string>
+    <string name="download_status_downloading">%1$s of %2$s</string>
+    <string name="download_status_downloading_unknown">%1$s downloaded</string>
+    <string name="download_status_paused">Paused at %1$s</string>
+    <string name="download_status_completed">Completed · %1$s</string>
+    <string name="download_status_cancelled">Cancelled</string>
+    <string name="download_failed_generic">Download failed.</string>
+    <string name="pause_download">Pause</string>
+    <string name="resume_download">Resume</string>
+    <string name="retry_download">Retry</string>
+    <string name="open_download">Open</string>
+    <string name="cancel_download">Remove</string>
+    <string name="delete_download">Delete file</string>
+    <string name="share_download">Share</string>
+    <string name="download_file_missing">The downloaded file could not be found.</string>
+    <string name="no_app_to_open_download">No app is available to open this file.</string>
+    <string name="install_apk_title">Install this app?</string>
+    <string name="install_apk_permission_message">Android needs your permission to install apps from Ebors. After enabling it, return here and tap the download again.</string>
+    <string name="install_apk_open_settings">Open settings</string>
+    <string name="download_notification_channel">Downloads</string>
+    <string name="download_notification_title_single">Downloading file</string>
+    <string name="download_notification_title_multiple">%1$d downloads in progress</string>
+    <string name="download_notification_with_progress">%1$s · %2$d%%</string>
+    <string name="download_notification_indeterminate">%1$s · downloading</string>
+    <string name="download_notification_idle">Preparing downloads</string>
+    <string name="download_notification_permission_denied">Allow notifications to keep download progress visible.</string>
+
+    <string name="media_notification_channel">Media playback</string>
+    <string name="media_play">Play</string>
+    <string name="media_pause">Pause</string>
+    <string name="media_previous">Previous</string>
+    <string name="media_next">Next</string>
+
+    <string name="press_back_again_to_exit">Press back again to exit</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_search">Search</string>
+    <string name="settings_section_privacy">Privacy &amp; security</string>
+    <string name="settings_section_advanced">Advanced</string>
+    <string name="settings_section_about">About</string>
+
+    <string name="setting_desktop_mode_title">Desktop site</string>
+    <string name="setting_desktop_mode_summary">Use a desktop user agent and viewport.</string>
+    <string name="setting_search_engine_title">Default search engine</string>
+    <string name="setting_ad_block_title">Block ads &amp; trackers</string>
+    <string name="setting_ad_block_summary">Filter known ad networks and tracking pixels.</string>
+    <string name="setting_site_block_title">Block sites in my list</string>
+    <string name="setting_site_block_summary">Hard-block every domain you\'ve added below.</string>
+    <string name="setting_manage_blocked_sites_title">Manage blocked sites</string>
+    <string name="setting_manage_blocked_sites_summary">Add or remove the domains you want to block.</string>
+
+    <!-- Block-list network updates -->
+    <string name="setting_blocklist_update_title">Block list updates</string>
+    <string name="setting_blocklist_update_version_checked">Version %1$d · checked %2$s</string>
+    <string name="setting_blocklist_update_version_never">Version %1$d · never checked</string>
+    <string name="setting_blocklist_update_not_configured">Version %1$d · no update source in this build</string>
+    <string name="setting_blocklist_auto_update_title">Auto-update block list</string>
+    <string name="setting_blocklist_auto_update_summary">Periodically fetch a refreshed ad/tracker list over the network. Has no effect unless this build has an update source configured.</string>
+    <string name="blocklist_update_checking">Checking for block list update…</string>
+    <string name="blocklist_update_up_to_date">Block list is already up to date.</string>
+    <string name="blocklist_update_updated">Block list updated to version %1$d.</string>
+    <string name="blocklist_update_failed">Block list update failed: %1$s</string>
+    <string name="blocklist_update_not_configured">This build has no block list update source configured.</string>
+    <string name="blocklist_update_skipped">Block list was already checked recently.</string>
+
+    <string name="blocked_sites_title">Blocked sites</string>
+    <string name="blocked_sites_summary_domains">%1$d domains</string>
+    <string name="blocked_sites_empty_title">Your block list is empty</string>
+    <string name="blocked_sites_empty_subtitle">Add domains you want this browser to refuse to load. Paste one per line.</string>
+    <string name="blocked_sites_add_first">Add your first site</string>
+    <string name="blocked_sites_add_title">Add blocked sites</string>
+    <string name="blocked_sites_add_helper">Enter one domain per line. Examples: youtube.com, facebook.com, twitter.com.</string>
+    <string name="blocked_sites_add_hint">youtube.com</string>
+    <string name="blocked_sites_add_confirm">Add</string>
+    <string name="blocked_sites_added_none">Nothing to add.</string>
+    <string name="blocked_sites_added_one">1 site added.</string>
+    <string name="blocked_sites_added_many">%1$d sites added.</string>
+    <string name="blocked_sites_remove_title">Remove site?</string>
+    <string name="blocked_sites_remove_message">Stop blocking %1$s?</string>
+    <string name="blocked_sites_remove_confirm">Remove</string>
+    <string name="blocked_sites_clear_title">Clear blocked sites?</string>
+    <string name="blocked_sites_clear_message">This removes every domain from your block list.</string>
+    <string name="blocked_sites_clear_confirm">Clear</string>
+    <string name="setting_third_party_cookies_title">Third-party cookies</string>
+    <string name="setting_third_party_cookies_summary">Required for most federated sign-in (Google, Microsoft, Apple).</string>
+    <string name="setting_history_title">Save browsing history</string>
+    <string name="setting_history_summary">Record visited pages locally so you can find them later.</string>
+    <string name="setting_search_suggestions_title">Search suggestions</string>
+    <string name="setting_search_suggestions_summary">Show live suggestions from your search engine as you type. Sends the typed text to the engine.</string>
+    <string name="suggestion_search_label">Search</string>
+    <string name="setting_javascript_title">JavaScript</string>
+    <string name="setting_javascript_summary">Most modern sites need this. Turn off for a plain-HTML web.</string>
+    <string name="setting_block_popups_title">Block popups</string>
+    <string name="setting_block_popups_summary">Stop sites from opening new windows. May break some sign-in flows.</string>
+    <string name="setting_tab_sleeping_title">Sleep inactive tabs</string>
+    <string name="setting_tab_sleeping_summary">Free memory by unloading tabs left unused for a few minutes; they reload when you return.</string>
+    <string name="setting_clear_data_on_exit_title">Auto-delete on exit</string>
+    <string name="setting_clear_data_on_exit_summary">Clear cookies, cache, history and site data every time you close the browser.</string>
+    <string name="setting_always_https_title">Always use HTTPS</string>
+    <string name="setting_always_https_summary">Upgrade http:// links to https:// automatically. Localhost and private network addresses are not upgraded.</string>
+    <string name="setting_allow_mixed_content_title">Allow mixed content</string>
+    <string name="setting_allow_mixed_content_summary">Let HTTPS pages load HTTP images, scripts and other resources. Off is more secure; turn on only if a legacy site you trust breaks.</string>
+    <string name="setting_aggressive_anti_adblock_title">Aggressive anti-adblock evasion</string>
+    <string name="setting_aggressive_anti_adblock_summary">Override page-side style queries used by anti-adblock walls. May interfere with normal pages whose elements have ad-like class names.</string>
+    <string name="setting_notification_permission_title">Notifications</string>
+    <string name="setting_notification_permission_legacy">Notifications are always available on this Android version.</string>
+    <string name="setting_notification_permission_granted">Allowed. Tap to manage in system settings.</string>
+    <string name="setting_notification_permission_can_prompt">Disabled. Tap to allow download progress notifications.</string>
+    <string name="setting_notification_permission_permanent_denied">Disabled. Tap to open system settings.</string>
+
+    <!-- Privacy toggles -->
+    <string name="setting_block_webrtc_title">Block WebRTC connections</string>
+    <string name="setting_block_webrtc_summary">Stops sites from gathering ICE candidates that can reveal your local IP address. May break video chat and screen-sharing features.</string>
+    <string name="setting_trim_referrer_title">Trim referrer to origin</string>
+    <string name="setting_trim_referrer_summary">Cross-site requests carry only the origin (scheme + host) instead of the full URL you came from.</string>
+
+    <!-- Custom search engine -->
+    <string name="setting_custom_search_dialog_title">Custom search engine</string>
+    <string name="setting_custom_search_save">Save</string>
+    <string name="setting_custom_search_name_label">Display name</string>
+    <string name="setting_custom_search_name_hint">My search engine</string>
+    <string name="setting_custom_search_url_label">Search URL template</string>
+    <string name="setting_custom_search_url_hint">https://search.example.com/?q=%s</string>
+    <string name="setting_custom_search_url_helper">Use %1$s where the query should be inserted. If %1$s is omitted, ?q=… is appended automatically.</string>
+    <string name="setting_custom_search_home_label">Home URL (optional)</string>
+    <string name="setting_custom_search_home_hint">https://search.example.com/</string>
+    <string name="setting_custom_search_invalid_url">Search URL must start with http:// or https://.</string>
+
+    <!-- SSL error dialog -->
+    <string name="ssl_error_title">Connection isn\'t private</string>
+    <string name="ssl_error_message">%1$s presented an invalid certificate. The reason was: %2$s</string>
+    <string name="ssl_error_reason_invalid_date">The certificate\'s date range is wrong (the device clock might be off).</string>
+    <string name="ssl_error_reason_expired">The certificate has expired.</string>
+    <string name="ssl_error_reason_hostname_mismatch">The certificate is for a different host.</string>
+    <string name="ssl_error_reason_not_yet_valid">The certificate is not yet valid.</string>
+    <string name="ssl_error_reason_untrusted">The certificate issuer is not trusted.</string>
+    <string name="ssl_error_reason_other">An unspecified SSL error occurred.</string>
+    <string name="ssl_error_cancel">Cancel</string>
+    <string name="ssl_error_proceed">Continue (unsafe)</string>
+
+    <!-- Pull-to-refresh has no user-facing strings — left here as a comment
+         anchor so future translations notice the feature. -->
+
+    <!-- Reused: existing strings cover the find-in-page debounce UX. -->
+
+    <string name="setting_clear_browsing_data_summary">Cookies, cache, history and form data.</string>
+    <string name="about_app_title">Ebors</string>
+    <string name="about_version_label">Version %1$s</string>
+    <string name="about_copyright">© 2026 Tejas Thimmaiah. Licensed under the Apache License, Version 2.0.</string>
+    <string name="about_engine">Rendering engine: Android System WebView (Chromium-based).</string>
+    <string name="about_known_limitation">Voice input (the Web Speech API used by mic buttons on sites like Google) is provided through your device\'s built-in speech recognition. It needs a speech-recognition service installed (most devices have one) and microphone permission. Accuracy and language support come from that service.</string>
+    <string name="setting_open_source_licenses_title">Open-source licenses</string>
+    <string name="setting_open_source_licenses_summary">Third-party libraries used by Ebors.</string>
+    <string name="open_source_licenses_title">Open-source licenses</string>
+    <string name="setting_privacy_policy_title">Privacy policy</string>
+    <string name="setting_privacy_policy_summary">What Ebors does and doesn\'t collect.</string>
+    <string name="setting_terms_title">Terms of use</string>
+    <string name="setting_terms_summary">Conditions of using Ebors.</string>
+    <string name="about_section_legal">Legal</string>
+
+    <!-- First-launch onboarding (WelcomeActivity) -->
+    <string name="welcome_eyebrow">Welcome</string>
+    <string name="welcome_title">A calmer way to browse.</string>
+    <string name="welcome_subtitle">Ebors is a fast, private Android browser with built-in ad and tracker blocking. No accounts, no analytics, no surprises.</string>
+    <string name="welcome_continue">Continue</string>
+    <string name="welcome_version_label">Version %1$s</string>
+    <string name="welcome_open_with">Open with</string>
+    <string name="welcome_legal_close">Close</string>
+
+    <string name="welcome_privacy_eyebrow">Privacy promise</string>
+    <string name="welcome_privacy_title">What Ebors does &amp; doesn\'t do</string>
+    <string name="welcome_privacy_bullets">• Your history, bookmarks and downloads stay on this device.\n• No analytics. No telemetry. No advertising SDKs.\n• Private tabs use an isolated profile, wiped when you close them.\n• The browser never sends your browsing to the developer.</string>
+    <string name="welcome_terms_consent">I agree to the Terms of use and have read the Privacy policy.</string>
+    <string name="welcome_link_privacy">Privacy policy</string>
+    <string name="welcome_link_terms">Terms of use</string>
+    <string name="welcome_accept">Accept &amp; continue</string>
+
+    <string name="welcome_default_eyebrow">One last thing</string>
+    <string name="welcome_default_title">Make Ebors your default browser?</string>
+    <string name="welcome_default_body">Optional. If you set Ebors as the default, links from other apps open here. You can change this any time in Android Settings.</string>
+    <string name="welcome_set_default">Set as default</string>
+    <string name="welcome_skip">Not now</string>
+
+    <!-- Privacy promise cards (page 2) -->
+    <string name="welcome_promise_1_title">History stays here</string>
+    <string name="welcome_promise_1_body">We don\'t sync, upload, or share your browsing.</string>
+    <string name="welcome_promise_2_title">Trackers blocked</string>
+    <string name="welcome_promise_2_body">A curated list filters known ad networks and pixels.</string>
+    <string name="welcome_promise_3_title">No account, ever</string>
+    <string name="welcome_promise_3_body">Bookmarks and settings live on this device.</string>
+    <string name="welcome_promise_4_title">Open by default</string>
+    <string name="welcome_promise_4_body">Source available. You can read what we do.</string>
+
+    <string name="file_chooser_title">Choose file</string>
+    <string name="file_chooser_unavailable">No app available to pick a file.</string>
+
+    <string name="library_title">Library</string>
+    <string name="bookmarks_history">Bookmarks &amp; history</string>
+    <string name="tab_bookmarks">Bookmarks</string>
+    <string name="tab_history">History</string>
+    <string name="add_bookmark">Add bookmark</string>
+    <string name="remove_bookmark">Remove bookmark</string>
+    <string name="bookmark_added">Bookmark saved.</string>
+    <string name="bookmark_removed">Bookmark removed.</string>
+    <string name="bookmarks_empty">No bookmarks yet. Add one from the menu.</string>
+    <string name="history_empty">No history yet.</string>
+    <string name="history_clear">Clear history</string>
+    <string name="history_clear_title">Clear history?</string>
+    <string name="history_clear_message">This removes all entries from your browsing history.</string>
+    <string name="history_clear_confirm">Clear</string>
+    <string name="open_in_browser">Open</string>
+    <string name="remove">Remove</string>
+
+    <string name="find_in_page">Find in page</string>
+    <string name="find_in_page_hint">Find in page</string>
+    <string name="find_count_format">%1$d / %2$d</string>
+    <string name="find_previous">Previous match</string>
+    <string name="find_next">Next match</string>
+    <string name="find_close">Close find</string>
+
+    <string name="desktop_mode_on">Desktop mode on. Reloading…</string>
+    <string name="desktop_mode_off">Mobile mode on. Reloading…</string>
+
+    <!-- Multi-tab UI -->
+    <string name="new_tab">New tab</string>
+    <string name="new_private_tab">New private tab</string>
+    <string name="new_private_tab_opened">Opened a new private tab</string>
+    <string name="close_tab">Close tab</string>
+    <string name="tab_private_url_prefix">Private · %1$s</string>
+    <string name="private_mode_unsupported">Private tabs need a newer Android System WebView.</string>
+
+    <!-- v10 accent picker (Settings → Appearance → Accent). -->
+    <string name="setting_accent_title">Accent</string>
+    <string name="setting_accent_summary">Choose the highlight colour used across buttons, links and the active-tab marker.</string>
+    <string name="accent_label_terracotta">Burnt Orange</string>
+    <string name="accent_label_teal">Deep Teal Green</string>
+    <string name="accent_label_royal_blue">Royal Blue</string>
+    <string name="accent_label_deep_purple">Deep Purple</string>
+    <string name="accent_label_charcoal">Near Black</string>
+    <string name="accent_picker_dialog_title">Accent colour</string>
+    <string name="accent_swatch_content_description">%1$s accent</string>
+    <string name="accent_swatch_selected_content_description">%1$s accent, selected</string>
+
+    <!-- v10 menu sheet tile labels. -->
+    <string name="menu_action_go_backward">Go backward</string>
+    <string name="menu_action_go_forward">Go forward</string>
+
+    <!-- v10 private start page (incognito about:home). -->
+    <string name="private_start_session_badge">PRIVATE SESSION</string>
+    <string name="private_start_greeting_top">You\'re</string>
+    <string name="private_start_greeting_bottom">off the record.</string>
+    <string name="private_start_search_hint">Search privately or paste a link</string>
+    <string name="private_start_quick_to">Quick to</string>
+    <string name="private_start_promises_title">This tab promises</string>
+    <string name="private_start_promise_history">History isn\'t recorded</string>
+    <string name="private_start_promise_cookies">Cookies clear when the tab closes</string>
+    <string name="private_start_promise_cache">Cache stays in this tab\'s heap</string>
+    <string name="private_start_promise_trackers">Trackers are still blocked</string>
+    <string name="private_start_disclaimer_lead">It doesn\'t hide you.</string>
+    <string name="private_start_disclaimer_body"> Your network, employer, and the sites you visit can still see what you\'re doing.</string>
+
+    <!-- v10 start page (about:home). -->
+    <string name="start_page_app_name">EFFECTIVE BROWSER</string>
+    <string name="start_page_date_format">EEE · MMM d</string>
+    <string name="start_page_greeting_morning">Good morning,</string>
+    <string name="start_page_greeting_afternoon">Good afternoon,</string>
+    <string name="start_page_greeting_evening">Good evening,</string>
+    <string name="start_page_greeting_night">Working late,</string>
+    <string name="start_page_greeting_bottom">where would you like to start today?</string>
+
+    <!--
+      v10 rotating bottom-line greeting prompts. StartPageView picks
+      one at random for each show() — different prompts on different
+      days keep the home page feeling alive without resorting to a
+      bigger feature.
+    -->
+    <string-array name="start_page_greeting_prompts">
+        <item>where would you like to read today?</item>
+        <item>what are you curious about?</item>
+        <item>what\'s on your mind?</item>
+        <item>where shall we wander?</item>
+        <item>what shall we learn today?</item>
+        <item>any rabbit holes to chase?</item>
+        <item>pick a thread to pull.</item>
+        <item>ready to dig in?</item>
+        <item>what\'s the plan?</item>
+        <item>what are you looking for?</item>
+        <item>ready when you are.</item>
+        <item>what shall we discover?</item>
+    </string-array>
+    <string name="start_page_search_hint">Search or paste a link</string>
+    <string name="start_page_section_pinned">Pinned</string>
+    <string name="start_page_pinned_edit">EDIT</string>
+    <string name="start_page_section_continue">Recent visits </string>
+    <string name="start_page_history_link">HISTORY ↗</string>
+    <string name="start_page_continue_empty">Nothing recent. Open a page and it lands here.</string>
+    <string name="start_page_continue_reader_ready">reader ready</string>
+    <string name="start_page_continue_meta">%1$s · %2$s</string>
+    <string name="start_page_continue_meta_reader">%1$s · %2$s · </string>
+    <string name="start_page_continue_age_just_now">just now</string>
+    <string name="start_page_continue_age_minutes">%1$d min ago</string>
+    <string name="start_page_continue_age_hour">an hour ago</string>
+    <string name="start_page_continue_age_hours">%1$d hours ago</string>
+    <string name="start_page_continue_age_yesterday">yesterday</string>
+    <string name="start_page_continue_age_days">%1$d days ago</string>
+    <string name="start_page_trackers_summary">%1$s <i>trackers blocked today</i></string>
+    <string name="start_page_trackers_meta">List v%1$d · updated %2$s</string>
+    <string name="start_page_trackers_meta_never">List v%1$d · never checked</string>
+
+    <!-- v10 tab switcher overlay. -->
+    <string name="tab_switcher_open_tabs_title">%1$d <i>open tabs</i></string>
+    <string name="tab_switcher_segment_regular">Regular</string>
+    <string name="tab_switcher_segment_private">Private</string>
+    <string name="tab_switcher_segment_regular_filter">Show regular tabs</string>
+    <string name="tab_switcher_segment_private_filter">Show private tabs</string>
+    <string name="tab_switcher_new_tab_button">New tab</string>
+    <string name="tab_card_private_label">PRIVATE</string>
+    <string name="tab_switcher_empty_regular">No regular tabs open.</string>
+    <string name="tab_switcher_empty_private">No private tabs open.</string>
+
+    <!-- Long-press context menu on links / images inside a page. -->
+    <string name="link_action_open_in_new_tab">Open in new tab</string>
+    <string name="link_action_open_in_private_tab">Open in private tab</string>
+    <string name="share_link">Share link</string>
+    <string name="image_action_copy_url">Copy image URL</string>
+    <string name="image_action_share_url">Share image URL</string>
+    <string name="image_action_save_image">Save image</string>
+
+    <!-- Reader mode -->
+    <string name="action_reader_mode">Reader mode</string>
+    <string name="reader_mode_not_eligible">Couldn\'t find readable content on this page.</string>
+    <string name="reader_mode_default_title">Reader</string>
+    <string name="reader_mode_reading_time">%1$d min read</string>
+    <string name="tabs_with_count">Tabs (%1$d)</string>
+    <string name="tab_switcher_title">Tabs (%1$d)</string>
+    <string name="tab_blank_url_placeholder">New tab</string>
+    <string name="tab_opened_in_background">New tab opened.</string>
+    <string name="permission_busy">Another site is already asking for a permission. Try again in a moment.</string>
+
+    <!-- No-internet screen -->
+    <string name="no_internet_eyebrow">Offline</string>
+    <string name="no_internet_title">The page\ncouldn\'t be reached.</string>
+    <string name="no_internet_body">Your device is between signals. We\'ll pick this up the moment the line\'s back.</string>
+    <string name="no_internet_stamp_eyebrow">Postage · Ebors</string>
+    <string name="no_internet_try_again">Try again</string>
+    <string name="no_internet_try_again_cd">Try again</string>
+
+    <!-- Site-not-found screen -->
+    <string name="site_not_found_eyebrow">Address not found</string>
+    <string name="site_not_found_title">Nobody\'s home\nat that address.</string>
+    <string name="site_not_found_body">We couldn\'t find a site at %1$s. Check the spelling, or search for it instead.</string>
+    <string name="site_not_found_back">Go back</string>
+    <string name="site_not_found_retry">Try again</string>
+
+    <!--
+      Perforated stamp outline (320×80 viewport). Shared by the shadow
+      and fill paths in bg_no_internet_stamp.xml so they stay in lockstep.
+    -->
+    <string name="no_internet_stamp_path" translatable="false">M 8 0 L 11.857 0 A 5 5 0 0 1 21.857 0 L 32.571 0 A 5 5 0 0 1 42.571 0 L 53.286 0 A 5 5 0 0 1 63.286 0 L 74 0 A 5 5 0 0 1 84 0 L 94.714 0 A 5 5 0 0 1 104.714 0 L 115.429 0 A 5 5 0 0 1 125.429 0 L 136.143 0 A 5 5 0 0 1 146.143 0 L 156.857 0 A 5 5 0 0 1 166.857 0 L 177.571 0 A 5 5 0 0 1 187.571 0 L 198.286 0 A 5 5 0 0 1 208.286 0 L 219 0 A 5 5 0 0 1 229 0 L 239.714 0 A 5 5 0 0 1 249.714 0 L 260.429 0 A 5 5 0 0 1 270.429 0 L 281.143 0 A 5 5 0 0 1 291.143 0 L 301.857 0 A 5 5 0 0 1 311.857 0 L 312 0 L 320 8 L 320 14 A 5 5 0 0 1 320 24 L 320 34 A 5 5 0 0 1 320 44 L 320 54 A 5 5 0 0 1 320 64 L 320 72 L 312 80 L 311.857 80 A 5 5 0 0 1 301.857 80 L 291.143 80 A 5 5 0 0 1 281.143 80 L 270.429 80 A 5 5 0 0 1 260.429 80 L 249.714 80 A 5 5 0 0 1 239.714 80 L 229 80 A 5 5 0 0 1 219 80 L 208.286 80 A 5 5 0 0 1 198.286 80 L 187.571 80 A 5 5 0 0 1 177.571 80 L 166.857 80 A 5 5 0 0 1 156.857 80 L 146.143 80 A 5 5 0 0 1 136.143 80 L 125.429 80 A 5 5 0 0 1 115.429 80 L 104.714 80 A 5 5 0 0 1 94.714 80 L 84 80 A 5 5 0 0 1 74 80 L 63.286 80 A 5 5 0 0 1 53.286 80 L 42.571 80 A 5 5 0 0 1 32.571 80 L 21.857 80 A 5 5 0 0 1 11.857 80 L 8 80 L 0 72 L 0 64 A 5 5 0 0 1 0 54 L 0 44 A 5 5 0 0 1 0 34 L 0 24 A 5 5 0 0 1 0 14 L 0 8 Z</string>
+</resources>

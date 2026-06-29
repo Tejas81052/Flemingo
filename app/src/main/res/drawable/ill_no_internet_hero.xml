@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Static composition of the no-internet hero.
+  Wrapped by avd_no_internet_hero.xml which animates these groups:
+    grp_compass        → 360° rotation, 60s, linear, infinite
+    grp_plane_push     → translate + rotate, 4.6s, cubic, infinite
+    grp_ripple_1/2/3   → scale 0.2→2.2 + alpha 0.55→0, staggered
+    grp_pin            → translateY bob, 3.4s
+    path_flight        → stroke-dashoffset crawl, 1.6s
+    grp_arc_1/2/3      → alpha breathe staggered
+    grp_specks_*       → translateY drift (3 tracks for variety)
+
+  Viewport is 320 × 300 so coordinates match the prototype 1:1.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="320dp"
+    android:height="300dp"
+    android:viewportWidth="320"
+    android:viewportHeight="300">
+
+    <!-- Soft horizon wash (bottom-blooming terracotta) -->
+    <path
+        android:fillColor="#F2DDD2"
+        android:fillAlpha="0.35"
+        android:pathData="M0,180 L320,180 L320,300 L0,300 Z" />
+
+    <!-- Faint chart grid: 24×24 px lines.
+         Rendered as one path with all horizontals + verticals for
+         drawcall efficiency. -->
+    <path
+        android:strokeColor="#E2DBC8"
+        android:strokeWidth="0.5"
+        android:strokeAlpha="0.5"
+        android:pathData="
+            M0,24 H320 M0,48 H320 M0,72 H320 M0,96 H320 M0,120 H320
+            M0,144 H320 M0,168 H320 M0,192 H320 M0,216 H320 M0,240 H320
+            M0,264 H320 M0,288 H320
+            M24,0 V300 M48,0 V300 M72,0 V300 M96,0 V300 M120,0 V300
+            M144,0 V300 M168,0 V300 M192,0 V300 M216,0 V300 M240,0 V300
+            M264,0 V300 M288,0 V300 M312,0 V300" />
+
+    <!-- ─── Compass rose, top-left ─────────────────────────────── -->
+    <group
+        android:name="grp_compass"
+        android:pivotX="34"
+        android:pivotY="38">
+
+        <!-- faint outer ring -->
+        <path
+            android:strokeColor="#B3A892"
+            android:strokeAlpha="0.45"
+            android:strokeWidth="0.5"
+            android:pathData="M52,38 A18,18 0 1,1 16,38 A18,18 0 1,1 52,38 Z" />
+
+        <!-- 4-point star, vertical (longer) -->
+        <path
+            android:fillColor="#C8533A"
+            android:fillAlpha="0.55"
+            android:pathData="M34,22 L38,38 L34,54 L30,38 Z" />
+        <!-- 4-point star, horizontal (shorter) -->
+        <path
+            android:fillColor="#C8533A"
+            android:fillAlpha="0.35"
+            android:pathData="M18,38 L34,34 L50,38 L34,42 Z" />
+        <!-- center dot -->
+        <path
+            android:fillColor="#C8533A"
+            android:pathData="M34,38 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z" />
+    </group>
+
+    <!-- "N" label below the compass (static, doesn't rotate) -->
+    <!-- skipped — VectorDrawable doesn't render <text>; the label is
+         rendered as an overlay TextView in the layout if desired -->
+
+    <!-- ─── Origin marker, bottom-left ─────────────────────────── -->
+    <path
+        android:fillColor="#574E42"
+        android:pathData="M40,230 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z" />
+    <path
+        android:strokeColor="#574E42"
+        android:strokeAlpha="0.35"
+        android:strokeWidth="1"
+        android:pathData="M40,230 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z" />
+    <path
+        android:strokeColor="#574E42"
+        android:strokeAlpha="0.18"
+        android:strokeWidth="1"
+        android:pathData="M40,230 m-14,0 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 Z" />
+
+    <!-- ─── Destination pushpin, top-right ─────────────────────── -->
+    <group
+        android:name="grp_pin"
+        android:pivotX="266"
+        android:pivotY="76">
+
+        <!-- wifi arcs above the pin: 3 stacked, alpha-pulsed -->
+        <group android:name="grp_arc_3" android:translateX="266" android:translateY="62">
+            <path
+                android:strokeColor="#C8533A"
+                android:strokeWidth="2"
+                android:strokeLineCap="round"
+                android:pathData="M-22,0 A22,22 0 0,1 22,0" />
+        </group>
+        <group android:name="grp_arc_2" android:translateX="266" android:translateY="62">
+            <path
+                android:strokeColor="#C8533A"
+                android:strokeWidth="2"
+                android:strokeLineCap="round"
+                android:pathData="M-14,0 A14,14 0 0,1 14,0" />
+        </group>
+        <group android:name="grp_arc_1" android:translateX="266" android:translateY="62">
+            <path
+                android:strokeColor="#C8533A"
+                android:strokeWidth="2"
+                android:strokeLineCap="round"
+                android:pathData="M-6,0 A6,6 0 0,1 6,0" />
+        </group>
+
+        <!-- pin triangle -->
+        <path
+            android:fillColor="#C8533A"
+            android:strokeColor="#9D3D27"
+            android:strokeWidth="0.8"
+            android:pathData="M259,76 L273,76 L266,92 Z" />
+        <!-- pin head -->
+        <path
+            android:fillColor="#C8533A"
+            android:strokeColor="#9D3D27"
+            android:strokeWidth="0.8"
+            android:pathData="M266,74 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z" />
+        <!-- pin highlight -->
+        <path
+            android:fillColor="#FDFAF3"
+            android:fillAlpha="0.6"
+            android:pathData="M264,73 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+        <!-- shadow -->
+        <path
+            android:fillColor="#2A241D"
+            android:fillAlpha="0.18"
+            android:pathData="M266,94 m-5,0 a5,1.2 0 1,0 10,0 a5,1.2 0 1,0 -10,0 Z" />
+    </group>
+
+    <!-- ─── Flight path, segment 1 (origin → gap): the crawling one ─── -->
+    <path
+        android:name="path_flight"
+        android:strokeColor="#C8533A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:trimPathStart="0"
+        android:trimPathEnd="1"
+        android:pathData="M50,224 C80,180 110,150 150,138" />
+
+    <!-- ─── Flight path, segment 2 (gap → destination): static, faint ─── -->
+    <path
+        android:strokeColor="#C8533A"
+        android:strokeAlpha="0.28"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M180,132 C210,124 240,110 260,88" />
+
+    <!-- ─── Sonar ripples at the gap ───────────────────────────── -->
+    <group
+        android:name="grp_ripple_1"
+        android:pivotX="165"
+        android:pivotY="135">
+        <path
+            android:strokeColor="#C8533A"
+            android:strokeWidth="1.5"
+            android:pathData="M165,135 m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    </group>
+    <group
+        android:name="grp_ripple_2"
+        android:pivotX="165"
+        android:pivotY="135">
+        <path
+            android:strokeColor="#C8533A"
+            android:strokeWidth="1.5"
+            android:pathData="M165,135 m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    </group>
+    <group
+        android:name="grp_ripple_3"
+        android:pivotX="165"
+        android:pivotY="135">
+        <path
+            android:strokeColor="#C8533A"
+            android:strokeWidth="1.5"
+            android:pathData="M165,135 m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    </group>
+
+    <!-- Central X mark — the barrier (static) -->
+    <path
+        android:strokeColor="#C8533A"
+        android:strokeWidth="2.4"
+        android:strokeLineCap="round"
+        android:pathData="M160,130 L170,140 M170,130 L160,140" />
+
+    <!-- ─── Paper plane: nested groups so push (translate+rotate)
+         and bob (translateY) compose cleanly. ───────────────── -->
+    <group
+        android:name="grp_plane_push"
+        android:pivotX="150"
+        android:pivotY="138">
+        <group
+            android:name="grp_plane_bob"
+            android:pivotX="150"
+            android:pivotY="138">
+
+            <!-- plane shadow -->
+            <path
+                android:fillColor="#2A241D"
+                android:fillAlpha="0.12"
+                android:pathData="M148,158 m-14,0 a14,2 0 1,0 28,0 a14,2 0 1,0 -28,0 Z" />
+
+            <!-- top wing (cream) -->
+            <path
+                android:fillColor="#FBF8F1"
+                android:strokeColor="#2A241D"
+                android:strokeWidth="1.5"
+                android:strokeLineJoin="round"
+                android:pathData="M134,142 L164,126 L148,150 Z" />
+
+            <!-- under wing (accent) -->
+            <path
+                android:fillColor="#C8533A"
+                android:strokeColor="#9D3D27"
+                android:strokeWidth="1.5"
+                android:strokeLineJoin="round"
+                android:pathData="M148,150 L164,126 L164,138 L152,148 Z" />
+
+            <!-- center crease -->
+            <path
+                android:strokeColor="#2A241D"
+                android:strokeAlpha="0.4"
+                android:strokeWidth="1.2"
+                android:strokeLineCap="round"
+                android:pathData="M134,142 L148,150" />
+        </group>
+    </group>
+
+    <!-- ─── Specks: three drift "tracks" with different speeds.
+         Each track holds 2-3 small dots stacked at the bottom. ── -->
+    <group android:name="grp_specks_1">
+        <path android:fillColor="#D6CCB6"  android:pathData="M28,300 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z" />
+        <path android:fillColor="#C8533A"  android:pathData="M62,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+        <path android:fillColor="#D6CCB6"  android:pathData="M252,300 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z" />
+    </group>
+    <group android:name="grp_specks_2">
+        <path android:fillColor="#E2DBC8"  android:pathData="M118,300 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0 Z" />
+        <path android:fillColor="#F2DDD2"  android:pathData="M188,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+    </group>
+    <group android:name="grp_specks_3">
+        <path android:fillColor="#B3A892"  android:pathData="M48,300 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0 Z" />
+        <path android:fillColor="#C8533A"  android:pathData="M292,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+        <path android:fillColor="#D6CCB6"  android:pathData="M228,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+    </group>
+
+    <!-- ─── Wind vector, bottom-right (static) ─────────────────── -->
+    <path
+        android:strokeColor="#8A7F6E"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M272,232 L290,232 M286,229 L290,232 L286,235" />
+
+    <!-- Altitude ticks, right edge (static) -->
+    <path
+        android:strokeColor="#B3A892"
+        android:strokeAlpha="0.4"
+        android:strokeWidth="0.7"
+        android:strokeLineCap="round"
+        android:pathData="M304,30 L310,30 M304,38 L310,38 M304,46 L310,46 M304,54 L310,54 M304,62 L310,62" />
+
+</vector>

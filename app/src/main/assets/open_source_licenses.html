@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open-source licenses</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif;
+         padding: 16px 18px 32px; max-width: 720px;
+         color: #232323; background: #faf6ee; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 22px 0 6px; }
+  p { margin: 0 0 12px; }
+  ul { padding-left: 22px; margin: 0 0 16px; }
+  li { margin: 4px 0; }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+              font-size: 12.5px; }
+  pre { white-space: pre-wrap; background: #f0eadb; padding: 10px 12px;
+        border-radius: 6px; }
+  hr { border: 0; border-top: 1px solid #00000022; margin: 18px 0; }
+  .muted { opacity: 0.7; font-size: 12.5px; }
+  /* Dark rules last so they win over the light base rules above
+     (equal specificity → later source order wins). */
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1817; color: #e8e3d8; }
+    a { color: #f0a079; }
+    pre { background: #232020; color: #e8e3d8; }
+    hr { border-top-color: #ffffff22; }
+  }
+</style>
+</head>
+<body>
+<h1>Open-source licenses</h1>
+<p class="muted">Ebors is free software, licensed under the
+GNU General Public License, version 3 or later.<br>
+© 2026 Tejas Thimmaiah.</p>
+
+<h2>Source code</h2>
+<p>Ebors is licensed under the <strong>GPL-3.0-or-later</strong>. Every user
+has the right to its complete corresponding source code. The full license
+text ships with the app as <a href="gpl-3.0.txt">gpl-3.0.txt</a> and is also
+at <a href="https://www.gnu.org/licenses/gpl-3.0.html">gnu.org/licenses/gpl-3.0.html</a>.
+To request the source for a released version, email
+<a href="mailto:ThimmaiahKK@proton.me">ThimmaiahKK@proton.me</a>.</p>
+
+<h2>uBlock Origin &amp; filter lists (GPL-3.0)</h2>
+<p>Ad and tracker blocking uses filter lists and scriptlets from
+<strong>uBlock Origin</strong> (© Raymond Hill and contributors, GPL-3.0)
+and <strong>EasyList / EasyPrivacy</strong> (© the EasyList authors,
+dual-licensed GPL-3.0 and CC BY-SA 3.0). The filter engine that reads these
+lists is an independent implementation of the EasyList/Adblock-Plus syntax
+written for Ebors. These GPL components are why Ebors as a whole is
+GPL-licensed.</p>
+
+<h2>Rendering engine</h2>
+<p>Ebors uses Android&rsquo;s system <strong>WebView</strong> (Chromium-based)
+as its rendering engine. The system WebView ships with the operating system
+and is not redistributed inside the Ebors APK.</p>
+
+<h2>Third-party libraries (Apache-2.0)</h2>
+<p>The libraries below are compiled into the APK under the Apache License,
+Version 2.0, which is compatible with the GPL-3.0:</p>
+<ul>
+  <li><strong>AndroidX</strong> (core-ktx, appcompat, activity, constraintlayout,
+      recyclerview, swiperefreshlayout, webkit) &mdash;
+      © Google LLC / The Android Open Source Project</li>
+  <li><strong>Material Components for Android</strong> &mdash; © Google LLC</li>
+  <li><strong>Kotlin standard library</strong> &mdash;
+      © JetBrains s.r.o. and Kotlin contributors</li>
+  <li><strong>OkHttp</strong> &mdash; © Square, Inc.</li>
+  <li><strong>ZXing Android Embedded</strong> (QR scanning) &mdash;
+      © ZXing authors / JourneyApps</li>
+</ul>
+<p class="muted">The Apache License, Version 2.0 is available at
+<a href="http://www.apache.org/licenses/LICENSE-2.0">apache.org/licenses/LICENSE-2.0</a>.</p>
+
+<hr>
+
+<p class="muted">If you redistribute or fork Ebors you must keep it under the
+GPL-3.0-or-later, provide the corresponding source, retain the copyright and
+license notices (including those of uBlock Origin and EasyList), and impose no
+further restrictions.</p>
+
+<p class="muted">Android, the Android logo and other Android marks are
+property of Google LLC. Chromium is the name of an open-source browser
+project led by The Chromium Authors. Ebors is not affiliated with or
+endorsed by Google LLC or The Chromium Authors.</p>
+
+</body>
+</html>

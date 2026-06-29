@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Pill-shaped accent button for the welcome / onboarding screens.
+    28dp radius = 56dp button height / 2, so it stays a true pill.
+
+    The disabled state (used on the "Accept & continue" button before
+    the terms checkbox is ticked) is the soft accent so the affordance
+    reads as "not yet" rather than "broken".
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/browser_accent_soft" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/browser_accent" />
+            <corners android:radius="28dp" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Strings for the site-not-found screen.
+
+  site_not_found_title uses a literal \n so the serif headline breaks
+  the same way as the prototype ("Nobody's home" / "at that address.").
+
+  site_not_found_body and site_not_found_search take the failing host /
+  search term at runtime — see SiteNotFoundController in the patch. The
+  %1$s placeholder is filled with the host (body) or the bare term
+  (search button).
+-->
+<resources>
+    <string name="site_not_found_eyebrow">Address not found</string>
+    <string name="site_not_found_title">Nobody\'s home\nat that address.</string>
+    <string name="site_not_found_body">We couldn\'t find a site at %1$s. Check the spelling, or search for it instead.</string>
+    <string name="site_not_found_search">Search for \"%1$s\"</string>
+    <string name="site_not_found_back">Go back</string>
+    <string name="site_not_found_retry">Try again</string>
+</resources>

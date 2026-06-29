@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="browser_bg_solid">#211C16</color>
+    <color name="browser_surface">#2A241D</color>
+    <color name="browser_surface_muted">#332C24</color>
+    <color name="browser_stroke">#3F372D</color>
+    <color name="browser_accent">#E26545</color>
+    <color name="browser_accent_soft">#3F2A22</color>
+    <color name="browser_on_accent">#1A140F</color>
+    <color name="browser_chip_bg">#3F2A22</color>
+    <color name="browser_text">#F0E8D8</color>
+    <color name="browser_text_2">#C8BFA9</color>
+    <color name="browser_hint">#9C907B</color>
+    <color name="browser_faint">#6C6354</color>
+    <color name="browser_icon">#E0D6C2</color>
+    <color name="browser_progress_track">#00000000</color>
+    <color name="browser_danger">#F0664A</color>
+    <color name="browser_success">#82C89B</color>
+
+    <!--
+      Avatar palette is overridden for night mode to keep enough
+      contrast against the dark surface; the private-tab tokens are
+      defined only in values/ because they're theme-invariant.
+    -->
+    <color name="avatar_purple">#8E6FC4</color>
+    <color name="avatar_terracotta">#E26545</color>
+    <color name="avatar_green">#5A9E6E</color>
+    <color name="avatar_blue">#7693C8</color>
+    <color name="avatar_amber">#D9A055</color>
+    <color name="avatar_ink">#C8BFA9</color>
+
+    <!--
+      Night variants of the selectable accent palette. Strong fills
+      shift one step warmer-bright so they still earn contrast on
+      the ink surface, and soft tints become dark "tinted card"
+      colours instead of pale washes.
+    -->
+    <color name="accent_terracotta">#E26545</color>
+    <color name="accent_terracotta_soft">#3F2A22</color>
+
+    <color name="accent_teal">#3A9784</color>
+    <color name="accent_teal_soft">#1F3530</color>
+
+    <color name="accent_royal_blue">#5C7BB8</color>
+    <color name="accent_royal_blue_soft">#1F2A40</color>
+
+    <color name="accent_deep_purple">#8E5CB8</color>
+    <color name="accent_deep_purple_soft">#311F40</color>
+
+    <color name="accent_charcoal">#E5DDC9</color>
+    <color name="accent_charcoal_soft">#3A322A</color>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One tile in the Pinned grid on the start page. Stacked vertically
+  inside the tile background: a colored letter avatar on top, the
+  shortcut's name underneath. The tile root is the click target.
+
+  Bound from StartPageView.bindPinned; avatar colour and letter are
+  computed from the bookmark's hostname so the same site always
+  lands on the same colour without persisted state.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pinned_tile_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_start_pinned_tile"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingStart="6dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:id="@+id/pinned_tile_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_start_avatar"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/browser_on_accent"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        tools:text="C" />
+
+    <TextView
+        android:id="@+id/pinned_tile_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/browser_text"
+        android:textSize="12sp"
+        tools:text="Coffee" />
+</LinearLayout>

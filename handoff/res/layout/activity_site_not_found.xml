@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_site_not_found.xml — animated "address not found" screen.
+
+  Distinct from activity_no_internet.xml: this is shown when the DEVICE
+  IS online but the HOST doesn't resolve. Surfaced from
+  WebViewClient.onReceivedError when the error code is
+  ERR_NAME_NOT_RESOLVED (-2) or ERR_NAME_RESOLUTION_FAILED, or from
+  onReceivedHttpError on a 404 at the top frame.
+
+  IDs:
+    site_not_found_root         FrameLayout root
+    site_not_found_tab_url      TextView — struck-through unreachable host
+    site_not_found_close        ImageButton (close tab)
+    site_not_found_hero         ImageView holding the AVD
+    site_not_found_body         TextView — body copy (host injected)
+    site_not_found_search       Button — "Search for <term>" (primary)
+    site_not_found_back         Button — go back
+    site_not_found_retry        Button — try again
+
+  The spinning/animated hero needs (hero.drawable as Animatable).start()
+  in the show() routine — see SiteNotFoundActivity.patch.kt.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/site_not_found_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/browser_bg_solid">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="32dp">
+
+        <!-- Tab pill — the unreachable address, struck through.
+             Strike-through is applied in code:
+               site_not_found_tab_url.paintFlags =
+                   site_not_found_tab_url.paintFlags or
+                   Paint.STRIKE_THRU_TEXT_FLAG -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_no_internet_tab_pill"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingEnd="6dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/bg_site_not_found_favicon"
+                android:contentDescription="@null"
+                android:padding="4dp"
+                android:src="@drawable/ic_no_internet_globe"
+                app:tint="@color/browser_faint" />
+
+            <TextView
+                android:id="@+id/site_not_found_tab_url"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:textColor="@color/browser_hint"
+                android:textSize="12sp"
+                tools:text="thevrege.com" />
+
+            <ImageButton
+                android:id="@+id/site_not_found_close"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/close_tab"
+                android:padding="10dp"
+                android:src="@drawable/ic_close_24"
+                app:tint="@color/browser_faint" />
+        </LinearLayout>
+
+        <!-- Hero: AnimatedVectorDrawable (the lonely door). -->
+        <ImageView
+            android:id="@+id/site_not_found_hero"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="6dp"
+            android:contentDescription="@null"
+            android:src="@drawable/avd_site_not_found_hero" />
+
+        <!-- Copy block -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.18"
+            android:text="@string/site_not_found_eyebrow"
+            android:textAllCaps="true"
+            android:textColor="@color/browser_accent"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            tools:text="ADDRESS NOT FOUND" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="serif"
+            android:lineSpacingMultiplier="1.02"
+            android:text="@string/site_not_found_title"
+            android:textColor="@color/browser_text"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/site_not_found_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="@color/browser_text_2"
+            android:textSize="14sp"
+            tools:text="We couldn't find a site at thevrege.com. Check the spelling, or search for it instead." />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Primary CTA: search instead -->
+        <Button
+            android:id="@+id/site_not_found_search"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_welcome_primary_button"
+            android:drawableStart="@drawable/ic_search_24"
+            android:drawablePadding="10dp"
+            android:drawableTint="@color/browser_on_accent"
+            android:gravity="center"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:text="@string/site_not_found_search"
+            android:textAllCaps="false"
+            android:textColor="@color/browser_on_accent"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="Search for &quot;thevrege&quot;" />
+
+        <!-- Secondary row: back + retry -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/site_not_found_back"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_site_not_found_secondary"
+                android:drawableStart="@drawable/ic_arrow_back_24"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/browser_text_2"
+                android:gravity="center"
+                android:text="@string/site_not_found_back"
+                android:textAllCaps="false"
+                android:textColor="@color/browser_text_2"
+                android:textSize="13sp" />
+
+            <Button
+                android:id="@+id/site_not_found_retry"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_site_not_found_secondary"
+                android:drawableStart="@drawable/ic_refresh_24"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/browser_text_2"
+                android:gravity="center"
+                android:text="@string/site_not_found_retry"
+                android:textAllCaps="false"
+                android:textColor="@color/browser_text_2"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

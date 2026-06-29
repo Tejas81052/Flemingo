@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tab-switcher grid spacing between cards. 12dp matches the
+         outer padding of tab_switcher_list. -->
+    <dimen name="tab_switcher_grid_spacing">12dp</dimen>
+
+    <!-- Extra bottom padding added to the grid below the measured
+         bottom-chrome height, so the last row doesn't sit flush
+         against the chrome's hairline. -->
+    <dimen name="tab_switcher_list_bottom_extra">16dp</dimen>
+</resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/browser_surface"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/browser_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="14dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/switch_title"
+                style="@style/SettingsRowTitle" />
+
+            <TextView
+                android:id="@+id/switch_summary"
+                style="@style/SettingsRowSummary" />
+        </LinearLayout>
+
+        <!--
+          saveEnabled=false closes a real bug. This layout is included
+          ~14 times inside activity_settings.xml — once per toggle row.
+          Every copy of the MaterialSwitch ends up with the same view
+          ID (@id/switch_value). When the activity is recreated (e.g.
+          the user picks a new accent), Android's view-state save /
+          restore walks the hierarchy and serialises every view's
+          state into a SparseArray keyed by view ID. 14 collisions
+          on the same key means only one state survives; on restore
+          that single state is then applied to the first switch found,
+          and the listener — already attached by bindSwitchRow — fires
+          and writes it back to prefs, flipping every other toggle in
+          step. Skipping the per-switch save is safe because
+          bindSwitchRow always sources isChecked from BrowserPreferences
+          (the durable, per-key store) rather than from the saved view
+          bundle, so nothing real is lost.
+        -->
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:saveEnabled="false" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

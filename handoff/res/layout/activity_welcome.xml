@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_welcome.xml — v2 ("vibrant" welcome flow).
+
+  Preserves EVERY id and string reference from v1 so WelcomeActivity.kt
+  compiles unchanged:
+    @+id/welcome_root, welcome_flipper, welcome_continue, welcome_version,
+    welcome_terms_check, welcome_privacy_link, welcome_terms_link,
+    welcome_accept, welcome_set_default, welcome_skip_default.
+
+  All @string/welcome_* references are kept identical too.
+
+  Visual changes vs. v1:
+    1. A 3-dot step indicator (top-right of each page) — new IDs are
+       welcome_step_1 / _2 / _3. WelcomeActivity binds them in
+       configureStepDots(activeIndex: Int) — see MainActivity.patch.kt.
+    2. Hero illustrations (vector drawables) above the copy block on
+       pages 1 and 3.
+    3. Page 3 has a full-width accent top panel (Theme makes it feel
+       like a finish line, not another paper page).
+    4. Buttons become pill-shaped (28dp radius) via the existing
+       bg_welcome_primary_button drawable.
+    5. Promise card replaces the bulleted TextView on page 2 — four
+       check-icon rows with an inline title + supporting line. Bullets
+       string (@string/welcome_privacy_bullets) becomes optional;
+       you can either delete the resource or leave it unreferenced.
+
+  Drop-in: replace `app/src/main/res/layout/activity_welcome.xml`.
+  Add the new drawables listed in handoff/README.md.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/welcome_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/browser_bg_solid">
+
+    <ViewFlipper
+        android:id="@+id/welcome_flipper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:measureAllChildren="false"
+        android:inAnimation="@android:anim/fade_in"
+        android:outAnimation="@android:anim/fade_out">
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PAGE 1 — Welcome
+             ═══════════════════════════════════════════════════════════ -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="24dp">
+
+                <!-- Header row: logo + step dots -->
+                <include
+                    layout="@layout/welcome_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Hero illustration (paper composition) -->
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:layout_marginTop="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ill_welcome_paper" />
+
+                <!-- Eyebrow -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.16"
+                    android:text="@string/welcome_eyebrow"
+                    android:textAllCaps="true"
+                    android:textColor="@color/browser_accent"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <!-- Title — large serif headline.
+                     fontFamily="serif" is the system fallback; ship
+                     instrument_serif.ttf in res/font/ to get the
+                     prototype's italic look. -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="serif"
+                    android:lineSpacingMultiplier="1.05"
+                    android:text="@string/welcome_title"
+                    android:textColor="@color/browser_text"
+                    android:textSize="32sp" />
+
+                <!-- Subtitle -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/welcome_subtitle"
+                    android:textColor="@color/browser_text_2"
+                    android:textSize="14sp" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/welcome_continue"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="32dp"
+                    android:background="@drawable/bg_welcome_primary_button"
+                    android:drawableEnd="@drawable/ic_arrow_forward_24"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/browser_on_accent"
+                    android:gravity="center"
+                    android:text="@string/welcome_continue"
+                    android:textAllCaps="false"
+                    android:textColor="@color/browser_on_accent"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/welcome_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:letterSpacing="0.10"
+                    android:textAllCaps="true"
+                    android:textColor="@color/browser_faint"
+                    android:textSize="11sp"
+                    tools:text="Version 1.0" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PAGE 2 — The promise (privacy + terms)
+             ═══════════════════════════════════════════════════════════ -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="24dp">
+
+                <include
+                    layout="@layout/welcome_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.16"
+                    android:text="@string/welcome_privacy_eyebrow"
+                    android:textAllCaps="true"
+                    android:textColor="@color/browser_accent"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="serif"
+                    android:lineSpacingMultiplier="1.05"
+                    android:text="@string/welcome_privacy_title"
+                    android:textColor="@color/browser_text"
+                    android:textSize="28sp" />
+
+                <!-- Promise cards.
+                     v1 used a single TextView with newline-separated bullets
+                     (@string/welcome_privacy_bullets); v2 expands each
+                     promise into its own card row with a check chip and
+                     an inline title + supporting line. Card titles &
+                     supporting strings are NEW; add the keys listed in
+                     handoff/strings.welcome.xml. -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/welcome_promise_row"
+                        android:id="@+id/welcome_promise_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:ignore="MissingPrefix" />
+
+                    <include layout="@layout/welcome_promise_row"
+                        android:id="@+id/welcome_promise_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" />
+
+                    <include layout="@layout/welcome_promise_row"
+                        android:id="@+id/welcome_promise_3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" />
+
+                    <include layout="@layout/welcome_promise_row"
+                        android:id="@+id/welcome_promise_4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp" />
+                </LinearLayout>
+
+                <!-- Terms acceptance -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/welcome_terms_check"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/browser_accent" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:lineSpacingExtra="3dp"
+                        android:text="@string/welcome_terms_consent"
+                        android:textColor="@color/browser_text"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="34dp"
+                    android:layout_marginTop="2dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/welcome_privacy_link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:text="@string/welcome_link_privacy"
+                        android:textColor="@color/browser_accent"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="6dp"
+                        android:text="·"
+                        android:textColor="@color/browser_hint"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/welcome_terms_link"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:text="@string/welcome_link_terms"
+                        android:textColor="@color/browser_accent"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/welcome_accept"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_welcome_primary_button"
+                    android:drawableEnd="@drawable/ic_arrow_forward_24"
+                    android:drawablePadding="8dp"
+                    android:drawableTint="@color/browser_on_accent"
+                    android:gravity="center"
+                    android:text="@string/welcome_accept"
+                    android:textAllCaps="false"
+                    android:textColor="@color/browser_on_accent"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PAGE 3 — Default browser
+             Accent-tinted top panel + paper bottom = "finish line"
+             ═══════════════════════════════════════════════════════════ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- Top: solid accent panel -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_welcome_accent_panel"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="30dp">
+
+                <!-- Header on the accent (inverted colors) -->
+                <include
+                    layout="@layout/welcome_header_inverse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.16"
+                    android:text="@string/welcome_default_eyebrow"
+                    android:textAllCaps="true"
+                    android:textColor="@color/browser_on_accent"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:alpha="0.85" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="serif"
+                    android:lineSpacingMultiplier="1.05"
+                    android:text="@string/welcome_default_title"
+                    android:textColor="@color/browser_on_accent"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:alpha="0.88"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/welcome_default_body"
+                    android:textColor="@color/browser_on_accent"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Bottom: paper, hero illustration + CTAs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="24dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ill_welcome_default" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/welcome_set_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_welcome_primary_button"
+                    android:text="@string/welcome_set_default"
+                    android:textAllCaps="false"
+                    android:textColor="@color/browser_on_accent"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/welcome_skip_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:padding="14dp"
+                    android:text="@string/welcome_skip"
+                    android:textColor="@color/browser_text_2"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </ViewFlipper>
+
+</FrameLayout>

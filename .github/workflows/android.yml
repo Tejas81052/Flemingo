@@ -1,0 +1,80 @@
+name: Android CI
+
+# Runs on every push and on every pull request, plus a manual trigger
+# from the GitHub UI. We deliberately don't gate merges on `assembleRelease`
+# because R8 takes longer and the debug build already exercises every
+# Kotlin source file. The release build can be re-run on demand via
+# workflow_dispatch when needed.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: { }
+
+# Cancel in-flight runs when a newer commit is pushed to the same branch.
+# Saves runner minutes on rapid iteration without trampling main builds.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint + tests + debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          # AGP 9.x requires JDK 17. JDK 21 also works but we pin 17 so
+          # CI matches the lowest-supported developer JDK.
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        # Caches ~/.gradle/caches and ~/.gradle/wrapper, plus uploads a
+        # build scan if `--scan` is passed. Speeds repeat runs up by
+        # ~30–50%.
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Run Android lint
+        # `--no-daemon` avoids Gradle daemon contention across steps;
+        # CI lifetime is short enough that daemon reuse offers no win.
+        run: ./gradlew --no-daemon lint
+
+      - name: Run unit tests
+        run: ./gradlew --no-daemon testDebugUnitTest
+
+      - name: Assemble debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-*.html
+          if-no-files-found: ignore
+
+      - name: Upload unit-test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: app/build/reports/tests/testDebugUnitTest
+          if-no-files-found: ignore
+
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

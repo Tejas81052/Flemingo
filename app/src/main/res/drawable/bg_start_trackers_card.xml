@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  "1247 trackers blocked today" card at the bottom of the start page.
+  Tinted soft-accent fill so it reads as a status summary, not a
+  primary action; matching accent-toned stroke for definition.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/browserAccentSoft" />
+    <corners android:radius="16dp" />
+</shape>

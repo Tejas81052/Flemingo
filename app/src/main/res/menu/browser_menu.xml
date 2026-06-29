@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_new_tab"
+        android:title="@string/new_tab" />
+    <item
+        android:id="@+id/action_new_private_tab"
+        android:title="@string/new_private_tab" />
+    <item
+        android:id="@+id/action_show_tabs"
+        android:title="@string/tabs_with_count" />
+    <item
+        android:id="@+id/action_close_tab"
+        android:title="@string/close_tab" />
+    <item
+        android:id="@+id/action_bookmark_toggle"
+        android:title="@string/add_bookmark" />
+    <item
+        android:id="@+id/action_library"
+        android:title="@string/library_title" />
+    <item
+        android:id="@+id/action_find_in_page"
+        android:title="@string/find_in_page" />
+    <item
+        android:id="@+id/action_reader_mode"
+        android:title="@string/action_reader_mode" />
+    <item
+        android:id="@+id/action_desktop_mode"
+        android:title="@string/setting_desktop_mode_title" />
+    <item
+        android:id="@+id/action_downloads"
+        android:title="@string/view_downloads" />
+    <item
+        android:id="@+id/action_share_page"
+        android:title="@string/share_page" />
+    <item
+        android:id="@+id/action_copy_link"
+        android:title="@string/copy_link" />
+    <item
+        android:id="@+id/action_print"
+        android:title="@string/print_page" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/settings_title" />
+    <item
+        android:id="@+id/action_set_default_browser"
+        android:title="@string/set_default_browser_action" />
+</menu>

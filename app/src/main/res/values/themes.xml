@@ -1,0 +1,207 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.Ebors" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Default accent attrs point at terracotta. Each
+             Theme.Ebors.Accent* child overrides these
+             to swap the whole chrome's accent colour without
+             touching layouts. -->
+        <item name="browserAccent">@color/accent_terracotta</item>
+        <item name="browserAccentSoft">@color/accent_terracotta_soft</item>
+        <item name="colorPrimary">?attr/browserAccent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">?attr/browserAccent</item>
+        <item name="colorSurface">@color/browser_surface</item>
+        <item name="colorOnSurface">@color/browser_text</item>
+        <item name="colorOnSurfaceVariant">@color/browser_hint</item>
+        <item name="android:windowBackground">@color/browser_bg_solid</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:textColor">@color/browser_text</item>
+    </style>
+
+    <style name="Theme.Ebors" parent="Base.Theme.Ebors" />
+
+    <!--
+      v10 user-selectable accent themes. Activities apply the right
+      one in onCreate based on BrowserPreferences.accentKey; the user
+      switches accents from Settings → Appearance → Accent.
+
+      Only the two accent attrs need overriding; everything else
+      inherits from Base.Theme.Ebors so day/night, surface
+      colours, etc. remain consistent.
+    -->
+    <style name="Theme.Ebors.AccentTerracotta" parent="Base.Theme.Ebors">
+        <item name="browserAccent">@color/accent_terracotta</item>
+        <item name="browserAccentSoft">@color/accent_terracotta_soft</item>
+    </style>
+
+    <style name="Theme.Ebors.AccentTeal" parent="Base.Theme.Ebors">
+        <item name="browserAccent">@color/accent_teal</item>
+        <item name="browserAccentSoft">@color/accent_teal_soft</item>
+    </style>
+
+    <style name="Theme.Ebors.AccentRoyalBlue" parent="Base.Theme.Ebors">
+        <item name="browserAccent">@color/accent_royal_blue</item>
+        <item name="browserAccentSoft">@color/accent_royal_blue_soft</item>
+    </style>
+
+    <style name="Theme.Ebors.AccentDeepPurple" parent="Base.Theme.Ebors">
+        <item name="browserAccent">@color/accent_deep_purple</item>
+        <item name="browserAccentSoft">@color/accent_deep_purple_soft</item>
+    </style>
+
+    <style name="Theme.Ebors.AccentCharcoal" parent="Base.Theme.Ebors">
+        <item name="browserAccent">@color/accent_charcoal</item>
+        <item name="browserAccentSoft">@color/accent_charcoal_soft</item>
+    </style>
+
+    <style name="TextAppearance.Ebors.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">-0.01</item>
+    </style>
+
+    <style name="SettingsHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_hint</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingTop">18dp</item>
+        <item name="android:paddingEnd">6dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="SettingsRowCard" parent="Widget.Material3.CardView.Filled">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="cardBackgroundColor">@color/browser_surface</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/browser_stroke</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="SettingsRowTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SettingsRowSummary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:textColor">@color/browser_hint</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="BrowserMenuQuickAction">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">84dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@drawable/bg_menu_quick_action</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingBottom">9dp</item>
+    </style>
+
+    <!--
+      Fixed-width variant of BrowserMenuQuickAction for the horizontally
+      scrolling quick-action strip. Weight-based sizing collapses to 0 in
+      a HorizontalScrollView (unbounded width), so the tile carries an
+      explicit width instead.
+    -->
+    <style name="BrowserMenuQuickActionScroll">
+        <item name="android:layout_width">78dp</item>
+        <item name="android:layout_height">84dp</item>
+        <item name="android:background">@drawable/bg_menu_quick_action</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingBottom">9dp</item>
+    </style>
+
+    <style name="BrowserMenuQuickIcon">
+        <item name="android:layout_width">25dp</item>
+        <item name="android:layout_height">25dp</item>
+    </style>
+
+    <style name="BrowserMenuQuickLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">7dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="BrowserMenuListRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">68dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingStart">28dp</item>
+        <item name="android:paddingEnd">24dp</item>
+    </style>
+
+    <style name="BrowserMenuListIcon">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:background">@drawable/bg_menu_icon_box</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="BrowserMenuListText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">16dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="BrowserMenuListTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/browser_text</item>
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="BrowserMenuListSummary">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/browser_hint</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="BrowserMenuChevron">
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:padding">4dp</item>
+    </style>
+</resources>

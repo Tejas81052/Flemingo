@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Soft accent-tinted square behind the globe icon in the tab pill. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/browser_accent_soft" />
+    <corners android:radius="4dp" />
+</shape>

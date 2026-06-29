@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 15px/1.6 -apple-system, system-ui, sans-serif;
+         padding: 18px 18px 36px; max-width: 720px; margin: 0 auto;
+         color: #232323; background: #faf6ee; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.08em;
+             font-size: 12px; font-weight: 700; color: #c66744; margin: 0 0 6px; }
+  h1 { font-size: 24px; margin: 0 0 12px; line-height: 1.2; }
+  h2 { font-size: 17px; margin: 26px 0 8px; }
+  p { margin: 0 0 12px; }
+  ul, ol { padding-left: 22px; margin: 0 0 14px; }
+  li { margin: 5px 0; }
+  a { color: #c66744; }
+  strong { font-weight: 700; }
+  .toc { background: #f0eadb; border-radius: 8px; padding: 12px 14px; margin: 4px 0 20px; }
+  .toc strong { display: block; margin-bottom: 4px; font-size: 12px;
+                text-transform: uppercase; letter-spacing: 0.06em; color: #6b6256; }
+  .toc ol { margin: 0; }
+  .muted { opacity: 0.7; font-size: 13px; margin-top: 28px; }
+  /* Dark rules last so they win over the light base rules above. */
+  @media (prefers-color-scheme: dark) {
+    body { background: #1a1817; color: #e8e3d8; }
+    .eyebrow, a { color: #f0a079; }
+    .toc { background: #232020; }
+    .toc strong { color: #a89e8d; }
+  }
+</style>
+</head>
+<body>
+
+<p class="eyebrow">Ebors &middot; Privacy policy</p>
+<h1>Privacy policy</h1>
+<p>
+  This is the privacy policy for the <strong>Ebors</strong>
+  Android browser (&ldquo;the app&rdquo;). The short version:
+  <em>the app does not collect, transmit, or share any of your
+  personal information.</em> The long version is below.
+</p>
+
+<div class="toc">
+  <strong>On this page</strong>
+  <ol>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#what-is-collected">What the app collects</a></li>
+    <li><a href="#what-is-sent">What leaves your device</a></li>
+    <li><a href="#permissions">Permissions and what they&rsquo;re used for</a></li>
+    <li><a href="#downloads">Downloaded files</a></li>
+    <li><a href="#third-parties">Third parties</a></li>
+    <li><a href="#children">Children</a></li>
+    <li><a href="#changes">Changes to this policy</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</div>
+
+<h2 id="summary">Summary</h2>
+<ul>
+  <li>No analytics, telemetry, crash reporting, or advertising SDKs.</li>
+  <li>No account, no sign-in, no cloud sync.</li>
+  <li>Browsing history, bookmarks, downloads, and settings stay on
+      your device.</li>
+  <li>Private (incognito) tabs use an isolated profile that is
+      wiped when you close the last private tab or restart the app.</li>
+  <li>The only network calls the <em>app itself</em> makes (as
+      opposed to network calls the pages you visit make) are an
+      optional, signed, rate-limited block-list update fetch &mdash;
+      and only if the build was configured with an update URL.</li>
+</ul>
+
+<h2 id="what-is-collected">What the app collects</h2>
+<p>
+  The app stores the following on your device only:
+</p>
+<ul>
+  <li><strong>Browsing history</strong> &mdash; URL and title of
+      pages you visit, capped at the most recent 500 entries.
+      You can disable this in Settings, and clear it from
+      Library &rarr; History.</li>
+  <li><strong>Bookmarks</strong> &mdash; pages you explicitly save.</li>
+  <li><strong>Downloads metadata</strong> &mdash; filename, source URL,
+      size, status. The files themselves live in your device&rsquo;s
+      Downloads folder.</li>
+  <li><strong>Cookies and site data</strong> &mdash; same as any
+      browser, controlled by the websites you visit. Private tabs
+      have their own isolated cookie jar.</li>
+  <li><strong>Settings</strong> &mdash; your preferences (theme,
+      search engine, block-list toggles, etc.).</li>
+</ul>
+<p>
+  None of the above is ever sent to a server operated by the
+  developer.
+</p>
+
+<h2 id="what-is-sent">What leaves your device</h2>
+<p>
+  The browser makes the network requests you initiate by visiting
+  a web page or downloading a file. Those requests go directly to
+  the page&rsquo;s server, with the same headers any other
+  Chromium-based browser would send. They are not proxied or
+  relayed through the developer.
+</p>
+<p>
+  The only request the app makes on its own is an optional update
+  check for the bundled ad/tracker block list. This is disabled
+  unless the build is configured with an update URL and signing
+  key. When enabled it runs at most once every 24 hours, fetches a
+  cryptographically signed JSON file over HTTPS, and does not send
+  any of your browsing data.
+</p>
+
+<h2 id="permissions">Permissions and what they&rsquo;re used for</h2>
+<ul>
+  <li><strong>Internet, network state</strong> &mdash; required to
+      load web pages.</li>
+  <li><strong>Camera, microphone, location</strong> &mdash; only
+      used when a web page you are visiting requests access (for
+      example, a video call). The browser shows an in-app prompt
+      before any of these are granted.</li>
+  <li><strong>Storage / downloads</strong> &mdash; used to save
+      files you choose to download.</li>
+  <li><strong>Post notifications</strong> &mdash; used to show
+      download progress in the notification shade. You can deny it.</li>
+  <li><strong>Request install packages</strong> &mdash; used only
+      to hand off an APK you have downloaded to Android&rsquo;s
+      installer when you tap &ldquo;Install&rdquo; on a downloaded
+      file. The browser does not install anything on its own.</li>
+  <li><strong>Foreground service (data sync)</strong> &mdash; keeps
+      downloads running while the app is backgrounded.</li>
+</ul>
+
+<h2 id="downloads">Downloaded files</h2>
+<p>
+  Downloaded files are saved to your device&rsquo;s public
+  Downloads folder. They are visible to other apps that have
+  storage access, just like any other file you put there. The
+  browser does not upload or scan them.
+</p>
+
+<h2 id="third-parties">Third parties</h2>
+<p>
+  The app does not embed any third-party analytics, advertising,
+  or crash-reporting SDK. The libraries it does include
+  (AndroidX, Material Components, OkHttp, Kotlin standard
+  library) are general-purpose UI and networking utilities and
+  do not phone home on their own.
+</p>
+<p>
+  Web pages you visit may, of course, set their own cookies and
+  run their own analytics. The browser&rsquo;s built-in block
+  list cuts down on the most common ad/tracker requests, but the
+  web is the web &mdash; if you visit a site that uses Google
+  Analytics, that site, not the browser, is the data controller.
+</p>
+
+<h2 id="children">Children</h2>
+<p>
+  The app is not directed at children under 13 and does not
+  knowingly collect any data from them. Because the app collects
+  no personal data from anyone, the practical impact of this
+  statement is small, but it is included here to comply with
+  Google Play&rsquo;s policy disclosure requirements.
+</p>
+
+<h2 id="changes">Changes to this policy</h2>
+<p>
+  If this policy ever changes, the &ldquo;Last updated&rdquo;
+  date below will move and any meaningful change will be called
+  out in the app&rsquo;s release notes.
+</p>
+
+<h2 id="contact">Contact</h2>
+<p>
+  Questions about this policy: <a href="mailto:ThimmaiahKK@proton.me">ThimmaiahKK@proton.me</a>.
+</p>
+<p class="muted">
+  Last updated: 2026.
+</p>
+
+</body>
+</html>

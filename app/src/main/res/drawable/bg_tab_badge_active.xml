@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Active variant of the tab-count badge that lives over the bottom-
+  nav tabs icon. When the tab switcher is open the badge fills in
+  with accent and the number paints in on-accent so the user can see
+  at a glance which surface they're on.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/browserAccent" />
+    <corners android:radius="4dp" />
+    <size
+        android:width="16dp"
+        android:height="14dp" />
+</shape>

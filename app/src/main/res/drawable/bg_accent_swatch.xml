@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One accent-swatch tile in the Settings → Accent picker. Square
+  with 10dp corners; tinted at runtime via backgroundTintList against
+  the swatch's strong colour resource. The "selected" variant is a
+  separate drawable that adds a stronger stroke so the chosen swatch
+  reads as the active one even before the check icon overlays it.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/accent_terracotta" />
+    <corners android:radius="10dp" />
+</shape>

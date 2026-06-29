@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      v10 user-selectable accent colour theme attrs.
+
+      All chrome that previously hard-referenced @color/browser_accent /
+      @color/browser_accent_soft now reads ?attr/browserAccent /
+      ?attr/browserAccentSoft instead, and each accent gets its own
+      theme that re-binds these attrs to a different colour palette.
+
+      MainActivity.applyAccentTheme() picks the right theme at startup
+      based on prefs.accent, and Settings → Accent triggers a
+      recreate() to flip the theme live.
+    -->
+    <attr name="browserAccent" format="color|reference" />
+    <attr name="browserAccentSoft" format="color|reference" />
+</resources>

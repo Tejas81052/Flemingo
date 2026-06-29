@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Static composition of the "lonely door" hero. Wrapped by
+  avd_site_not_found_hero.xml which animates these named groups:
+    grp_door        → knock shudder (rotation, hinge-left), 4.2s
+    grp_plate       → swing on one screw (rotation), 3.6s
+    grp_knock_1/2   → sound-ring scale+alpha, in sync with knock
+    grp_key         → float up / jiggle / give up (translate+rotate), 5.5s
+    grp_mote_1..4   → dust drifting in the keyhole light shaft
+    grp_shaft       → light shaft alpha breathe
+    grp_blade_1..5  → grass sway (rotation, bottom pivot)
+    grp_tumble      → paper tumbleweed roll (translateX+rotate), 9s
+    grp_specks_1..3 → drift up
+
+  Viewport 320 × 300 to match the prototype 1:1.
+
+  Wood tones: #C98A5E (slab), #A66B42 (frame), #8A572F (deep lines).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="300dp"
+    android:viewportWidth="320"
+    android:viewportHeight="300">
+
+    <!-- Sky → ground wash -->
+    <path
+        android:fillColor="#F2DDD2"
+        android:fillAlpha="0.5"
+        android:pathData="M0,170 L320,170 L320,300 L0,300 Z" />
+    <!-- Ground line -->
+    <path
+        android:strokeColor="#D6CCB6"
+        android:strokeWidth="1.5"
+        android:pathData="M0,244 L320,244" />
+
+    <!-- ─── Grass blades (sway) ─── -->
+    <group android:name="grp_blade_1" android:pivotX="84" android:pivotY="244">
+        <path android:strokeColor="#B3A892" android:strokeWidth="1.5" android:strokeLineCap="round"
+              android:pathData="M84,244 q-2,-12 1,-20" />
+    </group>
+    <group android:name="grp_blade_2" android:pivotX="92" android:pivotY="244">
+        <path android:strokeColor="#B3A892" android:strokeWidth="1.5" android:strokeLineCap="round"
+              android:pathData="M92,244 q2,-10 0,-18" />
+    </group>
+    <group android:name="grp_blade_3" android:pivotX="232" android:pivotY="244">
+        <path android:strokeColor="#B3A892" android:strokeWidth="1.5" android:strokeLineCap="round"
+              android:pathData="M232,244 q-2,-11 1,-19" />
+    </group>
+    <group android:name="grp_blade_4" android:pivotX="240" android:pivotY="244">
+        <path android:strokeColor="#B3A892" android:strokeWidth="1.5" android:strokeLineCap="round"
+              android:pathData="M240,244 q2,-9 0,-16" />
+    </group>
+    <group android:name="grp_blade_5" android:pivotX="226" android:pivotY="244">
+        <path android:strokeColor="#B3A892" android:strokeWidth="1.5" android:strokeLineCap="round"
+              android:pathData="M226,244 q-1,-7 -1,-13" />
+    </group>
+
+    <!-- Door ground shadow -->
+    <path
+        android:fillColor="#2A241D"
+        android:fillAlpha="0.10"
+        android:pathData="M160,246 m-66,0 a66,6 0 1,0 132,0 a66,6 0 1,0 -132,0 Z" />
+
+    <!-- ─── Knock sound ripples (sync with door knock) ─── -->
+    <group android:name="grp_knock_1" android:pivotX="186" android:pivotY="120">
+        <path android:strokeColor="#C8533A" android:strokeWidth="1.5"
+              android:pathData="M186,120 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z" />
+    </group>
+    <group android:name="grp_knock_2" android:pivotX="186" android:pivotY="120">
+        <path android:strokeColor="#C8533A" android:strokeWidth="1.2"
+              android:pathData="M186,120 m-16,0 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z" />
+    </group>
+
+    <!-- ─── The door (knocks as a unit; hinge on the left) ─── -->
+    <group android:name="grp_door" android:pivotX="104" android:pivotY="151">
+
+        <!-- frame / casing -->
+        <path
+            android:fillColor="#A66B42"
+            android:strokeColor="#8A572F"
+            android:strokeWidth="2"
+            android:pathData="M108,58 L212,58 A4,4 0 0,1 216,62 L216,244 L104,244 L104,62 A4,4 0 0,1 108,58 Z" />
+        <!-- slab -->
+        <path
+            android:fillColor="#C98A5E"
+            android:strokeColor="#8A572F"
+            android:strokeWidth="1.5"
+            android:pathData="M115,64 L205,64 A3,3 0 0,1 208,67 L208,244 L112,244 L112,67 A3,3 0 0,1 115,64 Z" />
+
+        <!-- recessed panels -->
+        <path
+            android:strokeColor="#8A572F"
+            android:strokeAlpha="0.55"
+            android:strokeWidth="1.5"
+            android:fillColor="#00000000"
+            android:pathData="M122,76 L198,76 L198,140 L122,140 Z" />
+        <path
+            android:strokeColor="#8A572F"
+            android:strokeAlpha="0.55"
+            android:strokeWidth="1.5"
+            android:fillColor="#00000000"
+            android:pathData="M122,150 L198,150 L198,234 L122,234 Z" />
+
+        <!-- house-number screw (static anchor for the plate) -->
+        <path android:fillColor="#8A572F"
+              android:pathData="M160,92 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z" />
+
+        <!-- ── plate "404" swinging on the screw ── -->
+        <group android:name="grp_plate" android:pivotX="160" android:pivotY="98">
+            <path
+                android:fillColor="#FBF8F1"
+                android:strokeColor="#8A572F"
+                android:strokeWidth="1"
+                android:pathData="M134,98 L186,98 A3,3 0 0,1 189,101 L189,117 A3,3 0 0,1 186,120 L134,120 A3,3 0 0,1 131,117 L131,101 A3,3 0 0,1 134,98 Z" />
+            <!-- "404" — VectorDrawable can't render <text>, so the digits
+                 are drawn as paths. Kept simple/condensed. -->
+            <!-- 4 -->
+            <path android:strokeColor="#C8533A" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000"
+                  android:pathData="M147,104 L143,114 L151,114 M149,104 L149,116" />
+            <!-- 0 -->
+            <path android:strokeColor="#C8533A" android:strokeWidth="2" android:fillColor="#00000000"
+                  android:pathData="M160,104 m-4,5 a4,5 0 1,0 8,0 a4,5 0 1,0 -8,0 Z" />
+            <!-- 4 -->
+            <path android:strokeColor="#C8533A" android:strokeWidth="2" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000"
+                  android:pathData="M174,104 L170,114 L178,114 M176,104 L176,116" />
+            <!-- empty second screw hole -->
+            <path android:strokeColor="#8A572F" android:strokeAlpha="0.5" android:strokeWidth="0.8" android:fillColor="#00000000"
+                  android:pathData="M180,109 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 Z" />
+        </group>
+
+        <!-- light shaft from keyhole (breathes) -->
+        <group android:name="grp_shaft">
+            <path
+                android:fillColor="#F2DDD2"
+                android:fillAlpha="0.22"
+                android:pathData="M192,168 L212,154 L216,170 L210,182 Z" />
+        </group>
+
+        <!-- keyhole -->
+        <path android:fillColor="#8A572F"
+              android:pathData="M192,168 m-3.4,0 a3.4,3.4 0 1,0 6.8,0 a3.4,3.4 0 1,0 -6.8,0 Z" />
+        <path android:fillColor="#8A572F"
+              android:pathData="M190.6,170 L193.4,170 L194.4,176 L189.6,176 Z" />
+
+        <!-- door knocker (origin of the ripples) -->
+        <path android:strokeColor="#8A572F" android:strokeWidth="2.5" android:fillColor="#00000000"
+              android:pathData="M186,117 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z" />
+        <path android:fillColor="#8A572F"
+              android:pathData="M186,123 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0 Z" />
+    </group>
+
+    <!-- ─── Key floating up to try the lock (outside door group) ─── -->
+    <group android:name="grp_key" android:pivotX="240" android:pivotY="168">
+        <!-- bow -->
+        <path android:strokeColor="#C8533A" android:strokeWidth="2.5" android:fillColor="#00000000"
+              android:pathData="M232,168 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z" />
+        <!-- shaft -->
+        <path android:fillColor="#C8533A"
+              android:pathData="M236,166.6 L252,166.6 L252,169.4 L236,169.4 Z" />
+        <!-- teeth -->
+        <path android:fillColor="#C8533A" android:pathData="M248,169 L250.4,169 L250.4,173 L248,173 Z" />
+        <path android:fillColor="#C8533A" android:pathData="M244,169 L246,169 L246,172 L244,172 Z" />
+    </group>
+
+    <!-- ─── Dust motes in the shaft ─── -->
+    <group android:name="grp_mote_1" android:pivotX="196" android:pivotY="170">
+        <path android:fillColor="#C8533A" android:pathData="M196,170 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 Z" />
+    </group>
+    <group android:name="grp_mote_2" android:pivotX="200" android:pivotY="166">
+        <path android:fillColor="#C8533A" android:pathData="M200,166 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 Z" />
+    </group>
+    <group android:name="grp_mote_3" android:pivotX="204" android:pivotY="172">
+        <path android:fillColor="#C8533A" android:pathData="M204,172 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 Z" />
+    </group>
+    <group android:name="grp_mote_4" android:pivotX="198" android:pivotY="168">
+        <path android:fillColor="#C8533A" android:pathData="M198,168 m-1.4,0 a1.4,1.4 0 1,0 2.8,0 a1.4,1.4 0 1,0 -2.8,0 Z" />
+    </group>
+
+    <!-- ─── Doormat "NOT FOUND" ─── -->
+    <path
+        android:fillColor="#EFE9DC"
+        android:strokeColor="#D6CCB6"
+        android:strokeWidth="1.2"
+        android:pathData="M116,250 L204,250 L212,266 L108,266 Z" />
+    <path android:strokeColor="#D6CCB6" android:strokeAlpha="0.6" android:strokeWidth="0.6"
+          android:pathData="M120,255 L200,255 M116,261 L204,261" />
+    <!-- "NOT FOUND" rendered as a thin path-word is impractical; ship it
+         as an overlay TextView in the layout if you want crisp text.
+         Here we approximate with small ticks so the mat reads as having
+         lettering even without <text>. -->
+    <path android:strokeColor="#8A7F6E" android:strokeWidth="1.4" android:strokeLineCap="round"
+          android:pathData="
+            M140,259 L140,262 M144,259 L144,262 M148,259 L148,262
+            M154,259 L154,262 M158,259 L158,262
+            M164,259 L164,262 M168,259 L168,262 M172,259 L172,262
+            M178,259 L178,262 M182,259 L182,262" />
+
+    <!-- ─── Paper tumbleweed (rolls across) ─── -->
+    <group android:name="grp_tumble" android:translateX="-40">
+        <path android:strokeColor="#B3A892" android:strokeWidth="1" android:strokeLineJoin="round" android:fillColor="#00000000"
+              android:pathData="M30,238 l2,5 l5,0 l-4,3 l2,5 l-5,-3 l-5,3 l2,-5 l-4,-3 l5,0 Z" />
+        <path android:strokeColor="#D6CCB6" android:strokeWidth="0.8" android:fillColor="#00000000"
+              android:pathData="M30,238 m-3,3 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z" />
+    </group>
+
+    <!-- ─── Specks drifting up ─── -->
+    <group android:name="grp_specks_1">
+        <path android:fillColor="#D6CCB6" android:pathData="M40,300 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0 Z" />
+        <path android:fillColor="#C8533A" android:pathData="M224,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+    </group>
+    <group android:name="grp_specks_2">
+        <path android:fillColor="#E2DBC8" android:pathData="M96,300 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0 Z" />
+        <path android:fillColor="#F2DDD2" android:pathData="M276,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+    </group>
+    <group android:name="grp_specks_3">
+        <path android:fillColor="#B3A892" android:pathData="M186,300 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0 Z" />
+        <path android:fillColor="#C8533A" android:pathData="M60,300 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0 Z" />
+    </group>
+
+</vector>

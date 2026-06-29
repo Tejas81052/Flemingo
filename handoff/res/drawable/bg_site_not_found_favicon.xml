@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral square behind the globe in the struck-through tab pill.
+     Muted (not accent) because the address is dead, not secure. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/browser_surface_muted" />
+    <corners android:radius="4dp" />
+</shape>

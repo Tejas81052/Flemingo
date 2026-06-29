@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/blocked_sites_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/blocked_sites_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:navigationIcon="@drawable/ic_arrow_back_24"
+        app:menu="@menu/blocked_sites_menu"
+        app:title="@string/blocked_sites_title"
+        app:titleTextAppearance="@style/TextAppearance.Ebors.Title"
+        app:titleTextColor="@color/browser_text" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/blocked_sites_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingStart="14dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="20dp"
+        tools:listitem="@layout/item_blocked_site" />
+
+    <LinearLayout
+        android:id="@+id/blocked_sites_empty"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/blocked_sites_empty_title"
+            android:textColor="@color/browser_text"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/blocked_sites_empty_subtitle"
+            android:textColor="@color/browser_hint"
+            android:textSize="13sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_first_site"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/blocked_sites_add_first"
+            app:backgroundTint="?attr/browserAccent" />
+    </LinearLayout>
+
+</LinearLayout>

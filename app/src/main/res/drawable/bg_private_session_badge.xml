@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Small pill at the top of the private start page that holds the
+  incognito glyph + "PRIVATE SESSION" caption. Always ink-coloured
+  so it reads identically in both day/night themes — same theme-
+  invariance rule the private tab cards follow.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/tab_private_surface" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/tab_private_stroke" />
+    <corners android:radius="14dp" />
+</shape>

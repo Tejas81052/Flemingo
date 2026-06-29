@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  New / updated strings for the welcome v2 layout.
+
+  Append these into app/src/main/res/values/strings.xml. Existing
+  string keys (welcome_eyebrow, welcome_title, welcome_subtitle,
+  welcome_continue, welcome_privacy_eyebrow, welcome_privacy_title,
+  welcome_terms_consent, welcome_link_privacy, welcome_link_terms,
+  welcome_accept, welcome_default_eyebrow, welcome_default_title,
+  welcome_default_body, welcome_set_default, welcome_skip) are
+  unchanged — keep yours.
+
+  The four `welcome_promise_*` keys are NEW. The
+  `welcome_privacy_bullets` key (the old multi-line bulleted body)
+  is no longer used by the layout — you can delete it or leave it
+  unreferenced.
+
+  Copy below is suggestive — adjust to match your tone.
+-->
+<resources>
+    <!-- Promise list (page 2) -->
+    <string name="welcome_promise_1_title">History stays here</string>
+    <string name="welcome_promise_1_body">We don\'t sync, upload, or share your browsing.</string>
+
+    <string name="welcome_promise_2_title">Trackers blocked</string>
+    <string name="welcome_promise_2_body">A curated list filters known ad networks and pixels.</string>
+
+    <string name="welcome_promise_3_title">No account, ever</string>
+    <string name="welcome_promise_3_body">Bookmarks and settings live on this device.</string>
+
+    <string name="welcome_promise_4_title">Open by default</string>
+    <string name="welcome_promise_4_body">Source available. You can read what we do.</string>
+
+    <!-- Suggested updates to existing strings for the new tone (optional). -->
+    <string name="welcome_eyebrow_new">Welcome</string>
+    <string name="welcome_title_new">A quieter way to read the web.</string>
+    <string name="welcome_subtitle_new">No accounts. No ads. No telemetry. Just a calm reading surface that gets out of your way.</string>
+    <string name="welcome_continue_new">Let\'s begin</string>
+
+    <string name="welcome_privacy_eyebrow_new">The promise</string>
+    <string name="welcome_privacy_title_new">Four small promises.</string>
+    <string name="welcome_accept_new">Accept and continue</string>
+
+    <string name="welcome_default_eyebrow_new">One last thing</string>
+    <string name="welcome_default_title_new">Make Ebros your default?</string>
+    <string name="welcome_default_body_new">Links from your other apps will open here. You can change this any time in Android settings.</string>
+    <string name="welcome_skip_new">Maybe later</string>
+</resources>

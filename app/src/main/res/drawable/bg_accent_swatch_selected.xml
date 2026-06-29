@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Selected variant of the accent swatch — same fill (tinted at
+  runtime) but with a 2dp inner stroke in browser_text_2 so the
+  active swatch reads as "pressed in" even on dark accents that
+  blend with the check icon.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/accent_terracotta" />
+    <stroke
+        android:width="2dp"
+        android:color="@color/browser_text" />
+    <corners android:radius="10dp" />
+</shape>

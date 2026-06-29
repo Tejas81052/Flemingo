@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- WebRTC/getUserMedia audio needs this to select the communication
+         audio device; without it the mic fails with NotReadableError
+         ("Unable to select communication device"). Normal permission,
+         auto-granted, no runtime prompt. -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!--
+      Package-visibility query (Android 11+ / API 30+). Without this,
+      the platform hides the speech-recognition service from us and
+      SpeechRecognizer.isRecognitionAvailable() returns false, breaking
+      the Web Speech API polyfill. Declaring the RecognitionService
+      intent lets us see and bind to the device's recogniser.
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
+    <!--
+      None of the hardware features below are *required* for the browser to
+      run. The permissions exist so that web pages may request camera, mic,
+      or location at runtime, but a device without them still installs and
+      works fine. Without these declarations Google Play would filter
+      tablets/Chromebooks based on missing camera hardware.
+    -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.location" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false" />
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+
+    <application
+        android:name=".EborsApplication"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Ebors"
+        android:usesCleartextTraffic="true"
+        tools:ignore="DataExtractionRules"
+        tools:targetApi="31">
+
+        <!-- Force WebView Safe Browsing on for every WebView in the app so
+             phishing / malware pages always hit the warning interstitial,
+             regardless of the device WebView's default. -->
+        <meta-data
+            android:name="android.webkit.WebView.EnableSafeBrowsing"
+            android:value="true" />
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|smallestScreenSize"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+        </activity>
+
+        <!--
+          Fixed-portrait QR/barcode scanner. The ZXing library's default
+          CaptureActivity is declared sensorLandscape in its manifest, so it
+          always rotates to landscape; this subclass carries a portrait
+          screenOrientation instead. launchQrScanner() points ScanOptions at
+          it (with orientationLocked=false so the library doesn't override
+          this). zxing_CaptureTheme is the library's capture theme.
+        -->
+        <activity
+            android:name=".PortraitCaptureActivity"
+            android:clearTaskOnLaunch="true"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:stateNotNeeded="true"
+            android:theme="@style/zxing_CaptureTheme" />
+
+        <activity
+            android:name=".DownloadsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".BookmarksActivity"
+            android:exported="false"
+            android:label="@string/library_title" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title" />
+
+        <activity
+            android:name=".BlockedSitesActivity"
+            android:exported="false"
+            android:label="@string/blocked_sites_title" />
+
+        <activity
+            android:name=".OpenSourceLicensesActivity"
+            android:exported="false"
+            android:label="@string/open_source_licenses_title" />
+
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:label="@string/about_app_title" />
+
+        <!--
+          First-launch onboarding (Welcome / Privacy / Default browser).
+          Not exported — only MainActivity launches it, on cold start
+          when onboarding has not yet been completed. Locked to
+          singleTask so a launcher tap during onboarding doesn't stack
+          a second instance on top.
+        -->
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
+        <service
+            android:name=".DownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <service
+            android:name=".MediaPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

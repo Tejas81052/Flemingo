@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Round accent terracotta button at the trailing edge of the
+  "N open tabs" title row. Creates a new (regular or private — picked
+  to match the segment that's active) tab.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="?attr/browserAccent" />
+</shape>

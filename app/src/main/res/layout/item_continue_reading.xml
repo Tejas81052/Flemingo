@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One row in the "Continue reading" section of the start page.
+  Letter avatar + title + meta line (host · age · optional reader-
+  ready badge). Bottom hairline divider visible on all rows except
+  the last (StartPageView toggles the trailing divider per row).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/continue_row_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingStart="2dp"
+    android:paddingEnd="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/continue_row_avatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_start_avatar"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:textColor="@color/browser_on_accent"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:text="T" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/continue_row_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/browser_text"
+                android:textSize="14sp"
+                tools:text="The slow web movement, ten years on" />
+
+            <TextView
+                android:id="@+id/continue_row_meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:textColor="@color/browser_hint"
+                android:textSize="11sp"
+                tools:text="theverge.com · 12 min ago · reader ready" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/continue_row_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="44dp"
+        android:background="@color/browser_stroke" />
+</LinearLayout>

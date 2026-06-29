@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!--
+      Stylised "incognito" mark: a horizontal eyemask shape with two
+      small lens circles. Matches the silhouette used in the Private
+      segment + private-tab thumbnails of the v10 design prototype.
+    -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M3.2,11h17.6c0.4,0 0.7,-0.3 0.7,-0.7c0,-0.4 -0.3,-0.7 -0.7,-0.7H19l-0.9,-2.8C17.8,5.6 16.8,5 15.7,5H8.3C7.2,5 6.2,5.6 5.9,6.8L5,9.6H3.2C2.8,9.6 2.5,9.9 2.5,10.3C2.5,10.7 2.8,11 3.2,11zM7.4,7.3C7.5,6.9 7.9,6.6 8.3,6.6h7.4c0.4,0 0.8,0.3 0.9,0.7L17.4,9.6H6.6L7.4,7.3z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M7.5,12.2c-1.8,0 -3.2,1.4 -3.2,3.2s1.4,3.2 3.2,3.2c1.6,0 2.9,-1.2 3.2,-2.7h2.7c0.3,1.5 1.6,2.7 3.2,2.7c1.8,0 3.2,-1.4 3.2,-3.2s-1.4,-3.2 -3.2,-3.2c-1.6,0 -2.9,1.2 -3.2,2.7h-2.7C10.4,13.4 9.1,12.2 7.5,12.2zM7.5,13.8c0.9,0 1.6,0.7 1.6,1.6S8.4,17 7.5,17s-1.6,-0.7 -1.6,-1.6S6.6,13.8 7.5,13.8zM16.5,13.8c0.9,0 1.6,0.7 1.6,1.6S17.4,17 16.5,17s-1.6,-0.7 -1.6,-1.6S15.6,13.8 16.5,13.8z" />
+</vector>

@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  v10 paper-theme start page (about:home).
+
+  Visible whenever the active tab's display URL is the internal
+  ABOUT_HOME_URL marker — replacing the previous "navigate to
+  DuckDuckGo on home press" behaviour. Sits as a sibling of
+  web_container in the activity layout; StartPageView toggles it
+  visible / gone and binds repository state on each show.
+
+  Sections, top → bottom:
+    1. Title strip: "EFFECTIVE BROWSER" + today's date
+    2. Greeting: serif italic "Good [morning|afternoon|evening]," +
+       non-italic "where would you like to read today?"
+    3. Search pill (taps focus the address bar so the user can type)
+    4. Pinned — 4×2 grid of bookmark shortcuts
+    5. Continue reading — top 3 recent history entries
+    6. Trackers blocked today — TrackerStats live count card
+
+  Built as a NestedScrollView so the trackers card lives "below
+  the fold" and the user reaches it by scrolling, matching the
+  prototype's vertical pacing.
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/browser_bg_solid"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp">
+
+        <!-- Title strip -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:text="@string/start_page_app_name"
+                android:textColor="@color/browser_hint"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/start_page_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.08"
+                android:textColor="@color/browser_hint"
+                android:textSize="11sp"
+                tools:text="Tue · May 16" />
+        </LinearLayout>
+
+        <!-- Greeting: mixed italic/normal serif heading -->
+        <TextView
+            android:id="@+id/start_page_greeting_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:fontFamily="serif"
+            android:textColor="@color/browser_text"
+            android:textSize="34sp"
+            android:textStyle="italic"
+            tools:text="Good morning," />
+
+        <TextView
+            android:id="@+id/start_page_greeting_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:lineSpacingExtra="-2dp"
+            android:text="@string/start_page_greeting_bottom"
+            android:textColor="@color/browser_text"
+            android:textSize="32sp" />
+
+        <!--
+          Search pill — owns the home page's own inline autocomplete
+          (Task 4). EditText so the user can type directly here
+          without jumping focus to the top address bar; the
+          suggestion list below repopulates from HistoryRepository
+          as they type, and Enter submits to MainActivity which
+          loads the URL (or search query) in the active tab.
+        -->
+        <FrameLayout
+            android:id="@+id/start_page_search_pill"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_start_search_pill">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="18dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_search_24"
+                app:tint="@color/browser_hint" />
+
+            <me.thimmaiah.ebors.AddressEditText
+                android:id="@+id/start_page_search_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:hint="@string/start_page_search_hint"
+                android:imeOptions="actionGo"
+                android:importantForAutofill="no"
+                android:inputType="textUri"
+                android:maxLines="1"
+                android:paddingStart="46dp"
+                android:paddingEnd="60dp"
+                android:textColor="@color/browser_text"
+                android:textColorHint="@color/browser_hint"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/start_page_engine_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="14dp"
+                android:background="@drawable/bg_engine_badge"
+                android:fontFamily="monospace"
+                android:includeFontPadding="false"
+                android:letterSpacing="0.05"
+                android:paddingStart="6dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="3dp"
+                android:textColor="@color/browser_hint"
+                android:textSize="10sp"
+                tools:text="DDG" />
+        </FrameLayout>
+
+        <!-- Inline autocomplete suggestion list. Painted directly
+             under the search pill — no jump to the top address bar.
+             StartPageView fills this from HistoryRepository whenever
+             the search EditText has focus. -->
+        <LinearLayout
+            android:id="@+id/start_page_suggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+        <!-- Pinned header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="serif"
+                android:text="@string/start_page_section_pinned"
+                android:textColor="@color/browser_text"
+                android:textSize="20sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/start_page_pinned_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:padding="6dp"
+                android:text="@string/start_page_pinned_edit"
+                android:textColor="@color/browser_hint"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Pinned grid row 1 -->
+        <LinearLayout
+            android:id="@+id/start_page_pinned_row_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" />
+
+        <!-- Pinned grid row 2 -->
+        <LinearLayout
+            android:id="@+id/start_page_pinned_row_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal" />
+
+        <!-- Continue reading header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="serif"
+                android:text="@string/start_page_section_continue"
+                android:textColor="@color/browser_text"
+                android:textSize="20sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/start_page_history_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.12"
+                android:padding="6dp"
+                android:text="@string/start_page_history_link"
+                android:textColor="@color/browser_hint"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Continue reading list (filled by StartPageView) -->
+        <LinearLayout
+            android:id="@+id/start_page_continue_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical" />
+
+        <!-- Empty state for "Continue reading" when there's no history -->
+        <TextView
+            android:id="@+id/start_page_continue_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/start_page_continue_empty"
+            android:textColor="@color/browser_hint"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <!-- Trackers blocked card -->
+        <LinearLayout
+            android:id="@+id/start_page_trackers_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_start_trackers_card"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="14dp">
+
+            <FrameLayout
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_trackers_card_icon">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_shield_check_24"
+                    app:tint="@color/browser_on_accent" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/start_page_trackers_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/browser_text"
+                    android:textSize="15sp"
+                    tools:text="1247 trackers blocked today" />
+
+                <TextView
+                    android:id="@+id/start_page_trackers_meta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:fontFamily="monospace"
+                    android:maxLines="1"
+                    android:textColor="@color/browser_hint"
+                    android:textSize="11sp"
+                    tools:text="List v17 · updated 2 days ago" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron_right_24"
+                app:tint="@color/browser_hint" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

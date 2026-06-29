@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  No-internet strings + the perforated stamp path.
+
+  The stamp path is exported as a string so both <path> elements in
+  bg_no_internet_stamp.xml (the shadow and the fill) reference the
+  same data — keeps them in lockstep if the shape ever changes.
+-->
+<resources>
+    <!-- Screen copy -->
+    <string name="no_internet_eyebrow">Offline</string>
+    <string name="no_internet_title">The page\ncouldn\'t be reached.</string>
+    <string name="no_internet_body">Your device is between signals. We\'ll pick this up the moment the line\'s back.</string>
+
+    <!-- Stamp button -->
+    <string name="no_internet_stamp_eyebrow">Postage · Ebros</string>
+    <string name="no_internet_try_again">Try again</string>
+    <string name="no_internet_try_again_cd">Try again</string>
+
+    <!--
+      Perforated stamp outline. Path traces 320×80 viewport clockwise
+      from (8,0), arcing inward at each notch. 14 notches per long
+      edge, 6 per short edge, notch radius 5.
+    -->
+    <string name="no_internet_stamp_path" translatable="false">M 8 0 L 11.857 0 A 5 5 0 0 1 21.857 0 L 32.571 0 A 5 5 0 0 1 42.571 0 L 53.286 0 A 5 5 0 0 1 63.286 0 L 74 0 A 5 5 0 0 1 84 0 L 94.714 0 A 5 5 0 0 1 104.714 0 L 115.429 0 A 5 5 0 0 1 125.429 0 L 136.143 0 A 5 5 0 0 1 146.143 0 L 156.857 0 A 5 5 0 0 1 166.857 0 L 177.571 0 A 5 5 0 0 1 187.571 0 L 198.286 0 A 5 5 0 0 1 208.286 0 L 219 0 A 5 5 0 0 1 229 0 L 239.714 0 A 5 5 0 0 1 249.714 0 L 260.429 0 A 5 5 0 0 1 270.429 0 L 281.143 0 A 5 5 0 0 1 291.143 0 L 301.857 0 A 5 5 0 0 1 311.857 0 L 312 0 L 320 8 L 320 14 A 5 5 0 0 1 320 24 L 320 34 A 5 5 0 0 1 320 44 L 320 54 A 5 5 0 0 1 320 64 L 320 72 L 312 80 L 311.857 80 A 5 5 0 0 1 301.857 80 L 291.143 80 A 5 5 0 0 1 281.143 80 L 270.429 80 A 5 5 0 0 1 260.429 80 L 249.714 80 A 5 5 0 0 1 239.714 80 L 229 80 A 5 5 0 0 1 219 80 L 208.286 80 A 5 5 0 0 1 198.286 80 L 187.571 80 A 5 5 0 0 1 177.571 80 L 166.857 80 A 5 5 0 0 1 156.857 80 L 146.143 80 A 5 5 0 0 1 136.143 80 L 125.429 80 A 5 5 0 0 1 115.429 80 L 104.714 80 A 5 5 0 0 1 94.714 80 L 84 80 A 5 5 0 0 1 74 80 L 63.286 80 A 5 5 0 0 1 53.286 80 L 42.571 80 A 5 5 0 0 1 32.571 80 L 21.857 80 A 5 5 0 0 1 11.857 80 L 8 80 L 0 72 L 0 64 A 5 5 0 0 1 0 54 L 0 44 A 5 5 0 0 1 0 34 L 0 24 A 5 5 0 0 1 0 14 L 0 8 Z</string>
+</resources>

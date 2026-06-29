@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Welcome hero — "phone with Ebros highlighted".
+  Small phone outline + accent-soft wallpaper, clock label, a 4x3 grid
+  of app tiles, the 6th tile (centre row) is the Ebros launcher icon
+  framed by a dashed accent halo to draw the eye. 200x240 viewport.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="240dp"
+    android:viewportWidth="200"
+    android:viewportHeight="240">
+
+    <!-- Phone body -->
+    <path
+        android:fillColor="#FBF8F1"
+        android:strokeColor="#2A241D"
+        android:strokeWidth="2"
+        android:pathData="M52,14 L148,14 A22,22 0 0,1 170,36 L170,210 A22,22 0 0,1 148,232 L52,232 A22,22 0 0,1 30,210 L30,36 A22,22 0 0,1 52,14 Z" />
+
+    <!-- Screen / wallpaper -->
+    <path
+        android:fillColor="#F2DDD2"
+        android:pathData="M52,22 L148,22 A14,14 0 0,1 162,36 L162,210 A14,14 0 0,1 148,224 L52,224 A14,14 0 0,1 38,210 L38,36 A14,14 0 0,1 52,22 Z" />
+
+    <!-- Clock label (placeholder via simple rounded rect) -->
+    <path
+        android:fillColor="#FBF8F1"
+        android:pathData="M88,52 L112,52 A4,4 0 0,1 116,56 L116,68 A4,4 0 0,1 112,72 L88,72 A4,4 0 0,1 84,68 L84,56 A4,4 0 0,1 88,52 Z" />
+
+    <!-- App grid row 1 -->
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M50,88 L66,88 L66,104 L50,104 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M74,88 L90,88 L90,104 L74,104 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M98,88 L114,88 L114,104 L98,104 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M122,88 L138,88 L138,104 L122,104 Z" />
+
+    <!-- App grid row 2 (Ebros = index 5, second from left) -->
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M50,118 L66,118 L66,134 L50,134 Z" />
+
+    <!-- Ebros tile + halo -->
+    <path
+        android:strokeColor="#C8533A"
+        android:strokeWidth="2"
+        android:strokeAlpha="1"
+        android:pathData="M82,126 m-18,0 a18,18 0 1,0 36,0 a18,18 0 1,0 -36,0" />
+    <path
+        android:fillColor="#C8533A"
+        android:strokeColor="#9D3D27"
+        android:strokeWidth="1"
+        android:pathData="M74,118 L90,118 L90,134 L74,134 Z" />
+    <!-- E inside the Ebros tile (small) -->
+    <group
+        android:pivotX="82"
+        android:pivotY="126"
+        android:scaleX="1"
+        android:scaleY="1" >
+        <path
+            android:fillColor="#FBF8F1"
+            android:pathData="M78,121 L86,121 L86,123 L80,123 L80,125.5 L85,125.5 L85,127.5 L80,127.5 L80,130 L86,130 L86,132 L78,132 Z" />
+    </group>
+
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M98,118 L114,118 L114,134 L98,134 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M122,118 L138,118 L138,134 L122,134 Z" />
+
+    <!-- App grid row 3 -->
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M50,148 L66,148 L66,164 L50,164 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M74,148 L90,148 L90,164 L74,164 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M98,148 L114,148 L114,164 L98,164 Z" />
+    <path android:fillColor="#EFE9DC" android:strokeColor="#E2DBC8" android:strokeWidth="0.7" android:pathData="M122,148 L138,148 L138,164 L122,164 Z" />
+
+    <!-- Dock indicator -->
+    <path
+        android:fillColor="#FBF8F1"
+        android:pathData="M64,200 L136,200 A7,7 0 0,1 143,207 L143,207 A7,7 0 0,1 136,214 L64,214 A7,7 0 0,1 57,207 L57,207 A7,7 0 0,1 64,200 Z" />
+</vector>

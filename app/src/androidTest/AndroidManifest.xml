@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  androidTest manifest. Declares test-only host activities used by
+  instrumented tests so they can be launched with ActivityScenario.
+
+  SiteNotFoundControllerTestHostActivity inflates
+  R.layout.activity_site_not_found under the app theme so that
+  SiteNotFoundControllerTest can construct the controller against a real
+  view tree (findViewById / getString / View click dispatch) without
+  pulling in MainActivity.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="me.thimmaiah.ebors.SiteNotFoundControllerTestHostActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ebors" />
+    </application>
+
+</manifest>

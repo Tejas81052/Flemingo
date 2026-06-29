@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="browser_bg_solid">#F6F2EA</color>
+    <color name="browser_surface">#FBF8F1</color>
+    <color name="browser_surface_muted">#EFE9DC</color>
+    <color name="browser_stroke">#E2DBC8</color>
+    <color name="browser_accent">#C8533A</color>
+    <color name="browser_accent_soft">#F2DDD2</color>
+    <color name="browser_on_accent">#FDFAF3</color>
+    <color name="browser_chip_bg">#F2DDD2</color>
+    <color name="browser_text">#2A241D</color>
+    <color name="browser_text_2">#574E42</color>
+    <color name="browser_hint">#8A7F6E</color>
+    <color name="browser_faint">#B3A892</color>
+    <color name="browser_icon">#3A322A</color>
+    <color name="browser_progress_track">#00000000</color>
+    <color name="browser_danger">#B53219</color>
+    <color name="browser_success">#2A6A3C</color>
+
+    <!--
+      Private-tab card palette. These deliberately do NOT have day/night
+      variants — private cards stay ink-coloured in both themes so the
+      "this tab is incognito" signal is theme-invariant. The values
+      mirror the dark-theme browser_* tokens but are pinned here so a
+      future tweak to the night palette can't quietly change how private
+      tabs look in light mode.
+    -->
+    <color name="tab_private_bg">#1F1A14</color>
+    <color name="tab_private_surface">#2A241D</color>
+    <color name="tab_private_stroke">#3F372D</color>
+    <color name="tab_private_text">#F0E8D8</color>
+    <color name="tab_private_text_2">#C8BFA9</color>
+    <color name="tab_private_hint">#9C907B</color>
+    <color name="tab_private_faint">#6C6354</color>
+
+    <!--
+      Default avatar palette for the favicon letter chips in the tab
+      switcher cards. AvatarPalette in TabSwitcherView hashes the
+      hostname to pick one of these so the same site always lands on the
+      same colour without us having to persist any state.
+    -->
+    <color name="avatar_purple">#5B3F8C</color>
+    <color name="avatar_terracotta">#C8533A</color>
+    <color name="avatar_green">#2E6B3F</color>
+    <color name="avatar_blue">#3F5A8C</color>
+    <color name="avatar_amber">#B97A2E</color>
+    <color name="avatar_ink">#3A322A</color>
+
+    <!--
+      v10 selectable accent palette. Each accent has a strong fill
+      colour (for buttons, badges, dots) and a soft tint (~14% over
+      paper) used as tinted-card fills. The "terracotta" pair matches
+      the original browser_accent / browser_accent_soft, so the
+      default theme renders identically to the v10 first release.
+
+      Five accents requested by the user prototype:
+        • Burnt Orange / Terracotta (default)
+        • Deep Teal Green
+        • Royal Blue
+        • Deep Purple
+        • Near Black / Charcoal
+    -->
+    <color name="accent_terracotta">#C8533A</color>
+    <color name="accent_terracotta_soft">#F2DDD2</color>
+
+    <color name="accent_teal">#1E6657</color>
+    <color name="accent_teal_soft">#D2E4DE</color>
+
+    <color name="accent_royal_blue">#2D4D88</color>
+    <color name="accent_royal_blue_soft">#D5DDED</color>
+
+    <color name="accent_deep_purple">#5B2D87</color>
+    <color name="accent_deep_purple_soft">#E0D2EC</color>
+
+    <color name="accent_charcoal">#2A241D</color>
+    <color name="accent_charcoal_soft">#D9D2C5</color>
+</resources>

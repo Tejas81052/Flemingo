@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Postage-stamp button background.
+
+  A VectorDrawable whose path traces the perforated stamp shape
+  (14 notches on each long edge, 6 on each short edge). Fills with
+  terracotta accent; the inner dashed-line guide is drawn as a
+  separate path on top.
+
+  Used as android:background on the Try Again button — actual button
+  text/icon is overlaid via a sibling LinearLayout inside a wrapping
+  FrameLayout (see activity_no_internet.xml).
+
+  viewportWidth/Height are 320×80 so the path numbers line up with
+  what the prototype emits. The actual rendered size is dictated by
+  the host view (match_parent + fixed 80dp height).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="80dp"
+    android:viewportWidth="320"
+    android:viewportHeight="80">
+
+    <!-- Drop shadow -->
+    <group
+        android:translateX="0"
+        android:translateY="3">
+        <path
+            android:fillColor="#2A241D"
+            android:fillAlpha="0.16"
+            android:pathData="@string/no_internet_stamp_path" />
+    </group>
+
+    <!-- Main stamp body -->
+    <path
+        android:fillColor="#C8533A"
+        android:pathData="@string/no_internet_stamp_path" />
+
+    <!-- Inner perforation guide line (dashed via approximated short
+         strokes — XML <path> can't directly do strokeDashArray, so the
+         guide is drawn as two stacked thin rectangles giving an inset
+         "ticket window" feel. Visually equivalent enough for the
+         handoff. -->
+    <path
+        android:strokeColor="#FDFAF3"
+        android:strokeAlpha="0.30"
+        android:strokeWidth="1"
+        android:fillColor="#00000000"
+        android:pathData="M10,10 L310,10 L310,70 L10,70 Z" />
+</vector>

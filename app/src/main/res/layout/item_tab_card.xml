@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One tab card in the v10 tab-switcher grid.
+
+  Layout shape (regular tabs):
+    ┌────────────────────────┐  ← bg_tab_card (paper surface + warm stroke)
+    │ [N] Title…           × │  ← header row
+    │ ┌────────────────────┐ │  ← bg_tab_thumbnail (surface_muted)
+    │ │ ▔▔▔▔▔▔▔▔           │ │
+    │ │   ▔▔▔▔▔            │ │  ← skeleton bars
+    │ │ ▔▔▔▔▔▔▔▔▔▔         │ │
+    │ └────────────────────┘ │
+    │ hostname.example       │  ← footer (monospace)
+    └────────────────────────┘
+
+  Private tabs swap the card / thumbnail backgrounds for ink variants
+  (tab_private_*) and replace the skeleton group with a centered
+  incognito glyph + PRIVATE caption. The toggle happens in
+  TabSwitcherView.bind so the same view holder can render either.
+
+  TabSwitcherView assumes the root id is tab_card_root; tab_skeleton_group
+  and tab_private_group occupy the same FrameLayout slot, with exactly
+  one visible per binding.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tab_card_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_tab_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Header row: favicon avatar + title + close × -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="2dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="0dp"
+            android:paddingBottom="6dp">
+
+            <TextView
+                android:id="@+id/tab_avatar"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/bg_tab_avatar"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:textColor="@color/browser_on_accent"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                tools:text="E" />
+
+            <TextView
+                android:id="@+id/tab_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/browser_text"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                tools:text="The case for a slower web" />
+
+            <ImageButton
+                android:id="@+id/tab_close"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/close_tab"
+                android:padding="6dp"
+                android:src="@drawable/ic_close_24"
+                app:tint="@color/browser_hint" />
+        </LinearLayout>
+
+        <!-- Thumbnail body: live screenshot (when available),
+             skeleton (regular tab, no capture yet), or incognito
+             glyph (private tab). Exactly one of the three child
+             groups is visible at any given time; TabSwitcherView
+             picks via setVisibility in bind(). -->
+        <me.thimmaiah.ebors.SquareFrameLayout
+            android:id="@+id/tab_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_tab_thumbnail"
+            android:clipChildren="true"
+            android:clipToOutline="true">
+
+            <!-- Live WebView screenshot, centre-cropped to fill the
+                 square so the middle of the page is what shows. -->
+            <ImageView
+                android:id="@+id/tab_thumbnail_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <!-- Skeleton placeholder for regular tabs -->
+            <LinearLayout
+                android:id="@+id/tab_skeleton_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="22dp"
+                    android:background="@drawable/bg_tab_skeleton" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="56dp"
+                    android:background="@drawable/bg_tab_skeleton" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="0dp"
+                    android:background="@drawable/bg_tab_skeleton" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="36dp"
+                    android:background="@drawable/bg_tab_skeleton" />
+            </LinearLayout>
+
+            <!-- Private placeholder: incognito glyph + caption -->
+            <LinearLayout
+                android:id="@+id/tab_private_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_incognito_24"
+                    app:tint="@color/tab_private_text_2" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.18"
+                    android:text="@string/tab_card_private_label"
+                    android:textColor="@color/tab_private_hint"
+                    android:textSize="10sp" />
+            </LinearLayout>
+        </me.thimmaiah.ebors.SquareFrameLayout>
+
+        <!-- Footer: monospace hostname -->
+        <TextView
+            android:id="@+id/tab_host"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:paddingStart="2dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="2dp"
+            android:paddingBottom="2dp"
+            android:textColor="@color/browser_text"
+            android:textSize="11sp"
+            tools:text="ebors.app" />
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Inner thumbnail box for a private tab card. Holds the incognito
+  glyph + PRIVATE caption instead of the skeleton placeholders.
+  Always ink-coloured so private cards read identically in both
+  themes.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/tab_private_bg" />
+    <corners android:radius="10dp" />
+</shape>
