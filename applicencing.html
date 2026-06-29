@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#c66744">
   <title>App licensing &mdash; Ebors &middot; Tejas Thimmaiah</title>
-  <meta name="description" content="Licensing and open-source attributions for the Ebors Android browser.">
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="GPL-3.0 licensing and open-source attributions for the Ebors Android browser.">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 </head>
 <body>
 
@@ -40,9 +40,11 @@
       <strong>On this page</strong>
       <ol>
         <li><a href="#license">License for Ebors itself</a></li>
+        <li><a href="#source">Getting the source code</a></li>
+        <li><a href="#ublock">uBlock Origin &amp; filter lists</a></li>
         <li><a href="#engine">Rendering engine</a></li>
-        <li><a href="#third-party">Third-party libraries</a></li>
-        <li><a href="#apache">Apache License, Version 2.0</a></li>
+        <li><a href="#third-party">Other third-party libraries</a></li>
+        <li><a href="#redistribution">If you redistribute or fork Ebors</a></li>
         <li><a href="#trademarks">Trademarks &amp; brand</a></li>
         <li><a href="#contact">Reporting an issue</a></li>
       </ol>
@@ -50,19 +52,61 @@
 
     <h2 id="license">License for Ebors itself</h2>
     <p>
-      <strong>&copy; 2026 Tejas Thimmaiah.</strong> Ebors is licensed
-      under the
-      <a href="https://www.apache.org/licenses/LICENSE-2.0" rel="noopener">Apache License, Version 2.0</a>.
-      You are free to use, modify, and redistribute the source under
-      the terms of that license, including for commercial use,
-      provided you retain attribution and the license notice.
+      <strong>&copy; 2026 Tejas Thimmaiah.</strong> Ebors is free
+      software, licensed under the
+      <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">GNU General Public License, version 3 or later (GPL-3.0-or-later)</a>.
+      You are free to use, study, share, and modify it under the terms of
+      that license, including for commercial use.
     </p>
     <p>
-      The Apache-2.0 license includes a patent grant from contributors
-      to users. It does <em>not</em> grant rights to use the
-      &ldquo;Ebors&rdquo; name or logo to label your own redistributions
-      &mdash; see <a href="#trademarks">Trademarks</a> below.
+      Because the GPL is a copyleft license, any version you redistribute
+      &mdash; modified or not &mdash; must also be released under the
+      GPL-3.0-or-later and be accompanied by its
+      <a href="#source">complete corresponding source code</a>, passing the
+      same freedoms on to whoever receives it. Ebors is licensed this way
+      because it incorporates GPL-licensed code and filter lists from
+      <a href="#ublock">uBlock Origin and EasyList</a>.
     </p>
+    <p>
+      The GPL does <em>not</em> grant rights to use the &ldquo;Ebors&rdquo;
+      name or logo to label your own redistributions &mdash; see
+      <a href="#trademarks">Trademarks</a> below.
+    </p>
+
+    <h2 id="source">Getting the source code</h2>
+    <p>
+      The GPL gives every user of Ebors the right to its complete
+      corresponding source code. That source is the
+      <a href="https://github.com/Tejas81052/Ebors" rel="noopener">public Ebors repository</a>,
+      which also carries the full
+      <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener"><code>LICENSE</code></a>
+      (GPL-3.0) and a <code>README</code> with build instructions. To obtain
+      the exact source for a released version, use the matching version tag;
+      if you cannot access the repository you may request it from the
+      <a href="#contact">contact address</a> below &mdash; this serves as a
+      written offer of source as required by the GPL.
+    </p>
+
+    <h2 id="ublock">uBlock Origin &amp; filter lists</h2>
+    <p>
+      Ebors blocks ads and trackers using filter lists and scriptlets from
+      <a href="https://github.com/gorhill/uBlock" rel="noopener">uBlock Origin</a>
+      (&copy; Raymond Hill and contributors), distributed under the
+      <strong>GPL-3.0</strong>, together with
+      <a href="https://easylist.to/" rel="noopener">EasyList and EasyPrivacy</a>
+      (&copy; the EasyList authors), dual-licensed under the
+      <strong>GPL-3.0</strong> and
+      <strong>Creative Commons Attribution-ShareAlike 3.0</strong>. The
+      matching engine that reads these lists is an independent implementation
+      of the EasyList/Adblock-Plus filter syntax written for Ebors.
+    </p>
+    <ul>
+      <li><strong>Bundled in the app:</strong> EasyList and the uBlock Origin
+        <em>ads</em>, <em>unbreak</em>, and <em>quick-fixes</em> lists.</li>
+      <li><strong>Fetched and updated at runtime:</strong> EasyPrivacy, the
+        Online Malicious URL Blocklist, and Peter Lowe&rsquo;s list, each
+        under the license of its upstream project.</li>
+    </ul>
 
     <h2 id="engine">Rendering engine</h2>
     <p>
@@ -81,11 +125,13 @@
       are interfaces, not the engine itself.
     </p>
 
-    <h2 id="third-party">Third-party libraries (in the APK)</h2>
+    <h2 id="third-party">Other third-party libraries (in the APK)</h2>
     <p>
-      The libraries below are compiled into the Ebors APK. Every one
-      is distributed under the
-      <a href="#apache">Apache License, Version 2.0</a>.
+      The libraries below are compiled into the Ebors APK. Every one is
+      distributed under the
+      <a href="https://www.apache.org/licenses/LICENSE-2.0" rel="noopener">Apache License, Version 2.0</a>,
+      which is one-way compatible with the GPL-3.0 and may be incorporated
+      into this GPL-licensed program.
     </p>
     <ul>
       <li>
@@ -104,39 +150,40 @@
       <li>
         <strong>OkHttp</strong> &mdash; &copy; Square, Inc.
       </li>
+      <li>
+        <strong>ZXing Android Embedded</strong> &mdash; QR scanning.
+        &copy; ZXing authors / JourneyApps.
+      </li>
     </ul>
     <p>
       Test-only dependencies (JUnit, <code>org.json</code>) are not
       compiled into the shipping APK and so are not redistributed.
     </p>
 
-    <h2 id="apache">Apache License, Version 2.0</h2>
+    <h2 id="redistribution">If you redistribute or fork Ebors</h2>
     <p>
-      The full text of the Apache License, Version 2.0 is available at
-      <a href="https://www.apache.org/licenses/LICENSE-2.0" rel="noopener">apache.org/licenses/LICENSE-2.0</a>
-      and is shipped in the Ebors source repository as the file
-      <code>LICENSE</code>. A short summary of the obligations it
-      places on a redistributor:
+      The full text of the GPL-3.0 is shipped in the Ebors source repository
+      as the file <code>LICENSE</code> and is available at
+      <a href="https://www.gnu.org/licenses/gpl-3.0.html" rel="noopener">gnu.org/licenses/gpl-3.0.html</a>.
+      Under it, a redistributor must:
     </p>
     <ul>
-      <li>Include a copy of the License with any redistribution.</li>
-      <li>Mark any modified files as modified.</li>
-      <li>Retain copyright, patent, trademark, and attribution notices.</li>
-      <li>If the project includes a <code>NOTICE</code> file, include
-        a readable copy of it with redistributions.</li>
+      <li>Keep the work under the GPL-3.0-or-later and include a copy of the
+        <code>LICENSE</code>.</li>
+      <li>Provide the complete corresponding source code &mdash; or a written
+        offer for it &mdash; to everyone who receives the binary.</li>
+      <li>Retain copyright and license notices, including those of uBlock
+        Origin and EasyList, and state the significant changes you made.</li>
+      <li>Not impose any further restrictions on the rights the GPL grants.</li>
     </ul>
-    <p>
-      The Apache-2.0 license is permissive, includes an explicit patent
-      grant, and is widely used across the Android ecosystem.
-    </p>
 
     <h2 id="trademarks">Trademarks &amp; brand</h2>
     <p>
       &ldquo;Ebors&rdquo; and the Ebors logo are unregistered
-      trademarks of Tejas Thimmaiah. The Apache-2.0 license does not
-      grant permission to use these marks; if you fork the source and
-      redistribute, please use a different name and identity so users
-      can tell the upstream project apart from your fork.
+      trademarks of Tejas Thimmaiah. The GPL does not grant permission to
+      use these marks; if you fork the source and redistribute, please use a
+      different name and identity so users can tell the upstream project
+      apart from your fork.
     </p>
     <p>
       &ldquo;Android,&rdquo; the Android logo, and &ldquo;Google
